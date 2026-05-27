@@ -2007,7 +2007,7 @@ const Scoreboard = {
 // ADMIN MODE
 // ============================================================
 const AdminMode = {
-  _CREDS: { user: 'tantunes@cisco.com', pass: 'Cisco!123' },
+  _CREDS: { user: 'tantunes', pass: 'Cisco!123' },
 
   showLogin() {
     const modal = document.getElementById('admin-login-modal');
@@ -3189,9 +3189,62 @@ const CharacterEngine = {
     null,
   ],
 
+  _dialogues: [
+    // Level 1 — Mesopotamian Scribe
+    {
+      default:  ['The clay remembers all…',       'Inscribe your thought with care.',      'Precision shaped the ancient world.'],
+      choice:   ['Four paths. One truth is carved.',  'Study carefully — choose with intent.'],
+      freetext: ['The reed stylus awaits your wisdom.', 'Let your words flow like the Euphrates.'],
+      ordering: ['Order is the first gift of civilization.', 'Arrange these as the stars arrange themselves.'],
+      matching: ['Link what belongs together.',      'Connect purpose with form, as scribe to tablet.'],
+    },
+    // Levels 2–5 — dialogue to be added with each character
+    null, null, null, null,
+  ],
+
+  setDialogue(levelIndex, exerciseType) {
+    const el = document.getElementById('char-dialogue-text');
+    if (!el) return;
+    const bank = this._dialogues[levelIndex];
+    if (!bank) { el.textContent = ''; return; }
+    const lines = bank[exerciseType] || bank.default;
+    el.textContent = lines[Math.floor(Math.random() * lines.length)];
+  },
+
+  _currentState: 'idle',
+
+  _stateDialogues: [
+    // Level 1 — Scribe
+    {
+      thinking: ['The scribe considers…',          'Let me read the tablet again…', 'Hmm…'],
+      success:  ['Excellent! The clay rings true!', 'Perfectly inscribed!',           'The river god smiles upon you!'],
+      partial:  ['A fair attempt, worth keeping.',  'Almost worthy of the archives.', 'The scribe nods with reservation.'],
+      failure:  ['Even I once made such errors.',   'Revise your inscription.',        'Study the ancient texts once more.'],
+    },
+    null, null, null, null,
+  ],
+
+  setState(state, levelIndex) {
+    this._currentState = state;
+    const el = document.getElementById('level-character');
+    if (el) {
+      el.classList.remove('char-thinking', 'char-success', 'char-partial', 'char-failure');
+      if (state !== 'idle') el.classList.add(`char-${state}`);
+    }
+    const textEl = document.getElementById('char-dialogue-text');
+    if (!textEl) return;
+    const bank = this._stateDialogues[levelIndex];
+    if (!bank) return;
+    const lines = bank[state] || bank.thinking;
+    textEl.textContent = lines[Math.floor(Math.random() * lines.length)];
+  },
+
   show(levelIndex) {
     const el = document.getElementById('level-character');
     if (!el) return;
+    // Reset state classes on each new question
+    el.classList.remove('char-thinking', 'char-success', 'char-partial', 'char-failure');
+    this._currentState = 'idle';
     const svg = this._svgs[levelIndex] ?? null;
     if (!svg) { el.innerHTML = ''; return; }
     el.innerHTML = svg;
@@ -3316,14 +3369,16 @@ const GameEngine = {
     GameState.matchingState = { selected: null, pairs: {} };
 
     // Header
-    document.getElementById('level-label').textContent = `Level ${level.id}: ${level.title}`;
+    document.getElementById('level-label').textContent = `Level ${level.id} / 5`;
     document.getElementById('exercise-counter').textContent =
-      `Exercise ${GameState.currentExercise + 1} / ${GameState.levelExercises.length}`;
+      `Q ${GameState.currentExercise + 1} / 4`;
     document.getElementById('score-display').textContent = `⭐ ${GameState.totalScore}`;
 
-    const totalEx = GAME_DATA.levels.length * 4;
-    const doneEx  = GameState.currentLevel * 4 + GameState.currentExercise;
-    document.getElementById('progress-bar').style.width = `${(doneEx / totalEx) * 100}%`;
+    // Fill 4-segment progress bar
+    document.querySelectorAll('#ex-segments .ex-seg').forEach((seg, i) => {
+      seg.classList.toggle('done',   i < GameState.currentExercise);
+      seg.classList.toggle('active', i === GameState.currentExercise);
+    });
 
     // Exercise card
     document.getElementById('exercise-type-badge').textContent = exercise.type;
@@ -3401,6 +3456,7 @@ const GameEngine = {
     }
 
     CharacterEngine.show(GameState.currentLevel);
+    CharacterEngine.setDialogue(GameState.currentLevel, exercise.inputType);
     showScreen('screen-exercise');
   },
 
@@ -3534,16 +3590,35 @@ const GameEngine = {
     } else {
       points = 0;
     }
-    GameState.score += points;
-    GameState.totalScore += points;
-    GameState.answers[GameState.currentExercise] = isCorrect || freetextGrade === 'partial';
 
-    // Play themed sound effect
-    if (isCorrect && freetextGrade !== 'partial') SoundEngine.playCorrect(GameState.currentLevel);
-    else if (freetextGrade === 'partial')          SoundEngine.playCorrect(GameState.currentLevel);
-    else                                           SoundEngine.playWrong(GameState.currentLevel);
+    // Determine character result state
+    const resultState = (isCorrect && !GameState.hintUsed && freetextGrade !== 'partial')
+      ? 'success'
+      : (isCorrect || freetextGrade === 'partial')
+      ? 'partial'
+      : 'failure';
 
-    this.showFeedback(isCorrect, exercise, points, freetextGrade);
+    // Disable submit and show thinking state for 1 second before revealing result
+    const submitBtn = document.getElementById('btn-submit');
+    if (submitBtn) submitBtn.disabled = true;
+    CharacterEngine.setState('thinking', GameState.currentLevel);
+
+    setTimeout(() => {
+      // Reveal character reaction
+      CharacterEngine.setState(resultState, GameState.currentLevel);
+
+      GameState.score      += points;
+      GameState.totalScore += points;
+      GameState.answers[GameState.currentExercise] = isCorrect || freetextGrade === 'partial';
+
+      // Play themed sound effect
+      if (isCorrect && freetextGrade !== 'partial') SoundEngine.playCorrect(GameState.currentLevel);
+      else if (freetextGrade === 'partial')          SoundEngine.playCorrect(GameState.currentLevel);
+      else                                           SoundEngine.playWrong(GameState.currentLevel);
+
+      if (submitBtn) submitBtn.disabled = false;
+      this.showFeedback(isCorrect, exercise, points, freetextGrade);
+    }, 1000);
   },
 
   showFeedback(isCorrect, exercise, points, freetextGrade) {

@@ -73,22 +73,34 @@
   </div>
 
   <div id="screen-exercise" class="screen">
-    <div class="exercise-layout">
-      <div class="exercise-header">
-        <div class="progress-bar-container">
-          <div id="progress-bar" class="progress-bar"></div>
-        </div>
-        <div class="exercise-meta">
-          <span id="level-label"></span>
-          <span id="exercise-counter"></span>
-          <div class="meta-right">
-            <span id="timer-display" class="timer-display">⏱ 0:00</span>
-            <span id="score-display">⭐ 0</span>
+    <div class="ex-split">
+
+      <!-- ── LEFT PANEL: Character & Story Zone ───────────────── -->
+      <div class="ex-left">
+        <div class="ex-left-top">
+          <span id="level-label" class="ex-level-indicator"></span>
+          <div class="ex-progress-segments" id="ex-segments">
+            <div class="ex-seg" data-seg="0"></div>
+            <div class="ex-seg" data-seg="1"></div>
+            <div class="ex-seg" data-seg="2"></div>
+            <div class="ex-seg" data-seg="3"></div>
           </div>
+        </div>
+        <div class="ex-char-zone">
+          <div id="level-character" class="level-character" aria-hidden="true"></div>
+        </div>
+        <div class="ex-dialogue">
+          <p id="char-dialogue-text"></p>
         </div>
       </div>
 
-      <div class="exercise-body">
+      <!-- ── RIGHT PANEL: Question & Interaction Zone ──────────── -->
+      <div class="ex-right">
+        <div class="ex-hud">
+          <span id="exercise-counter"></span>
+          <span id="timer-display" class="timer-display">⏱ 0:00</span>
+          <span id="score-display">⭐ 0</span>
+        </div>
         <div class="exercise-card">
           <div id="exercise-type-badge" class="ex-type-badge"></div>
           <h3 id="exercise-question"></h3>
@@ -101,8 +113,8 @@
           </div>
         </div>
       </div>
+
     </div>
-    <div id="level-character" class="level-character" aria-hidden="true"></div>
   </div>
 
   <div id="screen-feedback" class="screen">

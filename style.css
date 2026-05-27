@@ -224,6 +224,102 @@ body.welcome { /* Prompting Game 2.0 — The Evolution */
   85%           { transform: rotate(-4deg); }
 }
 
+/* ---- Character States: thinking / success / partial / failure ---- */
+
+/* THINKING — slow pulse, slightly dimmed */
+.ex-left .level-character.char-thinking {
+  animation: char-float 1.4s ease-in-out infinite, char-pulse 0.9s ease-in-out infinite;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.5)) brightness(0.82);
+}
+@keyframes char-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+/* Freeze blink + write-arm while thinking, and during shake */
+.ex-left .level-character.char-thinking .char-eyes,
+.ex-left .level-character.char-thinking .char-write-arm,
+.ex-left .level-character.char-failure  .char-write-arm { animation-play-state: paused; }
+
+/* SUCCESS — celebratory bounce, then returns to float */
+.ex-left .level-character.char-success {
+  animation: char-bounce 0.55s cubic-bezier(.36,.07,.19,.97) forwards,
+             char-float  2.8s 0.55s ease-in-out infinite;
+}
+@keyframes char-bounce {
+  0%   { transform: translateY(0)     scale(1); }
+  22%  { transform: translateY(-22px) scale(1.06); }
+  44%  { transform: translateY(-6px)  scale(0.97); }
+  66%  { transform: translateY(-16px) scale(1.03); }
+  82%  { transform: translateY(-3px)  scale(0.99); }
+  100% { transform: translateY(-8px)  scale(1); }
+}
+/* Per-level success glow flare */
+body.level-1 .ex-left .level-character.char-success {
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5))
+          drop-shadow(0 0 20px rgba(224,150,50,0.95)) brightness(1.15);
+}
+body.level-2 .ex-left .level-character.char-success {
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5))
+          drop-shadow(0 0 20px rgba(201,160,23,0.95)) brightness(1.12);
+}
+body.level-3 .ex-left .level-character.char-success {
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5))
+          drop-shadow(0 0 22px rgba(255,120,40,0.95)) brightness(1.12);
+}
+body.level-4 .ex-left .level-character.char-success {
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5))
+          drop-shadow(0 0 26px rgba(0,180,216,1))     brightness(1.18);
+}
+body.level-5 .ex-left .level-character.char-success {
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5))
+          drop-shadow(0 0 28px rgba(192,132,252,1))   brightness(1.2);
+}
+
+/* PARTIAL — approving nod, then float */
+.ex-left .level-character.char-partial {
+  animation: char-nod 0.8s ease forwards,
+             char-float 2.8s 0.8s ease-in-out infinite;
+}
+@keyframes char-nod {
+  0%, 100% { transform: rotate(0deg)  translateY(0); }
+  25%      { transform: rotate(-4deg) translateY(-5px); }
+  50%      { transform: rotate(4deg)  translateY(-5px); }
+  75%      { transform: rotate(-2deg) translateY(-2px); }
+}
+
+/* FAILURE — shake, then settle back to float */
+.ex-left .level-character.char-failure {
+  animation: char-shake 0.5s cubic-bezier(.36,.07,.19,.97),
+             char-float  2.8s 0.6s ease-in-out infinite;
+}
+@keyframes char-shake {
+  0%, 100% { transform: translateX(0); }
+  12%      { transform: translateX(-10px) rotate(-3deg); }
+  25%      { transform: translateX(10px)  rotate(3deg); }
+  37%      { transform: translateX(-8px)  rotate(-2deg); }
+  50%      { transform: translateX(8px)   rotate(2deg); }
+  62%      { transform: translateX(-5px)  rotate(-1deg); }
+  75%      { transform: translateX(5px)   rotate(1deg); }
+  87%      { transform: translateX(-3px); }
+}
+
+/* Level-3 goggles glow — hook for when L3 character is added */
+@keyframes goggle-flash {
+  0%, 100% { filter: none; }
+  50%      { filter: brightness(2.5) drop-shadow(0 0 8px #ff8c00); }
+}
+body.level-3 .ex-left .level-character.char-success .char-goggle-glow {
+  animation: goggle-flash 0.35s ease 4;
+}
+/* Level-4 visor flash — hook for when L4 character is added */
+@keyframes visor-flash {
+  0%, 100% { filter: none; }
+  50%      { filter: brightness(3) drop-shadow(0 0 12px #00b4d8); }
+}
+body.level-4 .ex-left .level-character.char-success .char-visor {
+  animation: visor-flash 0.28s ease 5;
+}
+
 /* ---- Reset & Base ---- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -675,40 +771,176 @@ body.welcome .name-error { font-family: 'Share Tech Mono', monospace; }
 }
 
 /* ============================================
-   EXERCISE SCREEN
+   EXERCISE SCREEN — TWO-PANEL SPLIT LAYOUT
    ============================================ */
-#screen-exercise { align-items: flex-start; min-height: 100vh; }
-.exercise-layout {
-  width: 100%;
-  max-width: 780px;
-  padding: 16px;
+#screen-exercise.active {
+  padding: 0;
+  align-items: stretch;
+  overflow: hidden;
 }
-.exercise-header {
+.ex-split {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  min-height: 100vh;
+}
+
+/* ── LEFT PANEL: Character & Story Zone ──────────── */
+.ex-left {
+  width: 35%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 28px;
+  position: relative;
+  overflow: hidden;
+}
+/* Per-level left panel backgrounds */
+body.level-1 .ex-left { background: #6b2a10; }
+body.level-2 .ex-left { background: #4a1f6e; }
+body.level-3 .ex-left { background: #1d1408; }
+body.level-4 .ex-left { background: #050c1f; }
+body.level-5 .ex-left { background: #06001e; }
+/* Top accent strip */
+.ex-left::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--primary);
+  z-index: 2;
+}
+/* Radial glow overlay */
+.ex-left::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,0.07) 0%, transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+.ex-left > * { position: relative; z-index: 1; }
+
+/* Level indicator */
+.ex-left-top {
+  width: 100%;
+  text-align: center;
   margin-bottom: 16px;
 }
-.progress-bar-container {
-  background: rgba(0,0,0,0.1);
-  border-radius: 50px;
-  height: 10px;
-  overflow: hidden;
+.ex-level-indicator {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 2px;
   margin-bottom: 10px;
 }
-.progress-bar {
-  height: 100%;
-  background: var(--primary);
-  border-radius: 50px;
-  transition: width 0.5s ease;
+/* 4-segment progress bar */
+.ex-progress-segments {
+  display: flex;
+  gap: 6px;
+  width: 100%;
 }
-.exercise-meta {
+.ex-seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 50px;
+  background: rgba(255,255,255,0.18);
+  transition: background 0.45s ease, box-shadow 0.45s ease;
+}
+.ex-seg.done   { background: var(--primary); box-shadow: 0 0 7px var(--primary); }
+.ex-seg.active { background: rgba(255,255,255,0.5); }
+body.level-1 .ex-seg.done { background: #e0602a; box-shadow: 0 0 7px #e0602a; }
+body.level-2 .ex-seg.done { background: #9b5fd8; box-shadow: 0 0 7px #9b5fd8; }
+
+/* Character avatar zone */
+.ex-char-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 0;
+  min-height: 180px;
+}
+/* Override old absolute positioning for the new layout */
+.ex-left .level-character {
+  position: relative !important;
+  bottom: auto !important;
+  right: auto !important;
+  width: 150px;
+  filter: drop-shadow(0 8px 28px rgba(0,0,0,0.5));
+}
+
+/* Dialogue speech bubble */
+.ex-dialogue {
+  width: 100%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
+  padding: 12px 14px;
+  position: relative;
+  margin-top: 8px;
+}
+.ex-dialogue::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: rgba(255,255,255,0.18);
+}
+#char-dialogue-text {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.88);
+  text-align: center;
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+  min-height: 2.6em;
+}
+
+/* ── RIGHT PANEL: Question & Interaction Zone ───────── */
+.ex-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+  gap: 14px;
+}
+/* HUD bar */
+.ex-hud {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.88rem;
+  padding: 9px 20px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--card-border);
+  border-radius: 50px;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-light);
+  flex-shrink: 0;
 }
-#level-label { color: var(--primary); }
-#score-display { font-size: 1rem; color: var(--accent); }
+.ex-hud #score-display   { color: var(--accent); font-size: 0.95rem; }
+.ex-hud #exercise-counter { font-size: 0.8rem; }
+.ex-hud #timer-display   { font-size: 0.83rem; }
+body.level-5 .ex-hud { background: rgba(8,2,25,0.92); border-color: #c084fc; color: #a78bfa; }
+
+/* Mobile: stack vertically */
+@media (max-width: 640px) {
+  .ex-split { flex-direction: column; min-height: auto; }
+  .ex-left  { width: 100%; padding: 16px 16px 18px; min-height: auto; }
+  .ex-char-zone { min-height: 140px; }
+  .ex-left .level-character { width: 100px; }
+  .ex-right { padding: 16px; gap: 12px; }
+}
 
 .exercise-card {
   background: var(--card-bg);
@@ -724,7 +956,6 @@ body.level-5 .exercise-card {
   border-color: #00ff88;
   box-shadow: 0 0 20px rgba(0,255,136,0.3), 0 0 60px rgba(0,255,136,0.1);
 }
-body.level-5 .progress-bar { background: #00e676; box-shadow: 0 0 8px #00e676; }
 
 .ex-type-badge {
   display: inline-block;
