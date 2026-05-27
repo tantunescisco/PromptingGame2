@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Quest 🚀</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- AUDIO CONTROLS (always visible) -->
+  <div id="audio-controls">
+    <button id="quit-btn" title="Quit Game">🏠</button>
+    <button id="music-toggle" onclick="MusicEngine.toggle()" title="Toggle Music">🎵</button>
+    <button id="sfx-toggle" onclick="SoundEngine.toggle()" title="Toggle Sound Effects">🔔</button>
+  </div>
+
+  <!-- SCREENS -->
+  <div id="screen-welcome" class="screen active">
+    <div class="welcome-content">
+      <h1 class="welcome-title">Prompt Quest <span class="welcome-logo">🚀</span></h1>
+      <p class="welcome-subtitle">The Evolution — Master Prompt Engineering Through the Ages</p>
+      <p class="welcome-desc">Journey through 5 ages of civilization — from Ancient clay tablets to the AI Singularity. Unlock the language that will define the future.</p>
+      <div class="name-entry">
+        <label for="player-name-input">Your Name:</label>
+        <div class="name-entry-row">
+          <input type="text" id="player-name-input" placeholder="Enter your name..." maxlength="20" autocomplete="off" />
+          <button class="btn-start" onclick="GameEngine.startGame()">Start Adventure</button>
+        </div>
+        <span id="name-error" class="name-error hidden">Please enter a name between 3 and 20 characters.</span>
+      </div>
+      <div class="level-previews">
+        <div id="admin-mode-banner" class="admin-mode-banner hidden">
+          <span>⚙️ Admin Mode — click any level to jump to it</span>
+          <button class="btn-exit-admin" onclick="AdminMode.exitAdminMode()">Exit Admin Mode</button>
+        </div>
+        <div class="lp lp1" id="lp-btn-0">� Level 1</div>
+        <div class="lp lp2" id="lp-btn-1">🏛️ Level 2</div>
+        <div class="lp lp3" id="lp-btn-2">⚙️ Level 3</div>
+        <div class="lp lp4" id="lp-btn-3">🌐 Level 4</div>
+        <div class="lp lp5" id="lp-btn-4">🌌 Level 5</div>
+      </div>
+
+      <!-- ADMIN RESET AREA (visible in admin mode only) -->
+      <div id="admin-reset-area" class="admin-reset-area hidden">
+        <button class="btn-admin-reset" onclick="AdminMode.confirmReset()">🗑️ Reset Leaderboard</button>
+        <button class="btn-admin-preview" onclick="AdminMode.previewVictory()">🎦 Preview Completion</button>
+      </div>
+
+      <!-- WELCOME LEADERBOARD -->
+      <div class="scoreboard-container">
+        <h3 class="scoreboard-title">🏆 This Week's Top 5</h3>
+        <table class="scoreboard-table" id="welcome-lb-table">
+          <thead>
+            <tr><th class="rank">#</th><th class="player-name">Player</th><th class="score-val">Score</th><th class="time-val">Time</th></tr>
+          </thead>
+          <tbody id="welcome-leaderboard-body">
+            <tr><td colspan="4" class="lb-loading">Loading scores…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="screen-level-intro" class="screen">
+    <div class="level-intro-content">
+      <div id="intro-badge" class="intro-badge"></div>
+      <h2 id="intro-title"></h2>
+      <p id="intro-subtitle"></p>
+      <div id="intro-concept" class="concept-box"></div>
+      <button class="btn-primary" onclick="GameEngine.startLevel()">Let's Go!</button>
+    </div>
+  </div>
+
+  <div id="screen-exercise" class="screen">
+    <div class="exercise-layout">
+      <div class="exercise-header">
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="exercise-meta">
+          <span id="level-label"></span>
+          <span id="exercise-counter"></span>
+          <div class="meta-right">
+            <span id="timer-display" class="timer-display">⏱ 0:00</span>
+            <span id="score-display">⭐ 0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise-body">
+        <div class="exercise-card">
+          <div id="exercise-type-badge" class="ex-type-badge"></div>
+          <h3 id="exercise-question"></h3>
+          <div id="exercise-context" class="ex-context"></div>
+          <div id="exercise-input-area"></div>
+          <div id="exercise-hint" class="hint-box hidden"></div>
+          <div class="exercise-actions">
+            <button class="btn-hint" onclick="GameEngine.showHint()">💡 Hint</button>
+            <button id="btn-submit" class="btn-submit" onclick="GameEngine.submitAnswer()">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-feedback" class="screen">
+    <div class="feedback-content">
+      <div id="feedback-icon" class="feedback-icon"></div>
+      <h2 id="feedback-title"></h2>
+      <p id="feedback-message"></p>
+      <div id="feedback-explanation" class="feedback-explanation"></div>
+      <div id="feedback-tip" class="feedback-tip"></div>
+      <button class="btn-primary" onclick="GameEngine.nextExercise()">Continue →</button>
+    </div>
+  </div>
+
+  <div id="screen-level-complete" class="screen">
+    <div class="level-complete-content">
+      <div id="complete-badge" class="complete-badge"></div>
+      <h2 id="complete-title"></h2>
+      <p id="complete-summary"></p>
+      <div id="complete-stars" class="stars-display"></div>
+      <div id="complete-badge-earned" class="badge-earned"></div>
+
+      <!-- LEVEL SCOREBOARD -->
+      <div class="scoreboard-container">
+        <h3 class="scoreboard-title" id="sb-level-title">🏆 Level Scoreboard</h3>
+        <table class="scoreboard-table" id="level-scoreboard-table">
+          <thead>
+            <tr>
+              <th class="rank">#</th>
+              <th class="player-name">Player</th>
+              <th class="score-val">Score</th>
+              <th class="time-val">Time</th>
+            </tr>
+          </thead>
+          <tbody id="level-scoreboard-body"></tbody>
+        </table>
+      </div>
+
+      <button class="btn-primary" onclick="GameEngine.nextLevel()">Next Level →</button>
+    </div>
+  </div>
+
+  <div id="screen-game-complete" class="screen">
+    <div class="game-complete-content">
+      <div class="final-icon">🏆</div>
+      <h1 id="final-title">Prompt Engineer Certified!</h1>
+      <p id="final-message"></p>
+      <div id="final-badges" class="final-badges"></div>
+      <div id="final-score" class="final-score"></div>
+
+      <!-- OVERALL SCOREBOARD -->
+      <div class="scoreboard-container scoreboard-final">
+          <h3 class="scoreboard-title" id="overall-sb-title">🌍 Overall Leaderboard</h3>
+        <table class="scoreboard-table" id="overall-scoreboard-table">
+          <thead>
+            <tr>
+              <th class="rank">#</th>
+              <th class="player-name">Player</th>
+              <th class="score-val">Total Score</th>
+              <th class="time-val">Total Time</th>
+            </tr>
+          </thead>
+          <tbody id="overall-scoreboard-body"></tbody>
+        </table>
+      </div>
+
+      <div class="final-tips">
+        <h3>🎓 Key Takeaways</h3>
+        <ul id="takeaways-list"></ul>
+      </div>
+      <button class="btn-start" onclick="GameEngine.restartGame()">Play Again</button>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN MODAL -->
+  <div id="admin-login-modal" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
+    <div class="admin-modal-box">
+      <h2 class="admin-modal-title" id="admin-login-title">🔐 Admin Access</h2>
+      <p class="admin-modal-desc">Enter your admin credentials to continue.</p>
+      <div class="admin-form">
+        <label for="admin-username">Username</label>
+        <input type="email" id="admin-username" placeholder="admin@example.com" autocomplete="off" />
+        <label for="admin-password">Password</label>
+        <input type="password" id="admin-password" placeholder="Password" />
+        <div id="admin-login-error" class="admin-error hidden">Invalid credentials. Please try again.</div>
+      </div>
+      <div class="admin-modal-actions">
+        <button class="btn-admin-cancel" onclick="AdminMode.closeLogin()">Cancel</button>
+        <button class="btn-admin-submit" onclick="AdminMode.handleLogin()">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL MODAL -->
+  <div id="admin-panel-modal" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="admin-panel-title">
+    <div class="admin-modal-box admin-panel-box">
+      <h2 class="admin-modal-title" id="admin-panel-title">⚙️ Admin Panel</h2>
+      <p class="admin-modal-desc">Manage the Prompt Quest leaderboard.</p>
+      <div class="admin-panel-section">
+        <div class="admin-panel-icon">🏆</div>
+        <h3>Leaderboard Management</h3>
+        <p>Permanently delete all player scores from the leaderboard. This action <strong>cannot be undone</strong>.</p>
+        <button class="btn-admin-danger" onclick="AdminMode.confirmReset()">🗑️ Reset Leaderboard</button>
+        <button class="btn-admin-preview" onclick="AdminMode.previewVictory()">🎦 Preview Completion</button>
+      </div>
+      <div class="admin-modal-actions">
+        <button class="btn-admin-cancel" onclick="AdminMode.closePanel()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
