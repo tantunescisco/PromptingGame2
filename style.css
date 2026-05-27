@@ -37,9 +37,9 @@ body.level-1 { /* 🌾 The Cradle of Clay — First Civilizations */
   --accent: #3d7db3;
   --btn-bg: #8b3a1a;
   --text: #2e1a0a;
-  --text-light: #7a5230;
+  --text-light: #8a6640;
   --font-heading: 'Cinzel', serif;
-  --font-body: 'Cinzel', serif;
+  --font-body: 'Roboto', sans-serif;
   --border-radius: 4px;
 }
 
@@ -1147,6 +1147,14 @@ body.level-5 .ex-context {
   text-align: left;
   line-height: 1.4;
 }
+body.level-1 .choice-btn {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2e1a0a;
+}
+body.level-1 .choice-btn:hover { border-color: var(--primary); background: rgba(0,0,0,0.03); transform: translateY(-2px); }
+body.level-1 .choice-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
 body.level-2 .choice-btn {
   font-family: 'Roboto', sans-serif;
   font-size: 1rem;
@@ -1177,6 +1185,17 @@ textarea.prompt-input, input.prompt-input {
   outline: none;
   transition: border-color 0.2s;
   margin-bottom: 16px;
+}
+body.level-1 textarea.prompt-input, body.level-1 input.prompt-input {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #2e1a0a;
+  line-height: 1.6;
+}
+body.level-1 textarea.prompt-input:focus, body.level-1 input.prompt-input:focus {
+  border-color: #8b3a1a;
+  box-shadow: 0 0 8px rgba(139,58,26,0.2);
 }
 body.level-2 textarea.prompt-input, body.level-2 input.prompt-input {
   font-family: 'Roboto', sans-serif;
@@ -1270,6 +1289,16 @@ body.level-5 .match-item.matched { background: rgba(192,132,252,.18); border-col
   font-size: 0.88rem;
   color: #795548;
   margin-bottom: 16px;
+}
+body.level-1 .hint-box {
+  background: rgba(184,92,37,0.12);
+  border: 1px dashed #b85c25;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 500;
+  color: #6b2a10;
 }
 body.level-2 .hint-box {
   background: rgba(201,160,23,0.12);
