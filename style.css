@@ -461,19 +461,19 @@ body {
 .welcome-title {
   font-family: 'Fredoka One', cursive;
   font-size: clamp(2.4rem, 6vw, 4rem);
-  color: var(--primary);
-  text-shadow: 3px 3px 0 #fff, 5px 5px 0 rgba(0,0,0,.08);
+  color: #0d47a1;
+  text-shadow: 2px 2px 0 rgba(255,255,255,.8), 4px 4px 0 rgba(0,0,0,.1);
   margin-bottom: 8px;
 }
 .welcome-subtitle {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #555;
+  color: #1a237e;
   margin-bottom: 16px;
 }
 .welcome-desc {
   font-size: 1rem;
-  color: #666;
+  color: #424242;
   line-height: 1.7;
   margin-bottom: 32px;
 }
@@ -493,39 +493,28 @@ body {
 }
 .btn-start:hover { transform: scale(1.06); box-shadow: 0 10px 32px rgba(255,111,0,.5); }
 
-/* ---- Vibe Coding Welcome Screen ---- */
+/* ---- Light Welcome Screen ---- */
 body.welcome #screen-welcome {
   background:
-    radial-gradient(circle, rgba(139,92,246,0.13) 1px, transparent 1px),
-    #0d1117;
+    radial-gradient(circle, rgba(25,118,210,0.08) 1px, transparent 1px),
+    linear-gradient(135deg, #f5f5f5 0%, #e3f2fd 100%);
   background-size: 28px 28px;
 }
 body.welcome::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 3px,
-    rgba(139,92,246,0.014) 3px,
-    rgba(139,92,246,0.014) 4px
-  );
-  pointer-events: none;
-  z-index: 9999;
+  display: none;
 }
 body.welcome .welcome-content {
   position: relative;
   text-align: left;
-  background: rgba(13, 17, 23, 0.88);
-  border: 1px solid rgba(139,92,246,0.22);
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #1976d2;
   border-radius: 12px;
-  border-top: 2px solid rgba(167,139,250,0.45);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 50px rgba(139,92,246,0.07);
+  border-top: 4px solid #1976d2;
+  box-shadow: 0 8px 32px rgba(25,118,210,0.15), 0 0 20px rgba(25,118,210,0.08);
   padding-top: 52px;
 }
 body.welcome .welcome-content::before {
-  content: '[ prompt-quest ]  —  running dev environment';
+  content: '[ prompt-quest-2 ]  —  the evolution of civilization';
   position: absolute;
   top: 0;
   left: 0;
@@ -533,10 +522,10 @@ body.welcome .welcome-content::before {
   padding: 10px 18px;
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.72rem;
-  color: rgba(139,92,246,0.45);
-  background: rgba(10, 12, 16, 0.7);
+  color: #1976d2;
+  background: rgba(227,242,253,0.9);
   border-radius: 10px 10px 0 0;
-  border-bottom: 1px solid rgba(139,92,246,0.12);
+  border-bottom: 2px solid #1976d2;
   letter-spacing: 1px;
   white-space: nowrap;
   overflow: hidden;
@@ -547,44 +536,37 @@ body.welcome .welcome-logo {
   display: none;
 }
 body.welcome .welcome-title {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Fredoka One', cursive;
   font-size: clamp(1.5rem, 4vw, 2.6rem);
-  color: #a78bfa;
-  text-shadow: 0 0 24px rgba(167,139,250,0.55), 0 0 60px rgba(167,139,250,0.18);
-  letter-spacing: 4px;
+  color: #0d47a1;
+  text-shadow: none;
+  letter-spacing: 2px;
   text-align: left;
   margin-bottom: 6px;
 }
 body.welcome .welcome-title::after {
-  content: '_';
-  animation: cursor-blink 1s step-end infinite;
-  color: #a78bfa;
-  font-size: 0.85em;
-  margin-left: 2px;
-}
-@keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+  content: '';
+  display: none;
 }
 body.welcome .welcome-subtitle {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.88rem;
-  color: #38bdf8;
-  font-weight: 400;
-  letter-spacing: 1px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: #1565c0;
+  font-weight: 700;
+  letter-spacing: 0;
   text-align: left;
   margin-bottom: 10px;
 }
 body.welcome .welcome-subtitle::before {
-  content: '// ';
-  color: #4b5563;
+  content: '';
+  display: none;
 }
 body.welcome .welcome-desc {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.82rem;
-  color: #4b5563;
-  letter-spacing: 0.3px;
-  line-height: 1.9;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.95rem;
+  color: #424242;
+  letter-spacing: 0;
+  line-height: 1.8;
   text-align: left;
   margin-bottom: 28px;
 }
@@ -595,55 +577,55 @@ body.welcome .name-entry-row {
   justify-content: flex-start;
 }
 body.welcome .name-entry label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.8rem;
-  color: #4ade80;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.95rem;
+  color: #0d47a1;
   text-transform: none;
-  letter-spacing: 0.5px;
-  font-weight: 400;
+  letter-spacing: 0;
+  font-weight: 600;
 }
 body.welcome .name-entry label::before {
-  content: '$ ';
-  color: #a78bfa;
+  content: '';
+  display: none;
 }
 body.welcome .name-entry input {
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(139,92,246,0.45);
-  border-radius: 4px;
-  color: #e2e8f0;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.97rem;
-  caret-color: #a78bfa;
+  background: #f5f5f5;
+  border: 2px solid #1976d2;
+  border-radius: 6px;
+  color: #0d47a1;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.95rem;
+  caret-color: #1976d2;
   text-align: left;
   padding: 11px 16px;
-  letter-spacing: 1px;
-  border-width: 1px;
+  letter-spacing: 0;
+  border-width: 2px;
 }
 body.welcome .name-entry input:focus {
-  border-color: #a78bfa;
-  box-shadow: 0 0 0 2px rgba(167,139,250,0.18), 0 0 16px rgba(167,139,250,0.12);
+  border-color: #0d47a1;
+  box-shadow: 0 0 0 3px rgba(25,118,210,0.1), 0 0 12px rgba(25,118,210,0.15);
 }
 body.welcome .name-entry input::placeholder {
-  color: rgba(139,92,246,0.35);
+  color: rgba(25,118,210,0.5);
   font-style: normal;
 }
 body.welcome .btn-start {
-  background: rgba(139,92,246,0.12);
-  border: 1px solid rgba(167,139,250,0.5);
-  color: #a78bfa;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.88rem;
-  border-radius: 4px;
-  letter-spacing: 2px;
+  background: #1976d2;
+  border: 2px solid #1565c0;
+  color: #ffffff;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  box-shadow: 0 0 12px rgba(167,139,250,0.1);
+  box-shadow: 0 4px 12px rgba(25,118,210,0.25);
   padding: 11px 22px;
 }
 body.welcome .btn-start:hover {
-  background: rgba(139,92,246,0.22);
-  border-color: #a78bfa;
-  box-shadow: 0 0 22px rgba(167,139,250,0.32);
-  transform: none;
+  background: #0d47a1;
+  border-color: #0d47a1;
+  box-shadow: 0 6px 20px rgba(25,118,210,0.35);
+  transform: scale(1.02);
 }
 body.welcome .level-previews {
   justify-content: flex-start;
@@ -651,70 +633,91 @@ body.welcome .level-previews {
 }
 body.welcome .lp {
   background: transparent;
-  border-radius: 3px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.5px;
-  padding: 5px 12px;
-  border: 1px solid;
-  transition: all 0.2s;
-}
-body.welcome .lp1 { border-color: rgba(249,115,22,0.55); color: #f97316; background: transparent; }
-body.welcome .lp2 { border-color: rgba(34,197,94,0.55);  color: #22c55e; background: transparent; }
-body.welcome .lp3 { border-color: rgba(167,139,250,0.55); color: #a78bfa; background: transparent; }
-body.welcome .lp4 { border-color: rgba(56,189,248,0.55);  color: #38bdf8; background: transparent; }
-body.welcome .lp5 { border-color: rgba(74,222,128,0.55);  color: #4ade80; background: transparent; }
-body.welcome .lp.admin-clickable:hover { box-shadow: 0 0 10px currentColor; }
-body.welcome .scoreboard-container {
-  background: rgba(10, 12, 16, 0.7);
-  border: 1px solid rgba(139,92,246,0.2);
-  box-shadow: 0 0 20px rgba(139,92,246,0.06);
   border-radius: 6px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  padding: 8px 14px;
+  border: 2px solid;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+body.welcome .lp1 { border-color: #ff6f00; color: #e65100; background: rgba(255, 111, 0, 0.08); }
+body.welcome .lp2 { border-color: #00897b; color: #004d40; background: rgba(0, 137, 123, 0.08); }
+body.welcome .lp3 { border-color: #7b1fa2; color: #4a148c; background: rgba(123, 31, 162, 0.08); }
+body.welcome .lp4 { border-color: #1976d2; color: #0d47a1; background: rgba(25, 118, 210, 0.08); }
+body.welcome .lp5 { border-color: #6a1b9a; color: #38006b; background: rgba(106, 27, 154, 0.08); }
+body.welcome .lp.admin-clickable:hover { box-shadow: 0 4px 12px currentColor; }
+body.welcome .scoreboard-container {
+  background: rgba(227, 242, 253, 0.6);
+  border: 2px solid #1976d2;
+  box-shadow: 0 4px 12px rgba(25,118,210,0.12);
+  border-radius: 8px;
 }
 body.welcome .scoreboard-title {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.82rem;
-  color: #a78bfa;
-  text-shadow: 0 0 8px rgba(167,139,250,0.4);
-  letter-spacing: 3px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  color: #0d47a1;
+  text-shadow: none;
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 body.welcome .scoreboard-table th {
-  color: #374151;
-  border-bottom: 1px solid rgba(139,92,246,0.15);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.72rem;
+  color: #0d47a1;
+  border-bottom: 2px solid #1976d2;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 body.welcome .scoreboard-table td {
-  color: #94a3b8;
-  border-bottom-color: rgba(255,255,255,0.04);
-  font-family: 'Share Tech Mono', monospace;
+  color: #424242;
+  border-bottom-color: rgba(25,118,210,0.1);
+  font-family: 'Roboto', sans-serif;
   font-size: 0.85rem;
 }
-body.welcome .scoreboard-table td.score-val   { color: #a78bfa; }
-body.welcome .scoreboard-table td.player-name { color: #e2e8f0; font-weight: 600; }
-body.welcome .scoreboard-table tbody tr:hover td { background: rgba(167,139,250,0.05); }
-body.welcome .lb-loading { color: #374151; font-family: 'Share Tech Mono', monospace; }
+body.welcome .scoreboard-table td.score-val   { color: #1565c0; font-weight: 700; }
+body.welcome .scoreboard-table td.player-name { color: #0d47a1; font-weight: 600; }
+body.welcome .scoreboard-table tbody tr:hover td { background: rgba(25,118,210,0.08); }
+body.welcome .lb-loading { color: #0d47a1; font-family: 'Roboto', sans-serif; }
 body.welcome #music-toggle,
 body.welcome #sfx-toggle {
-  border-color: rgba(139,92,246,0.35);
-  color: #64748b;
-  background: rgba(13,17,23,0.85);
+  border-color: #1976d2;
+  color: #0d47a1;
+  background: rgba(227,242,253,0.7);
 }
 body.welcome #music-toggle:hover,
 body.welcome #sfx-toggle:hover {
-  border-color: #a78bfa;
-  color: #a78bfa;
-  background: rgba(139,92,246,0.12);
+  border-color: #0d47a1;
+  color: #0d47a1;
+  background: rgba(25,118,210,0.1);
 }
 body.welcome .admin-mode-banner {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
-  background: rgba(139,92,246,0.18);
-  border: 1px solid rgba(139,92,246,0.4);
-  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.8rem;
+  background: rgba(255,193,7,0.15);
+  border: 2px solid #fbc02d;
+  border-radius: 6px;
+  color: #f57f17;
+  padding: 12px;
 }
-body.welcome .name-error { font-family: 'Share Tech Mono', monospace; }
+body.welcome .btn-exit-admin {
+  background: #fbc02d;
+  color: #000;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+body.welcome .btn-exit-admin:hover {
+  background: #f57f17;
+  color: #fff;
+}
+body.welcome .name-error { 
+  font-family: 'Roboto', sans-serif;
+  color: #d32f2f;
+}
 
 .level-previews {
   display: flex;
