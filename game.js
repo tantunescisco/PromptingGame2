@@ -3336,7 +3336,74 @@ const CharacterEngine = {
       <path d="M44 52 Q50 55 56 52" fill="none" stroke="#8a6a48" stroke-width="1.4" stroke-linecap="round"/>
     </svg>`,
     // Levels 4–5 — characters to be added
-    null,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 165">
+      <defs>
+        <filter id="neon-glow-l4">
+          <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <linearGradient id="visor-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.3"/>
+          <stop offset="50%" style="stop-color:#00f0ff;stop-opacity:0.5"/>
+          <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.3"/>
+        </linearGradient>
+      </defs>
+      <!-- Body: matte black tech hoodie -->
+      <path d="M28 75 L72 75 L76 160 L24 160Z" fill="#0a0a0a" stroke="#1a1a1a" stroke-width="1"/>
+      <!-- Left neon seam (glowing blue) -->
+      <line x1="28" y1="75" x2="22" y2="160" stroke="#00d4ff" stroke-width="2" opacity="0.8" filter="url(#neon-glow-l4)"/>
+      <!-- Right neon seam (glowing blue) -->
+      <line x1="72" y1="75" x2="78" y2="160" stroke="#00d4ff" stroke-width="2" opacity="0.8" filter="url(#neon-glow-l4)"/>
+      <!-- Center front seam (subtle) -->
+      <line x1="50" y1="75" x2="50" y2="160" stroke="#00a8cc" stroke-width="1.2" opacity="0.4" filter="url(#neon-glow-l4)"/>
+      <!-- Shoulders neon accent lines -->
+      <line x1="28" y1="75" x2="18" y2="70" stroke="#00d4ff" stroke-width="2.5" opacity="0.7" filter="url(#neon-glow-l4)"/>
+      <line x1="72" y1="75" x2="82" y2="70" stroke="#00d4ff" stroke-width="2.5" opacity="0.7" filter="url(#neon-glow-l4)"/>
+      <!-- Neon chest panel -->
+      <rect x="38" y="95" width="24" height="35" rx="4" fill="#0a0a0a" stroke="#00d4ff" stroke-width="1.5" opacity="0.6" filter="url(#neon-glow-l4)"/>
+      <!-- Horizontal waist stripe -->
+      <line x1="25" y1="120" x2="75" y2="120" stroke="#00d4ff" stroke-width="1" opacity="0.5" filter="url(#neon-glow-l4)"/>
+      <!-- Left arm in hoodie sleeve -->
+      <line x1="28" y1="85" x2="10" y2="125" stroke="#0a0a0a" stroke-width="8" stroke-linecap="round"/>
+      <!-- Left neon sleeve edge -->
+      <line x1="28" y1="85" x2="10" y2="125" stroke="#0080a0" stroke-width="2" opacity="0.5" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
+      <!-- Right arm in hoodie sleeve -->
+      <line x1="72" y1="85" x2="90" y2="125" stroke="#0a0a0a" stroke-width="8" stroke-linecap="round"/>
+      <!-- Right neon sleeve edge -->
+      <line x1="72" y1="85" x2="90" y2="125" stroke="#0080a0" stroke-width="2" opacity="0.5" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
+      <!-- Hoodie draw strings -->
+      <path d="M42 65 Q40 75 38 85" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.6" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
+      <path d="M58 65 Q60 75 62 85" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.6" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
+      <!-- Neck area under hoodie -->
+      <ellipse cx="50" cy="68" rx="14" ry="8" fill="#050505"/>
+      <!-- Digital visor: translucent overlay with gradient -->
+      <ellipse cx="50" cy="35" rx="28" ry="10" fill="url(#visor-grad)" stroke="#00d4ff" stroke-width="1.5" opacity="0.85" filter="url(#neon-glow-l4)"/>
+      <!-- Visor glass shine -->
+      <ellipse cx="50" cy="33" rx="26" ry="8" fill="#00ffff" opacity="0.15"/>
+      <!-- Left lens detail -->
+      <ellipse cx="38" cy="35" rx="10" ry="8" fill="#001a2e" opacity="0.5" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+      <!-- Right lens detail -->
+      <ellipse cx="62" cy="35" rx="10" ry="8" fill="#001a2e" opacity="0.5" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+      <!-- Matrix code flowing on visor (animated) -->
+      <g class="char-visor-code" opacity="0.7">
+        <text x="32" y="32" font-family="'Share Tech Mono', monospace" font-size="6" fill="#00ff88">01</text>
+        <text x="40" y="37" font-family="'Share Tech Mono', monospace" font-size="5" fill="#00d4ff">1101</text>
+        <text x="58" y="31" font-family="'Share Tech Mono', monospace" font-size="6" fill="#ff00ff">10</text>
+        <text x="66" y="38" font-family="'Share Tech Mono', monospace" font-size="5" fill="#00ff88">0110</text>
+      </g>
+      <!-- Head silhouette inside hoodie -->
+      <circle cx="50" cy="38" r="18" fill="#050505" stroke="#0a1a1a" stroke-width="0.5"/>
+      <!-- Eyes glow through visor -->
+      <ellipse cx="43" cy="36" rx="3.5" ry="3" fill="#00d4ff" opacity="0.6" filter="url(#neon-glow-l4)"/>
+      <ellipse cx="57" cy="36" rx="3.5" ry="3" fill="#00d4ff" opacity="0.6" filter="url(#neon-glow-l4)"/>
+      <!-- Visor frame accent (magenta edge) -->
+      <path d="M25 35 Q22 35 22 32" fill="none" stroke="#ff00ff" stroke-width="1.5" opacity="0.5" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
+      <path d="M75 35 Q78 35 78 32" fill="none" stroke="#ff00ff" stroke-width="1.5" opacity="0.5" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
+    </svg>`,
+    // Level 5 — character to be added
     null,
   ],
 
@@ -3365,8 +3432,16 @@ const CharacterEngine = {
       ordering: ['Systems work best in proper sequence.', 'Order the steps as a machine orders its gears.'],
       matching: ['Match each component to its function.', 'Every part serves a specific purpose.'],
     },
-    // Levels 4–5 — dialogue to be added with each character
-    null, null,
+    // Level 4 — Cyberpunk Hacker
+    {
+      default:  ['Optimize your prompt structure.',    'Data demands precision.',           'Code runs truest when clean.'],
+      choice:   ['Four algorithms — which is most efficient?', 'Logic and bandwidth must align.'],
+      freetext: ['Execute your command with clarity.',  'The network requires exact syntax.'],
+      ordering: ['Systems flow best in proper sequence.', 'Stack the operations as code flows through memory.'],
+      matching: ['Connect each variable to its value.', 'Every input streams to a specific output.'],
+    },
+    // Level 5 — dialogue to be added with character
+    null,
   ],
 
   setDialogue(levelIndex, exerciseType) {
@@ -3402,7 +3477,14 @@ const CharacterEngine = {
       partial:  ['Serviceable, but not optimal.',      'The machine works, yet could be refined.', 'Adequate for the moment.'],
       failure:  ['A misalignment in logic, my friend.', 'The gears resist this arrangement.',  'Back to the drawing board, I fear.'],
     },
-    null, null,
+    // Level 4 — Cyberpunk Hacker
+    {
+      thinking: ['Running diagnostics…',             'Scanning for optimal pathway…',    'Hmm, parsing the data stream…'],
+      success:  ['Signal locked. Perfect execution!',  'The network flows flawlessly!',     'Code compiled successfully!'],
+      partial:  ['Functional, but suboptimal latency.', 'System works — bandwidth could be refined.', 'Acceptable throughput achieved.'],
+      failure:  ['Signal degraded. Logic corrupted.',   'The firewall rejected that pattern.',  'Stack overflow in reasoning, friend.'],
+    },
+    null,
   ],
 
   setState(state, levelIndex) {

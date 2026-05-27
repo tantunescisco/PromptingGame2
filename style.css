@@ -248,6 +248,27 @@ body.welcome { /* Prompting Game 2.0 — The Evolution */
   50%      { transform: rotate(-6deg) translateY(-2px); }
 }
 
+/* Visor matrix code — applied to .char-visor-code group inside SVG (L4 hacker) */
+.char-visor-code {
+  animation: char-code-flow 2.8s linear infinite;
+}
+@keyframes char-code-flow {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0.1;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(20px);
+    opacity: 0.1;
+  }
+}
+
 /* ---- Character States: thinking / success / partial / failure ---- */
 
 /* THINKING — slow pulse, slightly dimmed */
