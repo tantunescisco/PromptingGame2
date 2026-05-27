@@ -87,9 +87,9 @@ body.level-4 { /* 🌐 Silicon & Neon — Hyper-Connected Information Age */
   --btn-bg: transparent;
   --btn-text: #00c8f0;
   --text: #eaf8ff;
-  --text-light: #90cde0;
+  --text-light: #a8d5e5;
   --font-heading: 'Orbitron', sans-serif;
-  --font-body: 'Share Tech Mono', monospace;
+  --font-body: 'Roboto', sans-serif;
   --border-radius: 6px;
 }
 
@@ -1163,6 +1163,14 @@ body.level-2 .choice-btn {
 }
 body.level-2 .choice-btn:hover { border-color: var(--primary); background: rgba(0,0,0,0.03); transform: translateY(-2px); }
 body.level-2 .choice-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
+body.level-4 .choice-btn {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #eaf8ff;
+}
+body.level-4 .choice-btn:hover { border-color: var(--primary); background: rgba(0,200,240,0.1); transform: translateY(-2px); }
+body.level-4 .choice-btn.selected { border-color: var(--primary); background: rgba(0,200,240,0.25); color: #fff; }
 body.level-5 .choice-btn {
   background: rgba(20, 8, 50, 0.85);
   border-color: #7c3aed;
@@ -1208,6 +1216,17 @@ textarea.prompt-input:focus, input.prompt-input:focus { border-color: var(--prim
 body.level-2 textarea.prompt-input:focus, body.level-2 input.prompt-input:focus {
   border-color: #6b2fa0;
   box-shadow: 0 0 8px rgba(107,47,160,0.2);
+}
+body.level-4 textarea.prompt-input, body.level-4 input.prompt-input {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #eaf8ff;
+  line-height: 1.6;
+}
+body.level-4 textarea.prompt-input:focus, body.level-4 input.prompt-input:focus {
+  border-color: #00c8f0;
+  box-shadow: 0 0 12px rgba(0,200,240,0.3);
 }
 body.level-5 textarea.prompt-input, body.level-5 input.prompt-input {
   background: #0c0528;
@@ -1311,6 +1330,16 @@ body.level-2 .hint-box {
   color: #4a1f6e;
 }
 body.level-3 .hint-box { background: rgba(186,104,255,0.12); border-color: #b388ff; color: #f0d9ff; }
+body.level-4 .hint-box {
+  background: rgba(0,180,216,0.12);
+  border: 1px dashed #00b4d8;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 500;
+  color: #a8d5e5;
+}
 body.level-5 .hint-box { background: rgba(192,132,252,0.1); border-color: #c084fc; color: #d8b4fe; }
 .hint-box.hidden { display: none; }
 
