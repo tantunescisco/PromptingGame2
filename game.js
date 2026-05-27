@@ -3655,6 +3655,7 @@ const GameEngine = {
 
   restartGame() {
     this._stopPolling();
+    clearInterval(GameState.fireworksInterval);
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     MusicEngine._stopAll();
     setTheme('');
@@ -3665,6 +3666,7 @@ const GameEngine = {
 
   quitGame() {
     this._stopPolling();
+    clearInterval(GameState.fireworksInterval);
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     Timer.stop();
     MusicEngine._stopAll();
@@ -4046,31 +4048,44 @@ const GameEngine = {
     GameState.pollInterval = null;
   },
 
-  _launchConfetti() {
-    // Remove existing confetti
-    document.querySelectorAll('.confetti-container').forEach(el => el.remove());
+  _launchFireworks() {
     const container = document.createElement('div');
     container.className = 'confetti-container';
     document.body.appendChild(container);
+
     const colors = ['#ffd700', '#ffb300', '#c084fc', '#7c3aed', '#2dd4bf', '#e040fb', '#fff7cc'];
-    const shapes = ['square', 'circle'];
-    for (let i = 0; i < 80; i++) {
+    const burstX = Math.random() * window.innerWidth;
+    const burstY = Math.random() * window.innerHeight * 0.5; // Upper half
+    const particleCount = 35;
+    const duration = 1.8; // seconds
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (i / particleCount) * Math.PI * 2;
+      const velocity = 3 + Math.random() * 5; // pixels per ms
+      const tx = Math.cos(angle) * velocity * duration * 100;
+      const ty = Math.sin(angle) * velocity * duration * 80 + 200; // gravity pull
+      
       const piece = document.createElement('div');
       piece.className = 'confetti-piece';
       const color = colors[Math.floor(Math.random() * colors.length)];
-      const shape = shapes[Math.floor(Math.random() * shapes.length)];
-      const size = 6 + Math.random() * 8;
-      piece.style.left = Math.random() * 100 + '%';
+      const size = 5 + Math.random() * 9;
+      
+      piece.style.left = burstX + 'px';
+      piece.style.top = burstY + 'px';
       piece.style.width = size + 'px';
       piece.style.height = size + 'px';
       piece.style.background = color;
-      piece.style.borderRadius = shape === 'circle' ? '50%' : '2px';
-      piece.style.animationDuration = (2.5 + Math.random() * 3) + 's';
-      piece.style.animationDelay = Math.random() * 2 + 's';
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      piece.style.setProperty('--tx', tx + 'px');
+      piece.style.setProperty('--ty', ty + 'px');
+      piece.style.animationDuration = duration + 's';
+      piece.style.boxShadow = `0 0 ${3 + Math.random() * 4}px ${color}`;
+      
       container.appendChild(piece);
     }
-    // Clean up after animation
-    setTimeout(() => container.remove(), 8000);
+
+    // Clean up
+    setTimeout(() => container.remove(), duration * 1000 + 100);
   },
 
   nextLevel() {
@@ -4090,8 +4105,8 @@ const GameEngine = {
     setTheme('');
     MusicEngine.playVictory();
 
-    // Cosmic confetti
-    this._launchConfetti();
+    // Cosmic fireworks
+    this._launchFireworks();
 
     const MAX_SCORE = 200;
     const totalTime = GameState.levelTimes.reduce((s, t) => s + t, 0);
@@ -4197,6 +4212,12 @@ const GameEngine = {
     GameState.pollInterval = setInterval(async () => {
       const live = await Scoreboard.getOverall();
       this._renderScoreboardTable('overall-scoreboard-body', live, GameState.playerName, true);
+    }, 5000);
+
+    // Fireworks burst every 5s
+    clearInterval(GameState.fireworksInterval);
+    GameState.fireworksInterval = setInterval(() => {
+      this._launchFireworks();
     }, 5000);
   },
 
