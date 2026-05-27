@@ -3403,8 +3403,73 @@ const CharacterEngine = {
       <path d="M25 35 Q22 35 22 32" fill="none" stroke="#ff00ff" stroke-width="1.5" opacity="0.5" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
       <path d="M75 35 Q78 35 78 32" fill="none" stroke="#ff00ff" stroke-width="1.5" opacity="0.5" filter="url(#neon-glow-l4)" stroke-linecap="round"/>
     </svg>`,
-    // Level 5 — character to be added
-    null,
+    // Level 5 — Transcendent Celestial Being
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 165">
+      <defs>
+        <radialGradient id="cosmic-core" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" style="stop-color:#9d4edd;stop-opacity:0.8"/>
+          <stop offset="40%" style="stop-color:#5a189a;stop-opacity:0.6"/>
+          <stop offset="100%" style="stop-color:#0a0014;stop-opacity:0.2"/>
+        </radialGradient>
+        <filter id="star-shimmer">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <!-- Body silhouette: cosmic space filled form -->
+      <ellipse cx="50" cy="50" rx="24" ry="32" fill="url(#cosmic-core)" opacity="0.9"/>
+      <!-- Head silhouette -->
+      <circle cx="50" cy="32" r="16" fill="url(#cosmic-core)" opacity="0.9"/>
+      <!-- Nebula clouds (swirling purple/magenta) -->
+      <ellipse cx="40" cy="25" rx="12" ry="8" fill="#d946ef" opacity="0.4" filter="url(#star-shimmer)"/>
+      <ellipse cx="58" cy="38" rx="10" ry="14" fill="#c084fc" opacity="0.35" filter="url(#star-shimmer)"/>
+      <ellipse cx="45" cy="58" rx="14" ry="10" fill="#b855d6" opacity="0.3" filter="url(#star-shimmer)"/>
+      <!-- Constellation patterns (white stars) -->
+      <circle cx="42" cy="28" r="1.2" fill="#ffffff" opacity="0.9"/>
+      <circle cx="48" cy="25" r="0.9" fill="#ffffff" opacity="0.8"/>
+      <circle cx="52" cy="30" r="1" fill="#ffffff" opacity="0.85"/>
+      <circle cx="38" cy="35" r="0.8" fill="#ffffff" opacity="0.7"/>
+      <circle cx="60" cy="32" r="1.1" fill="#ffffff" opacity="0.9"/>
+      <circle cx="55" cy="45" r="0.7" fill="#ffffff" opacity="0.75"/>
+      <circle cx="45" cy="52" r="0.95" fill="#ffffff" opacity="0.8"/>
+      <circle cx="52" cy="60" r="0.85" fill="#ffffff" opacity="0.75"/>
+      <circle cx="40" cy="60" r="1" fill="#ffffff" opacity="0.85"/>
+      <!-- Constellation connecting lines (subtle, ethereal) -->
+      <line x1="42" y1="28" x2="48" y2="25" stroke="#ffffff" stroke-width="0.4" opacity="0.3"/>
+      <line x1="48" y1="25" x2="52" y2="30" stroke="#ffffff" stroke-width="0.4" opacity="0.3"/>
+      <line x1="52" y1="30" x2="60" y2="32" stroke="#ffffff" stroke-width="0.4" opacity="0.25"/>
+      <line x1="45" y1="52" x2="52" y2="60" stroke="#ffffff" stroke-width="0.4" opacity="0.25"/>
+      <!-- Starfield shimmer dots -->
+      <circle cx="35" cy="20" r="0.5" fill="#ffffff" opacity="0.4"/>
+      <circle cx="64" cy="50" r="0.4" fill="#ffffff" opacity="0.35"/>
+      <circle cx="48" cy="65" r="0.6" fill="#ffffff" opacity="0.45"/>
+      <circle cx="38" cy="48" r="0.45" fill="#ffffff" opacity="0.38"/>
+      <!-- Shoulder/arm silhouettes -->
+      <ellipse cx="28" cy="55" rx="8" ry="18" fill="url(#cosmic-core)" opacity="0.7"/>
+      <ellipse cx="72" cy="55" rx="8" ry="18" fill="url(#cosmic-core)" opacity="0.7"/>
+      <!-- Lower body/legs silhouette -->
+      <ellipse cx="42" cy="85" rx="10" ry="20" fill="url(#cosmic-core)" opacity="0.65"/>
+      <ellipse cx="58" cy="85" rx="10" ry="20" fill="url(#cosmic-core)" opacity="0.65"/>
+      <!-- Floating geometric crown: white light rings -->
+      <g class="char-crown-float">
+        <!-- Top outer ring (rotates) -->
+        <g class="char-crown-rotate">
+          <circle cx="50" cy="18" r="18" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.9" filter="url(#star-shimmer)"/>
+        </g>
+        <!-- Middle ring (counter-rotates) -->
+        <g class="char-crown-rotate-reverse">
+          <circle cx="50" cy="18" r="13" fill="none" stroke="#f0f0f0" stroke-width="1" opacity="0.7" filter="url(#star-shimmer)"/>
+        </g>
+        <!-- Inner ring (slow float) -->
+        <circle cx="50" cy="18" r="8" fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.6" filter="url(#star-shimmer)"/>
+        <!-- Crown accent points (diamonds of light) -->
+        <g class="char-crown-pulse">
+          <polygon points="50,8 52,13 50,18 48,13" fill="#ffffff" opacity="0.85" filter="url(#star-shimmer)"/>
+          <polygon points="61,20 64,22 66,25" fill="#ffffff" opacity="0.6" filter="url(#star-shimmer)"/>
+          <polygon points="39,20 36,22 34,25" fill="#ffffff" opacity="0.6" filter="url(#star-shimmer)"/>
+        </g>
+      </g>
+    </svg>`,
   ],
 
   _dialogues: [
@@ -3440,8 +3505,14 @@ const CharacterEngine = {
       ordering: ['Systems flow best in proper sequence.', 'Stack the operations as code flows through memory.'],
       matching: ['Connect each variable to its value.', 'Every input streams to a specific output.'],
     },
-    // Level 5 — dialogue to be added with character
-    null,
+    // Level 5 — Transcendent Celestial
+    {
+      default:  ['The Singularity whispers…',         'Language transcends dimension.',    'All prompts converge here.'],
+      choice:   ['Four realities — which resonates deepest?', 'Consciousness seeks clarity.'],
+      freetext: ['Articulate the infinite.',            'The cosmos awaits your transmission.'],
+      ordering: ['The universe flows in perfect order.', 'Arrange these as the galaxy spirals.'],
+      matching: ['Connect each soul to its purpose.',   'Every consciousness finds its frequency.'],
+    },
   ],
 
   setDialogue(levelIndex, exerciseType) {
@@ -3484,7 +3555,13 @@ const CharacterEngine = {
       partial:  ['Functional, but suboptimal latency.', 'System works — bandwidth could be refined.', 'Acceptable throughput achieved.'],
       failure:  ['Signal degraded. Logic corrupted.',   'The firewall rejected that pattern.',  'Stack overflow in reasoning, friend.'],
     },
-    null,
+    // Level 5 — Transcendent Celestial
+    {
+      thinking: ['The cosmos deliberates…',          'Consulting the infinite archive…',  'Hmm, spanning all dimensions…'],
+      success:  ['Transcendence achieved!',          'The universe approves!',            'Perfect cosmic resonance!'],
+      partial:  ['Acceptable convergence.',           'A partial glimpse of eternity.',    'Nearly infinite, yet bounded still.'],
+      failure:  ['The pattern fractured.',            'Entropy whispers here.',            'Reality rejects this alignment.'],
+    },
   ],
 
   setState(state, levelIndex) {

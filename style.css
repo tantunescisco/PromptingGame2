@@ -269,6 +269,46 @@ body.welcome { /* Prompting Game 2.0 — The Evolution */
   }
 }
 
+/* Crown floating animation group — applied to .char-crown-float (L5 celestial) */
+.char-crown-float {
+  animation: char-crown-float 4s ease-in-out infinite;
+}
+@keyframes char-crown-float {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-4px) scaleY(1.02); }
+}
+
+/* Outer crown ring — rotates clockwise */
+.char-crown-rotate {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: char-crown-rotate-cw 6s linear infinite;
+}
+@keyframes char-crown-rotate-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Middle crown ring — rotates counter-clockwise */
+.char-crown-rotate-reverse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: char-crown-rotate-ccw 9s linear infinite;
+}
+@keyframes char-crown-rotate-ccw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Crown accent points — pulse with glow */
+.char-crown-pulse {
+  animation: char-crown-pulse 2.2s ease-in-out infinite;
+}
+@keyframes char-crown-pulse {
+  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px #ffffff); }
+  50%      { opacity: 1; filter: drop-shadow(0 0 6px #ffffff) drop-shadow(0 0 12px #c084fc); }
+}
+
 /* ---- Character States: thinking / success / partial / failure ---- */
 
 /* THINKING — slow pulse, slightly dimmed */
