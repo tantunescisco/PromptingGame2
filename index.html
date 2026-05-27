@@ -369,16 +369,52 @@
   </div>
 
   <div id="screen-game-complete" class="screen">
-    <div class="game-complete-content">
-      <div class="final-icon">🏆</div>
-      <h1 id="final-title">Prompt Engineer Certified!</h1>
-      <p id="final-message"></p>
-      <div id="final-badges" class="final-badges"></div>
-      <div id="final-score" class="final-score"></div>
+    <!-- Particle canvas -->
+    <canvas id="gc-canvas" class="gc-canvas" aria-hidden="true"></canvas>
 
-      <!-- OVERALL SCOREBOARD -->
-      <div class="scoreboard-container scoreboard-final">
-          <h3 class="scoreboard-title" id="overall-sb-title">🌍 Overall Leaderboard</h3>
+    <div class="gc-wrap" id="gc-wrap">
+
+      <!-- Header -->
+      <div class="gc-header">
+        <div class="gc-kicker">✦ PROMPT ENGINEERING MASTERY ACHIEVED ✦</div>
+        <h1 class="gc-title">CIVILIZATION SYNCHRONIZED</h1>
+        <p class="gc-subtitle" id="gc-subtitle">You guided humanity from clay tablets to the stars.</p>
+      </div>
+
+      <!-- Evolution Timeline — populated by JS -->
+      <div class="gc-timeline" id="gc-timeline" aria-label="The Evolution Timeline"></div>
+
+      <!-- Stat Cards -->
+      <div class="gc-stats">
+        <div class="gc-stat-card">
+          <div class="gc-stat-icon">🎯</div>
+          <div class="gc-stat-label">Score / Accuracy</div>
+          <div class="gc-stat-value"><span id="gc-score-counter">0</span> / 200</div>
+          <div class="gc-stat-sub" id="gc-accuracy-rate">—</div>
+        </div>
+        <div class="gc-stat-card gc-stat-card--rank">
+          <div class="gc-stat-icon">🏆</div>
+          <div class="gc-stat-label">Rank Achieved</div>
+          <div class="gc-stat-value gc-rank-name" id="gc-rank-name">—</div>
+          <div class="gc-stat-sub" id="gc-rank-tier">—</div>
+        </div>
+        <div class="gc-stat-card">
+          <div class="gc-stat-icon">⏱️</div>
+          <div class="gc-stat-label">Time / Efficiency</div>
+          <div class="gc-stat-value" id="gc-time-display">—</div>
+          <div class="gc-stat-sub" id="gc-efficiency">—</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="gc-actions">
+        <button class="gc-btn-primary" onclick="GameEngine.copyCompletionSummary()">📋 Copy Summary to Clipboard</button>
+        <button class="gc-btn-secondary" onclick="GameEngine.restartGame()">↺ Replay Timeline</button>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="scoreboard-container scoreboard-final gc-leaderboard">
+        <h3 class="scoreboard-title" id="overall-sb-title">🌍 Overall Leaderboard</h3>
         <table class="scoreboard-table" id="overall-scoreboard-table">
           <thead>
             <tr>
@@ -392,11 +428,6 @@
         </table>
       </div>
 
-      <div class="final-tips">
-        <h3>🎓 Key Takeaways</h3>
-        <ul id="takeaways-list"></ul>
-      </div>
-      <button class="btn-start" onclick="GameEngine.restartGame()">Play Again</button>
     </div>
   </div>
 

@@ -3655,6 +3655,7 @@ const GameEngine = {
 
   restartGame() {
     this._stopPolling();
+    if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     MusicEngine._stopAll();
     setTheme('');
     document.body.className = '';
@@ -3664,6 +3665,7 @@ const GameEngine = {
 
   quitGame() {
     this._stopPolling();
+    if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     Timer.stop();
     MusicEngine._stopAll();
     setTheme('');
@@ -4050,7 +4052,7 @@ const GameEngine = {
     const container = document.createElement('div');
     container.className = 'confetti-container';
     document.body.appendChild(container);
-    const colors = ['#ffd700', '#ff6f00', '#ff4081', '#00e676', '#2979ff', '#e040fb', '#ffab00'];
+    const colors = ['#ffd700', '#ffb300', '#c084fc', '#7c3aed', '#2dd4bf', '#e040fb', '#fff7cc'];
     const shapes = ['square', 'circle'];
     for (let i = 0; i < 80; i++) {
       const piece = document.createElement('div');
@@ -4084,40 +4086,104 @@ const GameEngine = {
   },
 
   async showGameComplete() {
-    // Use dedicated celebration theme instead of level-5
     document.body.className = 'game-complete';
     setTheme('');
     MusicEngine.playVictory();
 
-    // Launch confetti
+    // Cosmic confetti
     this._launchConfetti();
 
-    document.getElementById('final-title').textContent = '🏆 Prompt Engineer Certified!';
-    document.getElementById('final-message').textContent =
-      `Amazing work, ${GameState.playerName}! You completed all 5 levels with a total score of ${GameState.totalScore} points.`;
-
-    document.getElementById('final-badges').innerHTML =
-      GameState.badges.map(b => `<span title="${b}">🏅</span>`).join('');
-
+    const MAX_SCORE = 200;
     const totalTime = GameState.levelTimes.reduce((s, t) => s + t, 0);
-    document.getElementById('final-score').textContent =
-      `Total Score: ${GameState.totalScore} pts ⭐  ·  Total Time: ${Timer.format(totalTime)}`;
+    const pct = Math.round((GameState.totalScore / MAX_SCORE) * 100);
 
-    const takeaways = [
-      '📌 A prompt is your message to the AI — clarity is everything.',
-      '🎯 Be specific: include What, How, For Whom in every prompt.',
-      '🎭 Assign roles: "You are a [expert]..." dramatically improves outputs.',
-      '📋 Control format: specify structure, length, tone, and constraints.',
-      '🔗 Use few-shot examples to teach AI the exact pattern you want.',
-      '🧠 Add "Think step by step" for complex reasoning tasks.',
-      '⛓️ Break complex goals into prompt chains for best results.',
-      '🔄 Meta-prompting: use AI to improve your own prompts!'
+    // Rank matrix
+    let rankName, rankTier;
+    if (pct >= 100) {
+      rankName = 'Omniscient System Archon';
+      rankTier = '✦ Perfect Run — Flawless Execution ✦';
+    } else if (pct >= 80) {
+      rankName = 'Quantum Logic Engineer';
+      rankTier = 'Superior Command of Prompt Architecture';
+    } else if (pct >= 60) {
+      rankName = 'Industrial Automator';
+      rankTier = 'Solid Foundations in Prompt Craft';
+    } else {
+      rankName = 'Apprentice Clay Scribe';
+      rankTier = 'The Journey Has Just Begun';
+    }
+
+    // Stat cards
+    document.getElementById('gc-rank-name').textContent = rankName;
+    document.getElementById('gc-rank-tier').textContent = rankTier;
+    document.getElementById('gc-accuracy-rate').textContent = `Accuracy: ${pct}% of ${MAX_SCORE} pts`;
+    document.getElementById('gc-time-display').textContent = Timer.format(totalTime);
+    const mins = totalTime / 60000;
+    const ppm = mins > 0 ? (GameState.totalScore / mins).toFixed(1) : '—';
+    document.getElementById('gc-efficiency').textContent = `${ppm} pts / min`;
+    document.getElementById('gc-subtitle').textContent =
+      `${GameState.playerName} guided humanity from clay tablets to the stars.`;
+
+    // Build character evolution timeline
+    const levelMeta = [
+      { era: 'L1 · Clay Scribe',       topic: 'Clarity & Specificity<br>Audience & Roles' },
+      { era: 'L2 · Roman Orator',      topic: 'Tone, Context & Constraints<br>Rhetoric & Persuasion' },
+      { era: 'L3 · Victorian Engineer', topic: 'Role Prompting<br>System Prompts' },
+      { era: 'L4 · Cyberpunk Hacker',  topic: 'Format Engineering<br>Output Control' },
+      { era: 'L5 · Star Archon',       topic: 'Prompt Chaining<br>Meta-Prompting' }
     ];
 
-    document.getElementById('takeaways-list').innerHTML =
-      takeaways.map(t => `<li>${t}</li>`).join('');
+    const timeline = document.getElementById('gc-timeline');
+    timeline.innerHTML = '';
+    CharacterEngine._svgs.forEach((svgStr, i) => {
+      if (i > 0) {
+        const conn = document.createElement('div');
+        conn.className = 'gc-timeline-connector';
+        timeline.appendChild(conn);
+      }
+      const slot = document.createElement('div');
+      slot.className = 'gc-char-slot';
+      slot.innerHTML = `
+        <div class="gc-char-avatar">${svgStr}</div>
+        <div class="gc-char-era">${levelMeta[i].era}</div>
+        <div class="gc-char-tooltip">${levelMeta[i].topic}</div>
+      `;
+      timeline.appendChild(slot);
+    });
 
-    // Render overall scoreboard
+    // Sequential fade-in stagger (400ms between each)
+    const slots = timeline.querySelectorAll('.gc-char-slot');
+    slots.forEach((slot, i) => {
+      setTimeout(() => slot.classList.add('gc-char-visible'), i * 400);
+    });
+
+    // Score counter — counts 0 → final over 1.5s (starts after last char fades in)
+    const counterEl = document.getElementById('gc-score-counter');
+    const target = GameState.totalScore;
+    setTimeout(() => {
+      const start = performance.now();
+      const duration = 1500;
+      const tick = (now) => {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        counterEl.textContent = Math.round(ease * target);
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, slots.length * 400 + 200);
+
+    // Mouse parallax on the cosmic background
+    const screenEl = document.getElementById('screen-game-complete');
+    const parallaxHandler = (e) => {
+      const cx = screenEl.clientWidth  / 2;
+      const cy = screenEl.clientHeight / 2;
+      screenEl.style.setProperty('--px', ((e.clientX - cx) / cx).toFixed(3));
+      screenEl.style.setProperty('--py', ((e.clientY - cy) / cy).toFixed(3));
+    };
+    screenEl.addEventListener('mousemove', parallaxHandler);
+    GameState._parallaxCleanup = () => screenEl.removeEventListener('mousemove', parallaxHandler);
+
+    // Leaderboard
     const online  = await Scoreboard._isOnline();
     const overall = await Scoreboard.getOverall();
     document.getElementById('overall-sb-title').innerHTML =
@@ -4132,6 +4198,31 @@ const GameEngine = {
       const live = await Scoreboard.getOverall();
       this._renderScoreboardTable('overall-scoreboard-body', live, GameState.playerName, true);
     }, 5000);
+  },
+
+  copyCompletionSummary() {
+    const pct = Math.round((GameState.totalScore / 200) * 100);
+    let rank;
+    if (pct >= 100)      rank = 'Omniscient System Archon';
+    else if (pct >= 80)  rank = 'Quantum Logic Engineer';
+    else if (pct >= 60)  rank = 'Industrial Automator';
+    else                 rank = 'Apprentice Clay Scribe';
+
+    const text = `I just evolved human civilization from Clay to Stars by mastering Prompt Engineering! 🌌 Score: ${GameState.totalScore}/200 | Rank: ${rank}. Can you beat me? 🚀 Play at https://tantunescisco.github.io/PromptingGame2/`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.gc-btn-primary');
+      if (btn) {
+        btn.classList.add('copied');
+        btn.textContent = '✓ Copied to Clipboard!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = '📋 Copy Summary to Clipboard';
+        }, 2500);
+      }
+    }).catch(() => {
+      alert('Copy failed — please copy manually:\n\n' + text);
+    });
   },
 
   /** Renders rows into a scoreboard tbody.
