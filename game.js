@@ -3706,6 +3706,7 @@ const GameEngine = {
   },
 
   renderExercise() {
+    this.hideFeedback();
     const level = GAME_DATA.levels[GameState.currentLevel];
     const exercise = GameState.levelExercises[GameState.currentExercise];
     GameState.selectedChoice = null;
@@ -3973,7 +3974,7 @@ const GameEngine = {
       ? ['🎉', '⭐', '🚀', '✨', '🏆'][Math.floor(Math.random() * 5)]
       : isPartial
       ? ['👏', '💡', '📝'][Math.floor(Math.random() * 3)]
-      : ['�', '🤔', '📚', '🔄'][Math.floor(Math.random() * 4)];
+      : ['😕', '🤔', '📚', '🔄'][Math.floor(Math.random() * 4)];
 
     document.getElementById('feedback-icon').textContent = icons;
     document.getElementById('feedback-title').textContent = isFull
@@ -3994,10 +3995,18 @@ const GameEngine = {
 
     document.getElementById('feedback-tip').textContent = exercise.tip || '';
 
-    showScreen('screen-feedback');
+    // Show feedback panel on the right side
+    const panel = document.getElementById('feedback-panel');
+    panel.classList.add('show');
+  },
+
+  hideFeedback() {
+    const panel = document.getElementById('feedback-panel');
+    panel.classList.remove('show');
   },
 
   nextExercise() {
+    this.hideFeedback();
     const level = GAME_DATA.levels[GameState.currentLevel];
     GameState.currentExercise++;
 
