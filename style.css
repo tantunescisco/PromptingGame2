@@ -53,7 +53,7 @@ body.level-2 { /* 🏛️ Marble & Iron — Classical Antiquity */
   --accent: #c9a017;
   --btn-bg: #6b2fa0;
   --text: #1e1530;
-  --text-light: #6b5b80;
+  --text-light: #4a3068;
   --font-heading: 'Cinzel', serif;
   --font-body: 'Cinzel', serif;
   --border-radius: 6px;
@@ -61,16 +61,16 @@ body.level-2 { /* 🏛️ Marble & Iron — Classical Antiquity */
 
 body.level-3 { /* ⚙️ Smog & Steel — Industrial Revolution */
   --bg: linear-gradient(160deg, #151209 0%, #2a1e10 50%, #3d2a18 100%);
-  --card-bg: #1d1610;
+  --card-bg: #2e2010;
   --card-border: #b87333;
   --card-shadow: 0 8px 28px rgba(184,115,51,0.22);
-  --primary: #c47a33;
+  --primary: #d4893a;
   --primary-dark: #8b5a22;
   --accent: #ff6b35;
   --btn-bg: #c47a33;
   --btn-text: #1a1008;
-  --text: #ead5b0;
-  --text-light: #9a7a55;
+  --text: #f2e0c0;
+  --text-light: #c89a60;
   --font-heading: 'Special Elite', cursive;
   --font-body: 'Special Elite', cursive;
   --border-radius: 3px;
@@ -78,16 +78,16 @@ body.level-3 { /* ⚙️ Smog & Steel — Industrial Revolution */
 
 body.level-4 { /* 🌐 Silicon & Neon — Hyper-Connected Information Age */
   --bg: linear-gradient(160deg, #06091a 0%, #0a0f22 50%, #080d1e 100%);
-  --card-bg: rgba(12, 18, 38, 0.92);
+  --card-bg: rgba(18, 28, 58, 0.97);
   --card-border: #00b4d8;
   --card-shadow: 0 8px 32px rgba(0,180,216,0.2);
-  --primary: #00b4d8;
+  --primary: #00c8f0;
   --primary-dark: #0077b6;
   --accent: #a855f7;
   --btn-bg: transparent;
-  --btn-text: #00b4d8;
-  --text: #dff3fa;
-  --text-light: #6ab8d4;
+  --btn-text: #00c8f0;
+  --text: #eaf8ff;
+  --text-light: #90cde0;
   --font-heading: 'Orbitron', sans-serif;
   --font-body: 'Share Tech Mono', monospace;
   --border-radius: 6px;
@@ -95,7 +95,7 @@ body.level-4 { /* 🌐 Silicon & Neon — Hyper-Connected Information Age */
 
 body.level-5 { /* 🌌 The Stellar Singularity — Post-Humanity */
   --bg: linear-gradient(135deg, #02000a 0%, #06001e 50%, #0a0530 100%);
-  --card-bg: rgba(8, 2, 25, 0.92);
+  --card-bg: rgba(16, 8, 45, 0.97);
   --card-border: #c084fc;
   --card-shadow: 0 0 40px rgba(192,132,252,0.18);
   --primary: #c084fc;
@@ -103,8 +103,8 @@ body.level-5 { /* 🌌 The Stellar Singularity — Post-Humanity */
   --accent: #fde68a;
   --btn-bg: transparent;
   --btn-text: #c084fc;
-  --text: #ede9fe;
-  --text-light: #a78bfa;
+  --text: #f0eaff;
+  --text-light: #c4b5fd;
   --font-heading: 'Orbitron', sans-serif;
   --font-body: 'Share Tech Mono', monospace;
   --border-radius: 4px;
@@ -1056,7 +1056,7 @@ body.level-2 .ex-seg.done { background: #9b5fd8; box-shadow: 0 0 7px #9b5fd8; }
 .ex-hud #score-display   { color: var(--accent); font-size: 0.95rem; }
 .ex-hud #exercise-counter { font-size: 0.8rem; }
 .ex-hud #timer-display   { font-size: 0.83rem; }
-body.level-5 .ex-hud { background: rgba(8,2,25,0.92); border-color: #c084fc; color: #a78bfa; }
+body.level-5 .ex-hud { background: rgba(16,8,45,0.96); border-color: #c084fc; color: #c4b5fd; }
 
 /* Mobile: stack vertically */
 @media (max-width: 640px) {
@@ -1076,10 +1076,10 @@ body.level-5 .ex-hud { background: rgba(8,2,25,0.92); border-color: #c084fc; col
   position: relative;
 }
 
-/* Level-5 glowing card */
+/* Level-5 cosmic card */
 body.level-5 .exercise-card {
-  border-color: #00ff88;
-  box-shadow: 0 0 20px rgba(0,255,136,0.3), 0 0 60px rgba(0,255,136,0.1);
+  border-color: #c084fc;
+  box-shadow: 0 0 20px rgba(192,132,252,0.25), 0 0 60px rgba(192,132,252,0.1);
 }
 
 .ex-type-badge {
@@ -1096,8 +1096,8 @@ body.level-5 .exercise-card {
 }
 body.level-5 .ex-type-badge {
   background: transparent;
-  border: 1px solid #00ff88;
-  color: #00ff88;
+  border: 1px solid #c084fc;
+  color: #c084fc;
 }
 
 #exercise-question {
@@ -1119,9 +1119,9 @@ body.level-5 .ex-type-badge {
   font-style: italic;
 }
 body.level-5 .ex-context {
-  background: rgba(0,255,136,0.05);
-  border-left-color: #00ff88;
-  color: #8aff8a;
+  background: rgba(192,132,252,0.08);
+  border-left-color: #c084fc;
+  color: #d8b4fe;
 }
 .ex-context.hidden { display: none; }
 
@@ -1150,12 +1150,12 @@ body.level-5 .ex-context {
 .choice-btn:hover { border-color: var(--primary); background: rgba(0,0,0,0.03); transform: translateY(-2px); }
 .choice-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
 body.level-5 .choice-btn {
-  background: #0a1a0a;
-  border-color: #00994d;
-  color: #8aff8a;
+  background: rgba(20, 8, 50, 0.85);
+  border-color: #7c3aed;
+  color: #d8b4fe;
 }
-body.level-5 .choice-btn:hover { border-color: #00ff88; color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.2); }
-body.level-5 .choice-btn.selected { background: rgba(0,255,136,0.15); border-color: #00ff88; color: #00ff88; }
+body.level-5 .choice-btn:hover { border-color: #c084fc; color: #f0e6ff; box-shadow: 0 0 10px rgba(192,132,252,0.2); }
+body.level-5 .choice-btn.selected { background: rgba(192,132,252,0.2); border-color: #c084fc; color: #f0e6ff; }
 
 textarea.prompt-input, input.prompt-input {
   width: 100%;
@@ -1174,13 +1174,13 @@ textarea.prompt-input, input.prompt-input {
 }
 textarea.prompt-input:focus, input.prompt-input:focus { border-color: var(--primary); }
 body.level-5 textarea.prompt-input, body.level-5 input.prompt-input {
-  background: #050f05;
-  border-color: #00994d;
-  color: #00ff88;
+  background: #0c0528;
+  border-color: #7c3aed;
+  color: #d8b4fe;
   font-family: 'Share Tech Mono', monospace;
-  caret-color: #00ff88;
+  caret-color: #c084fc;
 }
-body.level-5 textarea.prompt-input:focus { border-color: #00ff88; box-shadow: 0 0 12px rgba(0,255,136,.25); }
+body.level-5 textarea.prompt-input:focus { border-color: #c084fc; box-shadow: 0 0 12px rgba(192,132,252,.25); }
 
 /* Ordering exercise */
 .order-list {
@@ -1232,7 +1232,7 @@ body.level-5 textarea.prompt-input:focus { border-color: #00ff88; box-shadow: 0 
 .match-item:hover { border-color: var(--primary); }
 .match-item.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
 .match-item.matched { border-color: #4caf50; background: #e8f5e9; color: #2e7d32; pointer-events: none; }
-body.level-5 .match-item.matched { background: rgba(0,255,136,.12); border-color: #00ff88; color: #00ff88; }
+body.level-5 .match-item.matched { background: rgba(192,132,252,.18); border-color: #c084fc; color: #f0e6ff; pointer-events: none; }
 
 /* Rewrite textarea label */
 .rewrite-label {
@@ -1254,8 +1254,8 @@ body.level-5 .match-item.matched { background: rgba(0,255,136,.12); border-color
   color: #795548;
   margin-bottom: 16px;
 }
-body.level-3 .hint-box { background: rgba(186,104,255,0.12); border-color: #b388ff; color: #e1bee7; }
-body.level-5 .hint-box { background: rgba(0,229,255,0.07); border-color: #00e5ff; color: #00e5ff; }
+body.level-3 .hint-box { background: rgba(186,104,255,0.12); border-color: #b388ff; color: #f0d9ff; }
+body.level-5 .hint-box { background: rgba(192,132,252,0.1); border-color: #c084fc; color: #d8b4fe; }
 .hint-box.hidden { display: none; }
 
 /* Exercise actions */
