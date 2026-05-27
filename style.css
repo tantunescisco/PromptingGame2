@@ -224,6 +224,19 @@ body.welcome { /* Prompting Game 2.0 — The Evolution */
   85%           { transform: rotate(-4deg); }
 }
 
+/* Debate arm — applied to .char-debate-arm group inside SVG (L2 philosopher) */
+.char-debate-arm {
+  transform-box: fill-box;
+  transform-origin: 66px 68px;
+  animation: char-debate 2.2s ease-in-out infinite;
+}
+@keyframes char-debate {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-8deg); }
+  50%      { transform: rotate(12deg); }
+  75%      { transform: rotate(-5deg); }
+}
+
 /* ---- Character States: thinking / success / partial / failure ---- */
 
 /* THINKING — slow pulse, slightly dimmed */

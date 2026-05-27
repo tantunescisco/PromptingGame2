@@ -3182,8 +3182,68 @@ const CharacterEngine = {
       <path d="M44 55 Q50 58 56 55" fill="none" stroke="#a87050" stroke-width="1.5" stroke-linecap="round"/>
     </svg>`,
 
-    // Levels 2–5 — characters to be added
-    null,
+    // ── Level 2: Roman/Greek Philosopher-Senator ──────────────────────────────
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 165">
+      <!-- Right arm raised — debate gesture, animated -->
+      <g class="char-debate-arm">
+        <line x1="67" y1="68" x2="83" y2="47" stroke="#d4a574" stroke-width="8" stroke-linecap="round"/>
+        <line x1="83" y1="47" x2="86" y2="26" stroke="#d4a574" stroke-width="7" stroke-linecap="round"/>
+        <ellipse cx="88" cy="22" rx="5.5" ry="4" fill="#d4a574" transform="rotate(-20,88,22)"/>
+        <line x1="83" y1="19" x2="80" y2="11" stroke="#d4a574" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="86" y1="18" x2="85" y2="10" stroke="#d4a574" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="89" y1="18" x2="90" y2="10" stroke="#d4a574" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="92" y1="20" x2="95" y2="13" stroke="#d4a574" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="84" y1="25" x2="79" y2="21" stroke="#d4a574" stroke-width="2"   stroke-linecap="round"/>
+      </g>
+      <!-- Left shoulder drape (outer fold) -->
+      <path d="M27 64 Q14 88 16 145 L22 143 Q20 92 32 66 Z" fill="#eee8df" stroke="#ddd0c4" stroke-width="0.8"/>
+      <!-- Purple trim on left drape edge -->
+      <path d="M15 68 Q13 94 15 143 L19 142 Q17 94 19 70 Z" fill="#6b2fa0"/>
+      <!-- Main toga body -->
+      <path d="M30 65 Q19 95 21 158 L79 158 Q81 95 70 65 Z" fill="#f5f0eb" stroke="#ddd0c4" stroke-width="0.9"/>
+      <!-- Toga fold lines -->
+      <path d="M40 68 Q38 108 40 155" fill="none" stroke="#ddd0c4" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M52 66 Q50 106 52 155" fill="none" stroke="#ddd0c4" stroke-width="1"   stroke-linecap="round"/>
+      <path d="M63 68 Q65 108 63 155" fill="none" stroke="#ddd0c4" stroke-width="1"   stroke-linecap="round"/>
+      <!-- Purple border hem -->
+      <path d="M21 147 Q50 151 79 147 L79 158 Q50 162 21 158 Z" fill="#6b2fa0"/>
+      <!-- Left arm, relaxed at side -->
+      <line x1="29" y1="90" x2="18" y2="126" stroke="#d4a574" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="16" cy="129" r="4" fill="#d4a574"/>
+      <!-- Bronze fibula pin at right shoulder -->
+      <circle cx="66" cy="67" r="3.5" fill="#c9a017" stroke="#7a5800" stroke-width="0.9"/>
+      <circle cx="66" cy="67" r="1.5" fill="#7a5800"/>
+      <!-- Neck -->
+      <rect x="44" y="58" width="12" height="8" rx="3" fill="#d4a574"/>
+      <!-- Head -->
+      <circle cx="50" cy="36" r="22" fill="#d4a574"/>
+      <!-- Hair — short Roman, neat -->
+      <path d="M29 36 Q29 13 50 13 Q71 13 71 36 Q65 20 50 18 Q35 20 29 36Z" fill="#3a2a1a"/>
+      <path d="M29 36 Q28 45 31 52" fill="none" stroke="#3a2a1a" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M71 36 Q72 45 69 52" fill="none" stroke="#3a2a1a" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Short forehead curls -->
+      <path d="M36 30 Q38 27 41 29" fill="none" stroke="#3a2a1a" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M43 28 Q46 25 49 27" fill="none" stroke="#3a2a1a" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Eyes — composed, analytical -->
+      <g class="char-eyes">
+        <ellipse cx="43" cy="36" rx="4" ry="4.5" fill="white"/>
+        <circle cx="44" cy="37" r="2.6" fill="#1e1208"/>
+        <circle cx="45" cy="36" r="1"   fill="white" opacity="0.9"/>
+        <ellipse cx="57" cy="36" rx="4" ry="4.5" fill="white"/>
+        <circle cx="58" cy="37" r="2.6" fill="#1e1208"/>
+        <circle cx="59" cy="36" r="1"   fill="white" opacity="0.9"/>
+      </g>
+      <!-- Eyebrows — composed, thoughtful -->
+      <path d="M38 28 Q43 26 48 28" fill="none" stroke="#3a2a1a" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M52 28 Q57 26 62 28" fill="none" stroke="#3a2a1a" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- Nose — Roman bridge -->
+      <path d="M50 41 Q48 47 49 51" fill="none" stroke="#b88055" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M46 52 Q50 54 54 52"  fill="none" stroke="#b88055" stroke-width="1"   stroke-linecap="round"/>
+      <!-- Mouth — composed, firm -->
+      <path d="M44 56 Q50 58 56 56" fill="none" stroke="#9a6a48" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    // Levels 3–5 — characters to be added
     null,
     null,
     null,
@@ -3198,8 +3258,16 @@ const CharacterEngine = {
       ordering: ['Order is the first gift of civilization.', 'Arrange these as the stars arrange themselves.'],
       matching: ['Link what belongs together.',      'Connect purpose with form, as scribe to tablet.'],
     },
-    // Levels 2–5 — dialogue to be added with each character
-    null, null, null, null,
+    // Level 2 — Philosopher-Senator
+    {
+      default:  ['Logic must govern your discourse.',    'Reason is the architect of truth.',        'Consider all arguments carefully.'],
+      choice:   ['Four propositions — which withstands scrutiny?', 'As Plato taught: seek the most truthful.'],
+      freetext: ['Frame your argument with precision.',  'The Senate demands clarity of thought.'],
+      ordering: ['Order reveals the deeper truth.',      'Arrange your reasoning as a Roman aqueduct.'],
+      matching: ['Connect each concept to its domain.',  'Logic demands perfect correspondence.'],
+    },
+    // Levels 3–5 — dialogue to be added with each character
+    null, null, null,
   ],
 
   setDialogue(levelIndex, exerciseType) {
@@ -3221,7 +3289,14 @@ const CharacterEngine = {
       partial:  ['A fair attempt, worth keeping.',  'Almost worthy of the archives.', 'The scribe nods with reservation.'],
       failure:  ['Even I once made such errors.',   'Revise your inscription.',        'Study the ancient texts once more.'],
     },
-    null, null, null, null,
+    // Level 2 — Philosopher-Senator
+    {
+      thinking: ['The senator deliberates…',         'Let reason illuminate the path…',  'Hmm, let me consider…'],
+      success:  ['By Jupiter, well argued!',           'The Senate would applaud!',         'Reason has prevailed!'],
+      partial:  ['Acceptable — but sharpen your argument.', 'The Academy acknowledges your effort.', 'A partial truth is still progress.'],
+      failure:  ['A flawed premise leads to ruin.',    'Logic requires more rigour here.',  'Even Socrates questioned himself.'],
+    },
+    null, null, null,
   ],
 
   setState(state, levelIndex) {
