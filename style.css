@@ -237,6 +237,17 @@ body.welcome { /* Prompting Game 2.0 — The Evolution */
   75%      { transform: rotate(-5deg); }
 }
 
+/* Wrench pulse — applied to .char-wrench-pulse groups inside SVG (L3 engineer) */
+.char-wrench-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: char-wrench-swing 1.4s ease-in-out infinite;
+}
+@keyframes char-wrench-swing {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(-6deg) translateY(-2px); }
+}
+
 /* ---- Character States: thinking / success / partial / failure ---- */
 
 /* THINKING — slow pulse, slightly dimmed */

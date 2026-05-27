@@ -3244,7 +3244,98 @@ const CharacterEngine = {
     </svg>`,
 
     // Levels 3–5 — characters to be added
-    null,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 165">
+      <!-- Apron -->
+      <path d="M24 70 L76 70 L80 160 L20 160Z" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="1.2"/>
+      <!-- Apron weathering/soot marks -->
+      <circle cx="35" cy="95" r="4" fill="#5a5a5a" opacity="0.6"/>
+      <circle cx="65" cy="110" r="3.5" fill="#5a5a5a" opacity="0.5"/>
+      <ellipse cx="50" cy="130" rx="8" ry="5" fill="#5a5a5a" opacity="0.4"/>
+      <!-- Apron straps -->
+      <line x1="30" y1="70" x2="25" y2="50" stroke="#2a2a2a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="70" y1="70" x2="75" y2="50" stroke="#2a2a2a" stroke-width="5" stroke-linecap="round"/>
+      <!-- Leather belt with wrenches -->
+      <rect x="22" y="105" width="56" height="11" rx="3" fill="#5a3a20" stroke="#3a2010" stroke-width="1"/>
+      <!-- Brass wrench 1 (left) -->
+      <g class="char-wrench-pulse">
+        <line x1="28" y1="105" x2="32" y2="98" stroke="#c9a017" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="30" cy="103" r="2.5" fill="#c9a017"/>
+        <ellipse cx="34" cy="96" rx="2" ry="3" fill="#c9a017"/>
+      </g>
+      <!-- Brass wrench 2 (center-left) -->
+      <g class="char-wrench-pulse" style="animation-delay: 0.15s;">
+        <line x1="42" y1="106" x2="45" y2="97" stroke="#c9a017" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="43" cy="104" r="2.5" fill="#c9a017"/>
+        <ellipse cx="46" cy="96" rx="2.2" ry="3.2" fill="#c9a017"/>
+      </g>
+      <!-- Brass wrench 3 (center-right) -->
+      <g class="char-wrench-pulse" style="animation-delay: 0.3s;">
+        <line x1="55" y1="105" x2="58" y2="97" stroke="#c9a017" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="56" cy="103" r="2.5" fill="#c9a017"/>
+        <ellipse cx="59" cy="96" rx="2" ry="3" fill="#c9a017"/>
+      </g>
+      <!-- Brass wrench 4 (right) -->
+      <g class="char-wrench-pulse" style="animation-delay: 0.45s;">
+        <line x1="68" y1="106" x2="72" y2="98" stroke="#c9a017" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="70" cy="104" r="2.5" fill="#c9a017"/>
+        <ellipse cx="73" cy="97" rx="2.2" ry="3" fill="#c9a017"/>
+      </g>
+      <!-- Left arm holding wrench -->
+      <line x1="24" y1="80" x2="12" y2="115" stroke="#d9c9b8" stroke-width="6" stroke-linecap="round"/>
+      <ellipse cx="10" cy="118" rx="3" ry="4" fill="#d9c9b8"/>
+      <!-- Right arm at side -->
+      <line x1="76" y1="82" x2="82" y2="120" stroke="#d9c9b8" stroke-width="6" stroke-linecap="round"/>
+      <ellipse cx="84" cy="123" rx="3" ry="4" fill="#d9c9b8"/>
+      <!-- Shirt sleeves rolled up -->
+      <line x1="20" y1="72" x2="16" y2="85" stroke="#f5f5f5" stroke-width="8" stroke-linecap="round"/>
+      <line x1="80" y1="72" x2="84" y2="85" stroke="#f5f5f5" stroke-width="8" stroke-linecap="round"/>
+      <!-- Shirt collar -->
+      <path d="M44 68 L50 60 L56 68" fill="#f5f5f5" stroke="#e0e0e0" stroke-width="0.9"/>
+      <!-- Neck -->
+      <rect x="46" y="55" width="8" height="7" rx="2" fill="#d9c9b8"/>
+      <!-- Head -->
+      <circle cx="50" cy="32" r="22" fill="#d9c9b8"/>
+      <!-- Hair — dark, tousled worker's style -->
+      <path d="M29 32 Q29 10 50 10 Q71 10 71 32 Q65 17 50 15 Q35 17 29 32Z" fill="#2a1a0a"/>
+      <path d="M29 32 Q27 42 30 50" fill="none" stroke="#2a1a0a" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M71 32 Q73 42 70 50" fill="none" stroke="#2a1a0a" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Welding goggles on forehead (mechanical, detailed) -->
+      <g class="char-goggle-glow">
+        <!-- Left lens circle -->
+        <circle cx="40" cy="20" r="6.5" fill="#4a4a4a" stroke="#1a1a1a" stroke-width="1.2"/>
+        <circle cx="40" cy="20" r="5" fill="#1a3a4a" opacity="0.8"/>
+        <circle cx="41" cy="19" r="2" fill="#00ff88" opacity="0.3"/>
+        <!-- Right lens circle -->
+        <circle cx="60" cy="20" r="6.5" fill="#4a4a4a" stroke="#1a1a1a" stroke-width="1.2"/>
+        <circle cx="60" cy="20" r="5" fill="#1a3a4a" opacity="0.8"/>
+        <circle cx="61" cy="19" r="2" fill="#00ff88" opacity="0.3"/>
+        <!-- Bridge connecting lenses -->
+        <rect x="46" y="18" width="8" height="4" rx="2" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="0.8"/>
+        <!-- Adjustment screw on bridge -->
+        <circle cx="50" cy="20" r="1" fill="#c9a017"/>
+        <!-- Top strap -->
+        <path d="M38 13 Q40 8 42 10" fill="none" stroke="#3a3a3a" stroke-width="2" stroke-linecap="round"/>
+        <path d="M58 13 Q60 8 62 10" fill="none" stroke="#3a3a3a" stroke-width="2" stroke-linecap="round"/>
+        <!-- Flexible side arms -->
+        <path d="M33 20 Q30 22 29 25" fill="none" stroke="#3a3a3a" stroke-width="2" stroke-linecap="round"/>
+        <path d="M67 20 Q70 22 71 25" fill="none" stroke="#3a3a3a" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <!-- Eyes behind goggles (hint of expression) -->
+      <g class="char-eyes">
+        <ellipse cx="41" cy="32" rx="4" ry="4.5" fill="white" opacity="0.6"/>
+        <circle cx="42" cy="33" r="2.4" fill="#1a0a00"/>
+        <ellipse cx="59" cy="32" rx="4" ry="4.5" fill="white" opacity="0.6"/>
+        <circle cx="60" cy="33" r="2.4" fill="#1a0a00"/>
+      </g>
+      <!-- Eyebrows — determined, focused -->
+      <path d="M36 28 Q41 25 46 28" fill="none" stroke="#2a1a0a" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M54 28 Q59 25 64 28" fill="none" stroke="#2a1a0a" stroke-width="1.6" stroke-linecap="round"/>
+      <!-- Nose -->
+      <path d="M50 38 Q48 44 49 48" fill="none" stroke="#a88060" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- Mouth — determined, confident -->
+      <path d="M44 52 Q50 55 56 52" fill="none" stroke="#8a6a48" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>`,
+    // Levels 4–5 — characters to be added
     null,
     null,
   ],
@@ -3266,8 +3357,16 @@ const CharacterEngine = {
       ordering: ['Order reveals the deeper truth.',      'Arrange your reasoning as a Roman aqueduct.'],
       matching: ['Connect each concept to its domain.',  'Logic demands perfect correspondence.'],
     },
-    // Levels 3–5 — dialogue to be added with each character
-    null, null, null,
+    // Level 3 — Victorian Engineer
+    {
+      default:  ['Precision drives progress.',        'Every bolt must be true.',          'Engineering demands exactitude.'],
+      choice:   ['Four solutions — which is most efficient?', 'Logic and mechanics must align.'],
+      freetext: ['Describe your process with clarity.',  'The blueprint requires precision.'],
+      ordering: ['Systems work best in proper sequence.', 'Order the steps as a machine orders its gears.'],
+      matching: ['Match each component to its function.', 'Every part serves a specific purpose.'],
+    },
+    // Levels 4–5 — dialogue to be added with each character
+    null, null,
   ],
 
   setDialogue(levelIndex, exerciseType) {
@@ -3296,7 +3395,14 @@ const CharacterEngine = {
       partial:  ['Acceptable — but sharpen your argument.', 'The Academy acknowledges your effort.', 'A partial truth is still progress.'],
       failure:  ['A flawed premise leads to ruin.',    'Logic requires more rigour here.',  'Even Socrates questioned himself.'],
     },
-    null, null, null,
+    // Level 3 — Victorian Engineer
+    {
+      thinking: ['The engineer calculates…',         'Let me recalibrate…',                 'Hmm, checking the pressure gauge…'],
+      success:  ['Excellent calibration!',           'The engine purrs perfectly!',        'A flawless mechanism!'],
+      partial:  ['Serviceable, but not optimal.',      'The machine works, yet could be refined.', 'Adequate for the moment.'],
+      failure:  ['A misalignment in logic, my friend.', 'The gears resist this arrangement.',  'Back to the drawing board, I fear.'],
+    },
+    null, null,
   ],
 
   setState(state, levelIndex) {
