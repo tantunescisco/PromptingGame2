@@ -3124,6 +3124,86 @@ function initDragDrop(list) {
 }
 
 // ============================================================
+// CHARACTER ENGINE
+// Animated 2D character avatars displayed during exercises
+// ============================================================
+const CharacterEngine = {
+
+  _svgs: [
+
+    // ── Level 1: Mesopotamian Scribe ─────────────────────────────────────────
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 165">
+      <!-- Tunic / body -->
+      <path d="M32 62 L68 62 L76 160 L24 160Z" fill="#f0e4c0" stroke="#c8aa80" stroke-width="1.2"/>
+      <!-- V-neck collar -->
+      <path d="M43 62 L50 75 L57 62" fill="#e8d8b0" stroke="#c8aa80" stroke-width="1.2"/>
+      <!-- Waist sash -->
+      <line x1="27" y1="110" x2="73" y2="110" stroke="#c8aa80" stroke-width="1.5"/>
+      <!-- Left arm — holds tablet -->
+      <line x1="34" y1="68" x2="13" y2="106" stroke="#c8956c" stroke-width="7" stroke-linecap="round"/>
+      <line x1="13" y1="106" x2="16" y2="133" stroke="#c8956c" stroke-width="6" stroke-linecap="round"/>
+      <!-- Clay tablet -->
+      <rect x="2" y="125" width="26" height="19" rx="2" fill="#9b6e42" stroke="#6b4a28" stroke-width="1.2"/>
+      <line x1="6" y1="131" x2="24" y2="131" stroke="#6b4a28" stroke-width="0.9"/>
+      <line x1="6" y1="136" x2="24" y2="136" stroke="#6b4a28" stroke-width="0.9"/>
+      <line x1="6" y1="141" x2="20" y2="141" stroke="#6b4a28" stroke-width="0.9"/>
+      <!-- Right arm + stylus — rotate from shoulder for writing motion -->
+      <g transform="translate(66,66)">
+        <g class="char-write-arm">
+          <line x1="0" y1="0" x2="17" y2="34" stroke="#c8956c" stroke-width="7" stroke-linecap="round"/>
+          <line x1="17" y1="34" x2="12" y2="60" stroke="#c8956c" stroke-width="6" stroke-linecap="round"/>
+          <line x1="10" y1="58" x2="-4" y2="76" stroke="#7a5230" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="-4" cy="77" r="1.5" fill="#4a2e10"/>
+        </g>
+      </g>
+      <!-- Neck -->
+      <rect x="45" y="58" width="10" height="7" rx="2" fill="#c8956c"/>
+      <!-- Head -->
+      <circle cx="50" cy="36" r="22" fill="#c8956c"/>
+      <!-- Hair — dark bowl cut -->
+      <path d="M28 37 Q28 13 50 13 Q72 13 72 37 Q66 22 50 20 Q34 22 28 37Z" fill="#2d1a0e"/>
+      <path d="M28 37 Q27 46 31 53" fill="none" stroke="#2d1a0e" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M72 37 Q73 46 69 53" fill="none" stroke="#2d1a0e" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Eyes — blink animation -->
+      <g class="char-eyes">
+        <ellipse cx="43" cy="37" rx="4.5" ry="5" fill="white"/>
+        <circle cx="44" cy="38" r="2.8" fill="#1a1008"/>
+        <circle cx="45" cy="37" r="1.1" fill="white" opacity="0.9"/>
+        <ellipse cx="57" cy="37" rx="4.5" ry="5" fill="white"/>
+        <circle cx="58" cy="38" r="2.8" fill="#1a1008"/>
+        <circle cx="59" cy="37" r="1.1" fill="white" opacity="0.9"/>
+      </g>
+      <!-- Eyebrows — focused -->
+      <path d="M38 30 Q43 28 48 31" fill="none" stroke="#2d1a0e" stroke-width="2" stroke-linecap="round"/>
+      <path d="M52 31 Q57 28 62 30" fill="none" stroke="#2d1a0e" stroke-width="2" stroke-linecap="round"/>
+      <!-- Nose -->
+      <path d="M50 41 Q47 47 49 51" fill="none" stroke="#a87050" stroke-width="1.3" stroke-linecap="round"/>
+      <!-- Mouth — focused slight smile -->
+      <path d="M44 55 Q50 58 56 55" fill="none" stroke="#a87050" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+
+    // Levels 2–5 — characters to be added
+    null,
+    null,
+    null,
+    null,
+  ],
+
+  show(levelIndex) {
+    const el = document.getElementById('level-character');
+    if (!el) return;
+    const svg = this._svgs[levelIndex] ?? null;
+    if (!svg) { el.innerHTML = ''; return; }
+    el.innerHTML = svg;
+  },
+
+  hide() {
+    const el = document.getElementById('level-character');
+    if (el) el.innerHTML = '';
+  }
+};
+
+// ============================================================
 // MAIN GAME ENGINE
 // ============================================================
 const GameEngine = {
@@ -3320,6 +3400,7 @@ const GameEngine = {
       this.renderMatching(exercise, inputArea);
     }
 
+    CharacterEngine.show(GameState.currentLevel);
     showScreen('screen-exercise');
   },
 

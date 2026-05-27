@@ -173,6 +173,57 @@ body.welcome { /* Prompting Game 2.0 — The Evolution */
   100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
 
+/* ============================================
+   LEVEL CHARACTER WIDGET
+   ============================================ */
+.level-character {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 110px;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.28));
+  animation: char-float 2.8s ease-in-out infinite;
+}
+.level-character:empty { display: none; }
+.level-character svg   { width: 100%; height: auto; display: block; }
+
+@media (max-width: 440px) {
+  .level-character { width: 70px; bottom: 8px; right: 8px; }
+}
+
+/* Idle float */
+@keyframes char-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+
+/* Eye blink — applied to .char-eyes group inside SVG */
+.char-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: char-blink 5s ease-in-out infinite;
+}
+@keyframes char-blink {
+  0%, 84%, 100% { transform: scaleY(1); }
+  89%           { transform: scaleY(0.08); }
+  94%           { transform: scaleY(1); }
+}
+
+/* Writing arm — applied to .char-write-arm group inside SVG */
+.char-write-arm {
+  transform-box: fill-box;
+  transform-origin: top left;
+  animation: char-write 3.5s ease-in-out infinite;
+}
+@keyframes char-write {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  65%           { transform: rotate(-6deg); }
+  75%           { transform: rotate(4deg); }
+  85%           { transform: rotate(-4deg); }
+}
+
 /* ---- Reset & Base ---- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
