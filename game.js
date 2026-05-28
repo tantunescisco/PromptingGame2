@@ -4095,7 +4095,7 @@ const GameEngine = {
 
     const timeline = document.getElementById('gc-timeline');
     timeline.innerHTML = '';
-    CharacterEngine._svgs.forEach((svgStr, i) => {
+    CharacterEngine._humanImages.forEach((imgSrc, i) => {
       if (i > 0) {
         const conn = document.createElement('div');
         conn.className = 'gc-timeline-connector';
@@ -4104,7 +4104,7 @@ const GameEngine = {
       const slot = document.createElement('div');
       slot.className = 'gc-char-slot';
       slot.innerHTML = `
-        <div class="gc-char-avatar">${svgStr}</div>
+        <div class="gc-char-avatar"><img src="${imgSrc}" alt="${levelMeta[i].era}" /></div>
         <div class="gc-char-era">${levelMeta[i].era}</div>
         <div class="gc-char-tooltip">${levelMeta[i].topic}</div>
       `;
