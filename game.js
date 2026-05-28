@@ -2159,6 +2159,7 @@ const MusicEngine = {
   masterGain: null,
   enabled: true,
   currentLevel: null,
+  currentMode: null,
   schedulers: [],     // handles returned by setInterval/setTimeout
   oscillators: [],    // active oscillators to stop
 
@@ -2184,16 +2185,33 @@ const MusicEngine = {
     const btn = document.getElementById('music-toggle');
     btn.classList.toggle('muted', !this.enabled);
     if (this.masterGain) this.masterGain.gain.value = this.enabled ? 0.18 : 0;
-    if (this.enabled && this.currentLevel !== null) {
-      this.play(this.currentLevel);
+    if (this.enabled) {
+      this._resumeCurrent();
     } else if (!this.enabled) {
       this._stopAll();
+    }
+  },
+
+  _resumeCurrent() {
+    switch (this.currentMode) {
+      case 'level':
+        if (this.currentLevel !== null) this.play(this.currentLevel);
+        break;
+      case 'welcome':
+        this.playWelcome();
+        break;
+      case 'victory':
+        this.playVictory();
+        break;
+      default:
+        break;
     }
   },
 
   play(levelIndex) {
     this._stopAll();
     this.currentLevel = levelIndex;
+    this.currentMode = 'level';
     if (!this.enabled) return;
     const ctx = this._ctx();
     // Level theme 0→4
@@ -2232,6 +2250,7 @@ const MusicEngine = {
   playWelcome() {
     this._stopAll();
     this.currentLevel = null;
+    this.currentMode = 'welcome';
     if (!this.enabled) return;
     const ctx = this._ctx();
 
@@ -2756,6 +2775,7 @@ const MusicEngine = {
   playVictory() {
     this._stopAll();
     this.currentLevel = null;
+    this.currentMode = 'victory';
     if (!this.enabled) return;
     const ctx = this._ctx();
 
