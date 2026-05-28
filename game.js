@@ -1087,13 +1087,14 @@ const GAME_DATA = {
       theme: "level-4",
       concept: `
         <h4>🌐 The Information Age — Structured Data & Formatting</h4>
-        <p>The digital world runs on <strong>structured information</strong>. JSON, markdown, tables, and databases work because the format is clear and consistent.</p>
-        <p>Prompting works the same way: define the <strong>output format</strong>, length, tone, and what to avoid so the answer is predictable and easy to use.</p>
-        <ul style="margin:8px 0 0 16px; line-height:1.45;">
-          <li><strong>Format</strong> — JSON, bullets, tables, numbered lists</li>
-          <li><strong>Length</strong> — summary depth, word or sentence limits</li>
-          <li><strong>Tone</strong> — formal, casual, technical, ELI5</li>
-          <li><strong>Constraints</strong> — "Do NOT include..." / "Avoid..."</li>
+        <p>The digital revolution runs on <strong>structured information</strong>. JSON, XML, markdown, databases — the world communicates in formats. Computers need data in precise structures to process it reliably.</p>
+        <p>AI models are the same: specifying the <strong>output format</strong> — JSON, bullet points, a table, a numbered list — makes responses predictable, parseable, and useful in real systems.</p>
+        <p>Techniques covered:</p>
+        <ul style="margin:8px 0 0 16px;">
+          <li><strong>Output format instructions</strong> — JSON, bullet points, tables, numbered lists</li>
+          <li><strong>Length control</strong> — word/sentence count, summary depth</li>
+          <li><strong>Tone and style</strong> — formal, casual, technical, ELI5</li>
+          <li><strong>Negative constraints</strong> — "Do NOT include..." / "Avoid..."</li>
         </ul>
       `,
       exercises: [
@@ -1438,14 +1439,14 @@ const GAME_DATA = {
       theme: "level-5",
       concept: `
         <h4>🌌 Post-Humanity — The Age of AI Architecture</h4>
-        <p>At the Singularity, <strong>prompting becomes engineering</strong>. You are no longer asking for one answer — you are building systems that reason in steps.</p>
-        <p>The focus shifts to chaining prompts, guiding reasoning, and tuning output so advanced AI behaves predictably at scale.</p>
-        <ul style="margin:8px 0 0 16px; line-height:1.45;">
-          <li><strong>Few-shot</strong> — give examples before the task</li>
-          <li><strong>Chain-of-thought</strong> — encourage stepwise reasoning</li>
-          <li><strong>Prompt chaining</strong> — split complex work into stages</li>
-          <li><strong>Constraints</strong> — balance creativity and precision</li>
-          <li><strong>Meta-prompting</strong> — use AI to refine prompts</li>
+        <p>The Singularity is the hypothetical moment when artificial intelligence surpasses human intelligence. At that frontier, <strong>prompting becomes engineering</strong> — reasoning pipelines replace simple Q&A.</p>
+        <p>You are no longer just asking an AI. You are <strong>designing systems</strong>, <strong>orchestrating agents</strong>, and building AI pipelines that reason, self-improve, and operate at scales no human could manage alone.</p>
+        <ul style="margin:8px 0 0 16px; line-height:2">
+          <li><strong>Few-Shot Prompting</strong> — Give examples before the task to guide output style</li>
+          <li><strong>Chain-of-Thought (CoT)</strong> — Ask the AI to "think step by step" for reasoning tasks</li>
+          <li><strong>Prompt Chaining</strong> — Break complex tasks into a sequence of connected prompts</li>
+          <li><strong>Temperature / Constraints</strong> — Control creativity vs. precision</li>
+          <li><strong>Meta-prompting</strong> — Use AI to improve your own prompts</li>
         </ul>
       `,
       exercises: [
@@ -1801,41 +1802,8 @@ const GameState = {
   levelElapsed: 0,
   timerInterval: null,
   levelTimes: [],
-  resumeLevel: 0,
   pollInterval: null,
   levelExercises: []   // randomly selected exercises for the current level
-};
-
-const ProgressStore = {
-  _lsKey: 'pq_campaign_progress',
-
-  _readAll() {
-    try { return JSON.parse(localStorage.getItem(this._lsKey)) || {}; } catch { return {}; }
-  },
-
-  _writeAll(all) {
-    try { localStorage.setItem(this._lsKey, JSON.stringify(all)); } catch {}
-  },
-
-  load(playerName) {
-    if (!playerName) return null;
-    const all = this._readAll();
-    return all[playerName.toLowerCase()] || null;
-  },
-
-  save(playerName, progress) {
-    if (!playerName) return;
-    const all = this._readAll();
-    all[playerName.toLowerCase()] = progress;
-    this._writeAll(all);
-  },
-
-  clear(playerName) {
-    if (!playerName) return;
-    const all = this._readAll();
-    delete all[playerName.toLowerCase()];
-    this._writeAll(all);
-  }
 };
 
 // ============================================================
@@ -2040,17 +2008,6 @@ const Scoreboard = {
 // ============================================================
 const AdminMode = {
   _CREDS: { user: 'tantunes', pass: 'Cisco!123' },
-  active: false,
-
-  _renderState() {
-    const banner = document.getElementById('admin-mode-banner');
-    if (banner) banner.classList.toggle('hidden', !this.active);
-
-    const resetArea = document.getElementById('admin-reset-area');
-    if (resetArea) resetArea.classList.toggle('hidden', !this.active);
-
-    GameEngine._renderWelcomeLevelButtons();
-  },
 
   showLogin() {
     const modal = document.getElementById('admin-login-modal');
@@ -2070,8 +2027,7 @@ const AdminMode = {
     const user = document.getElementById('admin-username').value.trim();
     const pass = document.getElementById('admin-password').value;
     if (user === this._CREDS.user && pass === this._CREDS.pass) {
-      this.active = true;
-      this._renderState();
+      this._activateAdminLevelButtons();
       this.closeLogin();
     } else {
       document.getElementById('admin-login-error').classList.remove('hidden');
@@ -2085,13 +2041,32 @@ const AdminMode = {
   },
 
   _activateAdminLevelButtons() {
-    this.active = true;
-    this._renderState();
+    [0, 1, 2, 3, 4].forEach(i => {
+      const el = document.getElementById('lp-btn-' + i);
+      if (!el) return;
+      el.classList.add('admin-clickable');
+      el.title = 'Admin: click to jump to this level';
+      el.addEventListener('click', () => AdminMode.jumpToLevel(i));
+    });
+    const banner = document.getElementById('admin-mode-banner');
+    if (banner) banner.classList.remove('hidden');
+    const resetArea = document.getElementById('admin-reset-area');
+    if (resetArea) resetArea.classList.remove('hidden');
   },
 
   exitAdminMode() {
-    this.active = false;
-    this._renderState();
+    [0, 1, 2, 3, 4].forEach(i => {
+      const el = document.getElementById('lp-btn-' + i);
+      if (!el) return;
+      const clone = el.cloneNode(true);
+      clone.classList.remove('admin-clickable');
+      clone.title = '';
+      el.replaceWith(clone);
+    });
+    const banner = document.getElementById('admin-mode-banner');
+    if (banner) banner.classList.add('hidden');
+    const resetArea = document.getElementById('admin-reset-area');
+    if (resetArea) resetArea.classList.add('hidden');
   },
 
   jumpToLevel(levelIndex) {
@@ -2184,7 +2159,6 @@ const MusicEngine = {
   masterGain: null,
   enabled: true,
   currentLevel: null,
-  currentMode: null,
   schedulers: [],     // handles returned by setInterval/setTimeout
   oscillators: [],    // active oscillators to stop
 
@@ -2210,33 +2184,16 @@ const MusicEngine = {
     const btn = document.getElementById('music-toggle');
     btn.classList.toggle('muted', !this.enabled);
     if (this.masterGain) this.masterGain.gain.value = this.enabled ? 0.18 : 0;
-    if (this.enabled) {
-      this._resumeCurrent();
+    if (this.enabled && this.currentLevel !== null) {
+      this.play(this.currentLevel);
     } else if (!this.enabled) {
       this._stopAll();
-    }
-  },
-
-  _resumeCurrent() {
-    switch (this.currentMode) {
-      case 'level':
-        if (this.currentLevel !== null) this.play(this.currentLevel);
-        break;
-      case 'welcome':
-        this.playWelcome();
-        break;
-      case 'victory':
-        this.playVictory();
-        break;
-      default:
-        break;
     }
   },
 
   play(levelIndex) {
     this._stopAll();
     this.currentLevel = levelIndex;
-    this.currentMode = 'level';
     if (!this.enabled) return;
     const ctx = this._ctx();
     // Level theme 0→4
@@ -2275,7 +2232,6 @@ const MusicEngine = {
   playWelcome() {
     this._stopAll();
     this.currentLevel = null;
-    this.currentMode = 'welcome';
     if (!this.enabled) return;
     const ctx = this._ctx();
 
@@ -2800,7 +2756,6 @@ const MusicEngine = {
   playVictory() {
     this._stopAll();
     this.currentLevel = null;
-    this.currentMode = 'victory';
     if (!this.enabled) return;
     const ctx = this._ctx();
 
@@ -3259,6 +3214,8 @@ const CharacterEngine = {
       <path d="M35 28 Q33 39 36 48" fill="none" stroke="#3c2a1b" stroke-width="3" stroke-linecap="round"/>
       <path d="M65 28 Q67 39 64 48" fill="none" stroke="#3c2a1b" stroke-width="3" stroke-linecap="round"/>
       <path d="M38 50 Q44 59 50 61 Q57 59 62 50" fill="none" stroke="#6f5a4b" stroke-width="4.4" stroke-linecap="round" opacity="0.82"/>
+      <path d="M39 25 Q41 22 44 24" fill="none" stroke="#3c2a1b" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M46 24 Q48 21.5 51 24" fill="none" stroke="#3c2a1b" stroke-width="1.4" stroke-linecap="round"/>
       <ellipse cx="32" cy="37" rx="2.2" ry="4.3" fill="#bf8d63"/>
       <ellipse cx="68" cy="37" rx="2.2" ry="4.3" fill="#bf8d63"/>
       <g class="char-eyes">
@@ -3566,100 +3523,6 @@ const CharacterEngine = {
 // ============================================================
 const GameEngine = {
 
-  _showNameError(msg) {
-    const nameInput = document.getElementById('player-name-input');
-    const nameError = document.getElementById('name-error');
-    if (nameError) {
-      nameError.textContent = msg;
-      nameError.classList.remove('hidden');
-    }
-    if (nameInput) {
-      nameInput.classList.remove('input-error');
-      void nameInput.offsetWidth;
-      nameInput.classList.add('input-error');
-      nameInput.addEventListener('animationend', () => nameInput.classList.remove('input-error'), { once: true });
-      nameInput.focus();
-    }
-  },
-
-  _getWelcomePlayerName() {
-    const nameInput = document.getElementById('player-name-input');
-    const typed = nameInput ? nameInput.value.trim() : '';
-    if (typed.length >= 3 && typed.length <= 20) return typed;
-    const existing = (GameState.playerName || '').trim();
-    if (existing.length >= 3 && existing.length <= 20 && existing !== 'Player') return existing;
-    return '';
-  },
-
-  _getUnlockedWelcomeLevel(playerName = this._getWelcomePlayerName()) {
-    if (!playerName) return 0;
-    const savedProgress = ProgressStore.load(playerName);
-    const unlockedLevel = savedProgress?.resumeLevel ?? 0;
-    return Math.max(0, Math.min(unlockedLevel, GAME_DATA.levels.length - 1));
-  },
-
-  _applySavedProgress(playerName, savedProgress, levelIndex = null) {
-    GameState.playerName = playerName;
-    GameState.resumeLevel = savedProgress?.resumeLevel ?? 0;
-    GameState.currentLevel = levelIndex ?? GameState.resumeLevel;
-    GameState.score = 0;
-    GameState.totalScore = savedProgress?.totalScore ?? 0;
-    GameState.badges = Array.isArray(savedProgress?.badges) ? [...savedProgress.badges] : [];
-    GameState.answers = {};
-    GameState.levelTimes = Array.isArray(savedProgress?.levelTimes) ? [...savedProgress.levelTimes] : [];
-  },
-
-  _renderWelcomeLevelButtons() {
-    const unlockedLevel = this._getUnlockedWelcomeLevel();
-    [0, 1, 2, 3, 4].forEach(i => {
-      const el = document.getElementById('lp-btn-' + i);
-      if (!el) return;
-
-      const clone = el.cloneNode(true);
-      clone.classList.remove('admin-clickable', 'student-clickable', 'lp-locked');
-      clone.removeAttribute('aria-disabled');
-      clone.title = '';
-
-      if (AdminMode.active) {
-        clone.classList.add('admin-clickable');
-        clone.title = 'Admin: click to jump to this level';
-        clone.addEventListener('click', () => AdminMode.jumpToLevel(i));
-      } else {
-        const unlocked = i <= unlockedLevel;
-        clone.classList.add(unlocked ? 'student-clickable' : 'lp-locked');
-        clone.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
-        clone.title = unlocked ? `Unlocked: Level ${i + 1}` : `Locked: complete Level ${i} first`;
-        if (unlocked) clone.addEventListener('click', () => GameEngine.openWelcomeLevel(i));
-      }
-
-      el.replaceWith(clone);
-    });
-  },
-
-  openWelcomeLevel(levelIndex) {
-    const playerName = this._getWelcomePlayerName();
-    if (!playerName) {
-      this._showNameError('Enter your name first to unlock your campaign progress.');
-      return;
-    }
-
-    const savedProgress = ProgressStore.load(playerName);
-    const unlockedLevel = Math.max(0, Math.min(savedProgress?.resumeLevel ?? 0, GAME_DATA.levels.length - 1));
-    if (levelIndex > unlockedLevel) {
-      this._renderWelcomeLevelButtons();
-      return;
-    }
-
-    const nameError = document.getElementById('name-error');
-    const nameInput = document.getElementById('player-name-input');
-    if (nameError) nameError.classList.add('hidden');
-    if (nameInput) nameInput.classList.remove('input-error');
-
-    this._applySavedProgress(playerName, savedProgress, levelIndex);
-    setTheme(GAME_DATA.levels[GameState.currentLevel].theme);
-    this.showLevelIntro();
-  },
-
   async startGame() {
     // Read and validate player name (3–20 chars required)
     const nameInput = document.getElementById('player-name-input');
@@ -3667,8 +3530,19 @@ const GameEngine = {
     const startBtn  = document.querySelector('.btn-start');
     const raw = nameInput ? nameInput.value.trim() : '';
 
+    const showNameError = (msg) => {
+      if (nameError) { nameError.textContent = msg; nameError.classList.remove('hidden'); }
+      if (nameInput) {
+        nameInput.classList.remove('input-error');
+        void nameInput.offsetWidth;
+        nameInput.classList.add('input-error');
+        nameInput.addEventListener('animationend', () => nameInput.classList.remove('input-error'), { once: true });
+        nameInput.focus();
+      }
+    };
+
     if (raw.length < 3 || raw.length > 20) {
-      this._showNameError('Please enter a name between 3 and 20 characters.');
+      showNameError('Please enter a name between 3 and 20 characters.');
       return;
     }
 
@@ -3677,9 +3551,8 @@ const GameEngine = {
     try {
       const existing = await Scoreboard.getOverall();
       const takenNames = (existing || []).map(e => e.name.toLowerCase());
-      const isReturningPlayer = (GameState.playerName || '').toLowerCase() === raw.toLowerCase();
-      if (!isReturningPlayer && takenNames.includes(raw.toLowerCase())) {
-        this._showNameError(`"${raw}" is already taken — please choose a different name.`);
+      if (takenNames.includes(raw.toLowerCase())) {
+        showNameError(`"${raw}" is already taken — please choose a different name.`);
         return;
       }
     } catch {
@@ -3690,10 +3563,15 @@ const GameEngine = {
 
     if (nameError) nameError.classList.add('hidden');
     if (nameInput) nameInput.classList.remove('input-error');
+    GameState.playerName = raw;
 
-    const savedProgress = ProgressStore.load(raw);
-    this._applySavedProgress(raw, savedProgress);
-    setTheme(GAME_DATA.levels[GameState.currentLevel].theme);
+    GameState.currentLevel = 0;
+    GameState.score = 0;
+    GameState.totalScore = 0;
+    GameState.badges = [];
+    GameState.answers = {};
+    GameState.levelTimes = [];
+    setTheme('level-1');
     this.showLevelIntro();
   },
 
@@ -3704,9 +3582,7 @@ const GameEngine = {
     MusicEngine._stopAll();
     setTheme('');
     document.body.className = '';
-    GameState.score = 0;
     showScreen('screen-welcome');
-    this._renderWelcomeLevelButtons();
     MusicEngine.playWelcome();
   },
 
@@ -3718,9 +3594,7 @@ const GameEngine = {
     MusicEngine._stopAll();
     setTheme('');
     document.body.className = '';
-    GameState.score = 0;
     showScreen('screen-welcome');
-    this._renderWelcomeLevelButtons();
     MusicEngine.playWelcome();
   },
 
@@ -3751,58 +3625,6 @@ const GameEngine = {
 
     Timer.start();
     this.renderExercise();
-  },
-
-  _resetChoiceButtonStyles(buttons) {
-    buttons.forEach(button => {
-      button.style.removeProperty('background');
-      button.style.removeProperty('border-color');
-      button.style.removeProperty('color');
-      button.style.removeProperty('box-shadow');
-      button.style.removeProperty('transform');
-      button.style.removeProperty('outline');
-      button.style.removeProperty('outline-offset');
-    });
-  },
-
-  _applyChoiceSelectionStyle(button) {
-    const palettes = {
-      0: {
-        background: 'var(--primary)',
-        borderColor: 'var(--primary)',
-        color: '#fff'
-      },
-      1: {
-        background: 'var(--primary)',
-        borderColor: 'var(--primary)',
-        color: '#fff'
-      },
-      2: {
-        background: 'linear-gradient(180deg, rgba(212, 137, 58, 0.95) 0%, rgba(139, 90, 34, 0.98) 100%)',
-        borderColor: '#f0b35a',
-        color: '#1a1008',
-        boxShadow: '0 0 0 1px rgba(240, 179, 90, 0.28), 0 10px 24px rgba(139, 90, 34, 0.28)'
-      },
-      3: {
-        background: 'rgba(0,200,240,0.25)',
-        borderColor: 'var(--primary)',
-        color: '#fff'
-      },
-      4: {
-        background: 'rgba(192,132,252,0.2)',
-        borderColor: '#c084fc',
-        color: '#f0e6ff'
-      }
-    };
-
-    const palette = palettes[GameState.currentLevel] || palettes[0];
-    button.style.background = palette.background;
-    button.style.borderColor = palette.borderColor;
-    button.style.color = palette.color;
-    button.style.transform = 'translateY(-2px)';
-    button.style.outline = '3px solid rgba(255, 255, 255, 0.28)';
-    button.style.outlineOffset = '1px';
-    button.style.boxShadow = palette.boxShadow || '0 10px 24px rgba(0, 0, 0, 0.16)';
   },
 
   renderExercise() {
@@ -3857,11 +3679,8 @@ const GameEngine = {
         btn.textContent = choice.text;
         btn.dataset.id = choice.id;
         btn.addEventListener('click', () => {
-          const buttons = [...grid.querySelectorAll('.choice-btn')];
-          buttons.forEach(b => b.classList.remove('selected'));
-          this._resetChoiceButtonStyles(buttons);
+          grid.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
-          this._applyChoiceSelectionStyle(btn);
           GameState.selectedChoice = choice.id;
         });
         grid.appendChild(btn);
@@ -4142,13 +3961,6 @@ const GameEngine = {
       `🏅 Badge Earned: <strong>${level.completeBadge}</strong>`;
 
     GameState.badges.push(level.completeBadge);
-    GameState.resumeLevel = Math.min(GameState.currentLevel + 1, GAME_DATA.levels.length - 1);
-    ProgressStore.save(GameState.playerName, {
-      resumeLevel: GameState.resumeLevel,
-      totalScore: GameState.totalScore,
-      badges: GameState.badges,
-      levelTimes: GameState.levelTimes
-    });
 
     // Save and render level scoreboard
     const updated = await Scoreboard.saveLevel(level.id, GameState.playerName, GameState.score, timeMs);
@@ -4225,8 +4037,6 @@ const GameEngine = {
   },
 
   async showGameComplete() {
-    ProgressStore.clear(GameState.playerName);
-    GameState.resumeLevel = 0;
     document.body.className = 'game-complete';
     setTheme('');
     MusicEngine.playVictory();
@@ -4378,21 +4188,15 @@ const GameEngine = {
    */
   async _renderWelcomeLeaderboard() {
     const tbody = document.getElementById('welcome-leaderboard-body');
-    const welcomeCard = document.querySelector('#screen-welcome .welcome-content');
-    const scoreboardContainer = document.querySelector('#screen-welcome .scoreboard-container');
     if (!tbody) return;
     try {
       const entries = await Scoreboard.getOverall();
       const MEDALS = ['🥇', '🥈', '🥉'];
       if (!entries || entries.length === 0) {
-        if (welcomeCard) welcomeCard.classList.add('leaderboard-empty');
-        if (scoreboardContainer) scoreboardContainer.classList.add('is-empty');
         tbody.innerHTML = '<tr><td colspan="4" class="lb-loading">No scores yet — be the first!</td></tr>';
         return;
       }
-      if (welcomeCard) welcomeCard.classList.remove('leaderboard-empty');
-      if (scoreboardContainer) scoreboardContainer.classList.remove('is-empty');
-      tbody.innerHTML = entries.slice(0, 12).map((e, i) => {
+      tbody.innerHTML = entries.slice(0, 5).map((e, i) => {
         const rank = MEDALS[i] || `${i + 1}`;
         return `<tr>
           <td class="rank">${rank}</td>
@@ -4402,8 +4206,6 @@ const GameEngine = {
         </tr>`;
       }).join('');
     } catch {
-      if (welcomeCard) welcomeCard.classList.add('leaderboard-empty');
-      if (scoreboardContainer) scoreboardContainer.classList.add('is-empty');
       tbody.innerHTML = '<tr><td colspan="4" class="lb-loading">Could not load scores.</td></tr>';
     }
   },
@@ -4435,7 +4237,6 @@ const GameEngine = {
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
   showScreen('screen-welcome');
-  AdminMode._renderState();
 
   // Start welcome music on first user interaction (browsers require gesture)
   const startWelcomeMusic = () => {
@@ -4460,11 +4261,8 @@ window.addEventListener('DOMContentLoaded', () => {
       nameInput.classList.remove('input-error');
       const nameError = document.getElementById('name-error');
       if (nameError) nameError.classList.add('hidden');
-      GameEngine._renderWelcomeLevelButtons();
     });
   }
-
-  GameEngine._renderWelcomeLevelButtons();
 
   // Allow Enter key to submit admin login
   const adminPassInput = document.getElementById('admin-password');
