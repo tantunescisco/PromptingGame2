@@ -2008,6 +2008,26 @@ const Scoreboard = {
 // ============================================================
 const AdminMode = {
   _CREDS: { user: 'tantunes', pass: 'Cisco!123' },
+  active: false,
+
+  _renderState() {
+    [0, 1, 2, 3, 4].forEach(i => {
+      const el = document.getElementById('lp-btn-' + i);
+      if (!el) return;
+
+      const clone = el.cloneNode(true);
+      clone.classList.toggle('admin-clickable', this.active);
+      clone.title = this.active ? 'Admin: click to jump to this level' : '';
+      if (this.active) clone.addEventListener('click', () => AdminMode.jumpToLevel(i));
+      el.replaceWith(clone);
+    });
+
+    const banner = document.getElementById('admin-mode-banner');
+    if (banner) banner.classList.toggle('hidden', !this.active);
+
+    const resetArea = document.getElementById('admin-reset-area');
+    if (resetArea) resetArea.classList.toggle('hidden', !this.active);
+  },
 
   showLogin() {
     const modal = document.getElementById('admin-login-modal');
@@ -2027,7 +2047,8 @@ const AdminMode = {
     const user = document.getElementById('admin-username').value.trim();
     const pass = document.getElementById('admin-password').value;
     if (user === this._CREDS.user && pass === this._CREDS.pass) {
-      this._activateAdminLevelButtons();
+      this.active = true;
+      this._renderState();
       this.closeLogin();
     } else {
       document.getElementById('admin-login-error').classList.remove('hidden');
@@ -2041,32 +2062,13 @@ const AdminMode = {
   },
 
   _activateAdminLevelButtons() {
-    [0, 1, 2, 3, 4].forEach(i => {
-      const el = document.getElementById('lp-btn-' + i);
-      if (!el) return;
-      el.classList.add('admin-clickable');
-      el.title = 'Admin: click to jump to this level';
-      el.addEventListener('click', () => AdminMode.jumpToLevel(i));
-    });
-    const banner = document.getElementById('admin-mode-banner');
-    if (banner) banner.classList.remove('hidden');
-    const resetArea = document.getElementById('admin-reset-area');
-    if (resetArea) resetArea.classList.remove('hidden');
+    this.active = true;
+    this._renderState();
   },
 
   exitAdminMode() {
-    [0, 1, 2, 3, 4].forEach(i => {
-      const el = document.getElementById('lp-btn-' + i);
-      if (!el) return;
-      const clone = el.cloneNode(true);
-      clone.classList.remove('admin-clickable');
-      clone.title = '';
-      el.replaceWith(clone);
-    });
-    const banner = document.getElementById('admin-mode-banner');
-    if (banner) banner.classList.add('hidden');
-    const resetArea = document.getElementById('admin-reset-area');
-    if (resetArea) resetArea.classList.add('hidden');
+    this.active = false;
+    this._renderState();
   },
 
   jumpToLevel(levelIndex) {
@@ -4273,6 +4275,7 @@ const GameEngine = {
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
   showScreen('screen-welcome');
+  AdminMode._renderState();
 
   // Start welcome music on first user interaction (browsers require gesture)
   const startWelcomeMusic = () => {
