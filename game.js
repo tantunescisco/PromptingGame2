@@ -3129,6 +3129,14 @@ function initDragDrop(list) {
 // ============================================================
 const CharacterEngine = {
 
+  _humanImages: [
+    'civil1_human.png',
+    'civil2_human.png',
+    'civil3_human.png',
+    'civil4_human.png',
+    'civil5_human.png'
+  ],
+
   _svgs: [
 
     // ── Level 1: Mesopotamian Scribe ─────────────────────────────────────────
@@ -3507,9 +3515,10 @@ const CharacterEngine = {
     // Reset state classes on each new question
     el.classList.remove('char-thinking', 'char-success', 'char-partial', 'char-failure');
     this._currentState = 'idle';
-    const svg = this._svgs[levelIndex] ?? null;
-    if (!svg) { el.innerHTML = ''; return; }
-    el.innerHTML = svg;
+    const imgSrc = this._humanImages[levelIndex] ?? null;
+    if (!imgSrc) { el.innerHTML = ''; return; }
+    const levelNumber = levelIndex + 1;
+    el.innerHTML = `<img src="${imgSrc}" alt="Level ${levelNumber} guide" draggable="false" />`;
   },
 
   hide() {
@@ -3558,7 +3567,7 @@ const GameEngine = {
     } catch {
       // If the check fails (offline / error), allow the game to proceed
     } finally {
-      if (startBtn) { startBtn.disabled = false; startBtn.textContent = 'Start Adventure'; }
+      if (startBtn) { startBtn.disabled = false; startBtn.textContent = 'Start Quest'; }
     }
 
     if (nameError) nameError.classList.add('hidden');
