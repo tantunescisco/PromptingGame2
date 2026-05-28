@@ -1087,14 +1087,13 @@ const GAME_DATA = {
       theme: "level-4",
       concept: `
         <h4>🌐 The Information Age — Structured Data & Formatting</h4>
-        <p>The digital revolution runs on <strong>structured information</strong>. JSON, XML, markdown, databases — the world communicates in formats. Computers need data in precise structures to process it reliably.</p>
-        <p>AI models are the same: specifying the <strong>output format</strong> — JSON, bullet points, a table, a numbered list — makes responses predictable, parseable, and useful in real systems.</p>
-        <p>Techniques covered:</p>
-        <ul style="margin:8px 0 0 16px;">
-          <li><strong>Output format instructions</strong> — JSON, bullet points, tables, numbered lists</li>
-          <li><strong>Length control</strong> — word/sentence count, summary depth</li>
-          <li><strong>Tone and style</strong> — formal, casual, technical, ELI5</li>
-          <li><strong>Negative constraints</strong> — "Do NOT include..." / "Avoid..."</li>
+        <p>The digital world runs on <strong>structured information</strong>. JSON, markdown, tables, and databases work because the format is clear and consistent.</p>
+        <p>Prompting works the same way: define the <strong>output format</strong>, length, tone, and what to avoid so the answer is predictable and easy to use.</p>
+        <ul style="margin:8px 0 0 16px; line-height:1.45;">
+          <li><strong>Format</strong> — JSON, bullets, tables, numbered lists</li>
+          <li><strong>Length</strong> — summary depth, word or sentence limits</li>
+          <li><strong>Tone</strong> — formal, casual, technical, ELI5</li>
+          <li><strong>Constraints</strong> — "Do NOT include..." / "Avoid..."</li>
         </ul>
       `,
       exercises: [
@@ -1439,14 +1438,14 @@ const GAME_DATA = {
       theme: "level-5",
       concept: `
         <h4>🌌 Post-Humanity — The Age of AI Architecture</h4>
-        <p>The Singularity is the hypothetical moment when artificial intelligence surpasses human intelligence. At that frontier, <strong>prompting becomes engineering</strong> — reasoning pipelines replace simple Q&A.</p>
-        <p>You are no longer just asking an AI. You are <strong>designing systems</strong>, <strong>orchestrating agents</strong>, and building AI pipelines that reason, self-improve, and operate at scales no human could manage alone.</p>
-        <ul style="margin:8px 0 0 16px; line-height:2">
-          <li><strong>Few-Shot Prompting</strong> — Give examples before the task to guide output style</li>
-          <li><strong>Chain-of-Thought (CoT)</strong> — Ask the AI to "think step by step" for reasoning tasks</li>
-          <li><strong>Prompt Chaining</strong> — Break complex tasks into a sequence of connected prompts</li>
-          <li><strong>Temperature / Constraints</strong> — Control creativity vs. precision</li>
-          <li><strong>Meta-prompting</strong> — Use AI to improve your own prompts</li>
+        <p>At the Singularity, <strong>prompting becomes engineering</strong>. You are no longer asking for one answer — you are building systems that reason in steps.</p>
+        <p>The focus shifts to chaining prompts, guiding reasoning, and tuning output so advanced AI behaves predictably at scale.</p>
+        <ul style="margin:8px 0 0 16px; line-height:1.45;">
+          <li><strong>Few-shot</strong> — give examples before the task</li>
+          <li><strong>Chain-of-thought</strong> — encourage stepwise reasoning</li>
+          <li><strong>Prompt chaining</strong> — split complex work into stages</li>
+          <li><strong>Constraints</strong> — balance creativity and precision</li>
+          <li><strong>Meta-prompting</strong> — use AI to refine prompts</li>
         </ul>
       `,
       exercises: [
@@ -1802,8 +1801,41 @@ const GameState = {
   levelElapsed: 0,
   timerInterval: null,
   levelTimes: [],
+  resumeLevel: 0,
   pollInterval: null,
   levelExercises: []   // randomly selected exercises for the current level
+};
+
+const ProgressStore = {
+  _lsKey: 'pq_campaign_progress',
+
+  _readAll() {
+    try { return JSON.parse(localStorage.getItem(this._lsKey)) || {}; } catch { return {}; }
+  },
+
+  _writeAll(all) {
+    try { localStorage.setItem(this._lsKey, JSON.stringify(all)); } catch {}
+  },
+
+  load(playerName) {
+    if (!playerName) return null;
+    const all = this._readAll();
+    return all[playerName.toLowerCase()] || null;
+  },
+
+  save(playerName, progress) {
+    if (!playerName) return;
+    const all = this._readAll();
+    all[playerName.toLowerCase()] = progress;
+    this._writeAll(all);
+  },
+
+  clear(playerName) {
+    if (!playerName) return;
+    const all = this._readAll();
+    delete all[playerName.toLowerCase()];
+    this._writeAll(all);
+  }
 };
 
 // ============================================================
@@ -3587,13 +3619,15 @@ const GameEngine = {
     if (nameInput) nameInput.classList.remove('input-error');
     GameState.playerName = raw;
 
-    GameState.currentLevel = 0;
+    const savedProgress = ProgressStore.load(raw);
+    GameState.currentLevel = savedProgress?.resumeLevel ?? 0;
+    GameState.resumeLevel = savedProgress?.resumeLevel ?? GameState.currentLevel;
     GameState.score = 0;
-    GameState.totalScore = 0;
-    GameState.badges = [];
+    GameState.totalScore = savedProgress?.totalScore ?? 0;
+    GameState.badges = Array.isArray(savedProgress?.badges) ? [...savedProgress.badges] : [];
     GameState.answers = {};
-    GameState.levelTimes = [];
-    setTheme('level-1');
+    GameState.levelTimes = Array.isArray(savedProgress?.levelTimes) ? [...savedProgress.levelTimes] : [];
+    setTheme(GAME_DATA.levels[GameState.currentLevel].theme);
     this.showLevelIntro();
   },
 
@@ -3604,6 +3638,7 @@ const GameEngine = {
     MusicEngine._stopAll();
     setTheme('');
     document.body.className = '';
+    GameState.score = 0;
     showScreen('screen-welcome');
     MusicEngine.playWelcome();
   },
@@ -3616,6 +3651,7 @@ const GameEngine = {
     MusicEngine._stopAll();
     setTheme('');
     document.body.className = '';
+    GameState.score = 0;
     showScreen('screen-welcome');
     MusicEngine.playWelcome();
   },
@@ -3647,6 +3683,58 @@ const GameEngine = {
 
     Timer.start();
     this.renderExercise();
+  },
+
+  _resetChoiceButtonStyles(buttons) {
+    buttons.forEach(button => {
+      button.style.removeProperty('background');
+      button.style.removeProperty('border-color');
+      button.style.removeProperty('color');
+      button.style.removeProperty('box-shadow');
+      button.style.removeProperty('transform');
+      button.style.removeProperty('outline');
+      button.style.removeProperty('outline-offset');
+    });
+  },
+
+  _applyChoiceSelectionStyle(button) {
+    const palettes = {
+      0: {
+        background: 'var(--primary)',
+        borderColor: 'var(--primary)',
+        color: '#fff'
+      },
+      1: {
+        background: 'var(--primary)',
+        borderColor: 'var(--primary)',
+        color: '#fff'
+      },
+      2: {
+        background: 'linear-gradient(180deg, rgba(212, 137, 58, 0.95) 0%, rgba(139, 90, 34, 0.98) 100%)',
+        borderColor: '#f0b35a',
+        color: '#1a1008',
+        boxShadow: '0 0 0 1px rgba(240, 179, 90, 0.28), 0 10px 24px rgba(139, 90, 34, 0.28)'
+      },
+      3: {
+        background: 'rgba(0,200,240,0.25)',
+        borderColor: 'var(--primary)',
+        color: '#fff'
+      },
+      4: {
+        background: 'rgba(192,132,252,0.2)',
+        borderColor: '#c084fc',
+        color: '#f0e6ff'
+      }
+    };
+
+    const palette = palettes[GameState.currentLevel] || palettes[0];
+    button.style.background = palette.background;
+    button.style.borderColor = palette.borderColor;
+    button.style.color = palette.color;
+    button.style.transform = 'translateY(-2px)';
+    button.style.outline = '3px solid rgba(255, 255, 255, 0.28)';
+    button.style.outlineOffset = '1px';
+    button.style.boxShadow = palette.boxShadow || '0 10px 24px rgba(0, 0, 0, 0.16)';
   },
 
   renderExercise() {
@@ -3701,8 +3789,11 @@ const GameEngine = {
         btn.textContent = choice.text;
         btn.dataset.id = choice.id;
         btn.addEventListener('click', () => {
-          grid.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+          const buttons = [...grid.querySelectorAll('.choice-btn')];
+          buttons.forEach(b => b.classList.remove('selected'));
+          this._resetChoiceButtonStyles(buttons);
           btn.classList.add('selected');
+          this._applyChoiceSelectionStyle(btn);
           GameState.selectedChoice = choice.id;
         });
         grid.appendChild(btn);
@@ -3983,6 +4074,13 @@ const GameEngine = {
       `🏅 Badge Earned: <strong>${level.completeBadge}</strong>`;
 
     GameState.badges.push(level.completeBadge);
+    GameState.resumeLevel = Math.min(GameState.currentLevel + 1, GAME_DATA.levels.length - 1);
+    ProgressStore.save(GameState.playerName, {
+      resumeLevel: GameState.resumeLevel,
+      totalScore: GameState.totalScore,
+      badges: GameState.badges,
+      levelTimes: GameState.levelTimes
+    });
 
     // Save and render level scoreboard
     const updated = await Scoreboard.saveLevel(level.id, GameState.playerName, GameState.score, timeMs);
@@ -4059,6 +4157,8 @@ const GameEngine = {
   },
 
   async showGameComplete() {
+    ProgressStore.clear(GameState.playerName);
+    GameState.resumeLevel = 0;
     document.body.className = 'game-complete';
     setTheme('');
     MusicEngine.playVictory();

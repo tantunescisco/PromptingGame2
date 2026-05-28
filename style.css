@@ -680,6 +680,9 @@ body.welcome .admin-mode-banner {
   flex-wrap: wrap;
   margin-bottom: 4px;
 }
+body.welcome .admin-mode-banner.hidden {
+  display: none;
+}
 body.welcome .lp {
   background: transparent;
   border-radius: 6px;
@@ -702,6 +705,9 @@ body.welcome .lp.admin-clickable:hover { box-shadow: 0 4px 12px currentColor; }
 body.welcome .admin-reset-area {
   width: 100%;
   margin-top: 12px;
+}
+body.welcome .admin-reset-area.hidden {
+  display: none;
 }
 body.welcome .scoreboard-container {
   background: linear-gradient(180deg, rgba(240, 245, 255, 0.34) 0%, rgba(227, 242, 253, 0.22) 100%);
@@ -912,6 +918,54 @@ body.welcome .name-error {
   font-size: 1rem;
   color: var(--primary);
   margin-bottom: 8px;
+}
+
+body.level-4 .level-intro-content {
+  max-width: 560px;
+  padding: 28px 22px;
+}
+
+body.level-4 #intro-title {
+  margin-bottom: 6px;
+}
+
+body.level-4 #intro-subtitle {
+  margin-bottom: 16px;
+}
+
+body.level-4 .concept-box {
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+body.level-4 .concept-box h4 {
+  margin-bottom: 6px;
+}
+
+body.level-5 .level-intro-content {
+  max-width: 560px;
+  padding: 24px 20px;
+}
+
+body.level-5 #intro-title {
+  margin-bottom: 6px;
+}
+
+body.level-5 #intro-subtitle {
+  margin-bottom: 14px;
+}
+
+body.level-5 .concept-box {
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  line-height: 1.48;
+  font-size: 0.9rem;
+}
+
+body.level-5 .concept-box h4 {
+  margin-bottom: 6px;
 }
 
 /* ============================================
@@ -1148,8 +1202,136 @@ body.level-2 .ex-seg.done { background: #9b5fd8; box-shadow: 0 0 7px #9b5fd8; }
   border: 2px solid var(--card-border);
   border-radius: var(--border-radius);
   padding: 28px;
+  padding-top: 68px;
   box-shadow: var(--card-shadow);
   position: relative;
+}
+
+.ex-hud {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: calc(100% - 40px);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-align: right;
+}
+
+#exercise-counter,
+#score-display,
+.timer-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  min-width: 72px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 250, 244, 0.92);
+  border: 1px solid rgba(30, 24, 18, 0.14);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  backdrop-filter: blur(6px);
+  font-weight: 800;
+}
+
+#exercise-counter {
+  color: #2e1a0a;
+}
+
+#score-display {
+  color: #7c4a12;
+}
+
+.timer-display {
+  color: #0f5fa8;
+}
+
+body.level-1 #exercise-counter,
+body.level-1 #score-display,
+body.level-1 .timer-display {
+  background: rgba(255, 247, 235, 0.95);
+  border-color: rgba(139, 58, 26, 0.16);
+}
+
+body.level-2 #exercise-counter,
+body.level-2 #score-display,
+body.level-2 .timer-display {
+  background: rgba(255, 252, 248, 0.94);
+  border-color: rgba(107, 47, 160, 0.16);
+}
+
+body.level-2 #exercise-counter {
+  color: #4a1f6e;
+}
+
+body.level-2 #score-display {
+  color: #7a5c00;
+}
+
+body.level-2 .timer-display {
+  color: #8a6a00;
+}
+
+body.level-3 #exercise-counter,
+body.level-3 #score-display,
+body.level-3 .timer-display {
+  background: rgba(28, 18, 9, 0.92);
+  border-color: rgba(212, 137, 58, 0.28);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+}
+
+body.level-3 #exercise-counter {
+  color: #f2dfc2;
+}
+
+body.level-3 #score-display {
+  color: #ffd089;
+}
+
+body.level-3 .timer-display {
+  color: #ffb069;
+}
+
+body.level-4 #exercise-counter,
+body.level-4 #score-display,
+body.level-4 .timer-display {
+  background: rgba(9, 18, 41, 0.9);
+  border-color: rgba(0, 200, 240, 0.24);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+}
+
+body.level-4 #exercise-counter {
+  color: #eaf8ff;
+}
+
+body.level-4 #score-display {
+  color: #8fe8ff;
+}
+
+body.level-4 .timer-display {
+  color: #9d7cff;
+}
+
+body.level-5 #exercise-counter,
+body.level-5 #score-display,
+body.level-5 .timer-display {
+  background: rgba(6, 0, 30, 0.68);
+  border-color: rgba(192,132,252,0.35);
+  box-shadow: 0 0 16px rgba(192,132,252,0.14);
+}
+
+body.level-5 #exercise-counter {
+  color: #c4b5fd;
+}
+
+body.level-5 #score-display {
+  color: #fde68a;
 }
 
 /* Level-5 cosmic card */
@@ -1224,6 +1406,12 @@ body.level-5 .ex-context {
   text-align: left;
   line-height: 1.48;
 }
+.choice-btn.selected {
+  transform: translateY(-2px);
+  outline: 3px solid rgba(255, 255, 255, 0.28);
+  outline-offset: 1px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
 body.level-1 .choice-btn {
   font-family: 'Roboto', sans-serif;
   font-size: 1rem;
@@ -1240,6 +1428,25 @@ body.level-2 .choice-btn {
 }
 body.level-2 .choice-btn:hover { border-color: var(--primary); background: rgba(0,0,0,0.03); transform: translateY(-2px); }
 body.level-2 .choice-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
+body.level-3 .choice-btn {
+  font-family: 'Special Elite', cursive;
+  font-size: 0.98rem;
+  font-weight: 400;
+  color: #f2e0c0;
+  background: rgba(46, 32, 16, 0.92);
+  border-color: #b87333;
+}
+body.level-3 .choice-btn:hover {
+  border-color: #d4893a;
+  background: rgba(92, 57, 26, 0.96);
+  transform: translateY(-2px);
+}
+body.level-3 .choice-btn.selected {
+  border-color: #f0b35a !important;
+  background: linear-gradient(180deg, rgba(212, 137, 58, 0.95) 0%, rgba(139, 90, 34, 0.98) 100%) !important;
+  color: #1a1008 !important;
+  box-shadow: 0 0 0 1px rgba(240, 179, 90, 0.28), 0 10px 24px rgba(139, 90, 34, 0.28) !important;
+}
 body.level-4 .choice-btn {
   font-family: 'Roboto', sans-serif;
   font-size: 1rem;
@@ -2055,7 +2262,8 @@ body.level-3 #audio-controls,
 body.level-4 #audio-controls,
 body.level-5 #audio-controls {
   top: 18px;
-  right: calc(clamp(380px, 37vw, 450px) + 24px);
+  left: 18px;
+  right: auto;
 }
 #quit-btn {
   background: rgba(200,50,30,0.15);
@@ -2099,7 +2307,8 @@ body.level-5 #music-toggle, body.level-5 #sfx-toggle { border-color: #00ff88; co
   body.level-4 #audio-controls,
   body.level-5 #audio-controls {
     top: 10px;
-    right: 10px;
+    left: 10px;
+    right: auto;
   }
 }
 
