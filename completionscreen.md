@@ -3,7 +3,8 @@ Instructions for Completion page.
 The game completion screen needs to feel like the ultimate payoff. It must seamlessly tie all 5 eras together, showing the full arc of human advancement from mud tablets to cosmic gods. 
 Here are the system prompts to feed your vibe coding assistant to build a highly rewarding, beautiful completion screen.
 
-🎨 1. Look & Feel System PromptCopy and paste this to design the visual layout and artistic atmosphere:textCreate a beautiful, minimalist, and highly rewarding Game Completion screen. 
+🎨 1. Look & Feel System Prompt
+Create a beautiful, minimalist, and highly rewarding Game Completion screen. 
 
 Visual Theme: "The Transcendent Timeline"
 - Background: A deep cosmic void filled with a subtle, slowly rotating galaxy or nebula (using deep purples, teals, and starry dust). 
@@ -18,7 +19,8 @@ UI Layout Components:
    - "Time Spent / Efficiency"
 3. Action Buttons: A prominent "Download Certification Matrix" button and a secondary "Replay Timeline" button.
 
-⚙️ 2. Screen Logic & Interactive States PromptCopy and paste this to handle how the screen behaves and populates data when the player arrives:textWrite the component logic for the Game Completion screen. It should take the user's final game stats and calculate their dynamic "Prompt Engineer Rank" based on their final score.
+⚙️ 2. Screen Logic & Interactive States Promp
+Write the component logic for the Game Completion screen. It should take the user's final game stats and calculate their dynamic "Prompt Engineer Rank" based on their final score.
 
 Rank Matrix Logic:
 - Score 100%: "Omniscient System Archon" (Perfect Run)
@@ -31,7 +33,8 @@ Interactive States to Implement:
 2. Counter Animation: The final score number should quickly count up from 0 to its final value (e.g., 0 to 180 points) over 1.5 seconds.
 3. Share Handler: Create a functional "Copy Summary to Clipboard" button that copies a stylized string of text like: "I just evolved human civilization from Clay to Stars by mastering Prompt Engineering! 🌌 Score: X/200 | Rank: Y. Can you beat me?"
 
-🎬 3. Micro-Animations & "Juice" PromptTo make the screen feel incredibly rewarding, use this prompt to add motion and polish:textAdd high-quality visual "juice" and micro-interactions to the Completion screen:
+🎬 3. Micro-Animations & "Juice" Prompt
+Add high-quality visual "juice" and micro-interactions to the Completion screen:
 
 - Background Motion: The cosmic background should use a CSS parallax effect that shifts slightly based on the user's mouse movement.
 - Particle Explosion: Upon mounting the screen, fire a one-time confetti explosion of digital bits, golden leaves, and stardust particles across the canvas.

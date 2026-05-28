@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Quest 2 - The Evolution of Civilization</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=welcome-panorama-4" />
 </head>
 <body>
   <!-- AUDIO CONTROLS (always visible) -->
@@ -18,197 +18,7 @@
   <div id="screen-welcome" class="screen active">
     <!-- Civilizations panorama background strip -->
     <div class="welcome-panorama" aria-hidden="true">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 440" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <linearGradient id="pano-sky" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stop-color="#1a0800"/>
-            <stop offset="100%" stop-color="#04000e"/>
-          </linearGradient>
-          <linearGradient id="pano-ground" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stop-color="#c2855c"/>
-            <stop offset="22%"  stop-color="#d4c5a9"/>
-            <stop offset="38%"  stop-color="#e8e0d0"/>
-            <stop offset="52%"  stop-color="#6a5a50"/>
-            <stop offset="66%"  stop-color="#1a1a2e"/>
-            <stop offset="100%" stop-color="#0a0014"/>
-          </linearGradient>
-          <linearGradient id="pano-fade-btm" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="75%"  stop-color="white" stop-opacity="0"/>
-            <stop offset="100%" stop-color="white" stop-opacity="0.55"/>
-          </linearGradient>
-          <linearGradient id="pano-fade-top" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stop-color="white" stop-opacity="1"/>
-            <stop offset="48%" stop-color="white" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-
-        <!-- Sky + ground base -->
-        <rect x="0"   y="0"   width="1400" height="340" fill="url(#pano-sky)"/>
-        <circle cx="152" cy="10" r="1.1" fill="#fff" opacity="0.85"/>
-        <circle cx="205" cy="28" r="0.8" fill="#fff" opacity="0.75"/>
-        <!-- Ziggurat silhouette -->
-        <rect x="38"  y="95"  width="140" height="33" fill="#6b3d1e" opacity="0.95"/>
-        <rect x="57"  y="75"  width="102" height="20" fill="#7a4828" opacity="0.95"/>
-        <rect x="76"  y="58"  width="64"  height="17" fill="#8b5534" opacity="0.95"/>
-        <rect x="92"  y="44"  width="32"  height="14" fill="#9e6040" opacity="0.95"/>
-        <!-- Palm trees -->
-        <rect x="198" y="112" width="5"   height="16" fill="#7a4f2a"/>
-        <ellipse cx="200" cy="109" rx="19" ry="9" fill="#1e5218" opacity="0.9"/>
-        <rect x="238" y="118" width="4"   height="10" fill="#7a4f2a"/>
-        <ellipse cx="240" cy="116" rx="14" ry="7" fill="#1e5218" opacity="0.9"/>
-        <!-- Clay tablet -->
-        <rect x="260" y="138" width="24" height="16" rx="2" fill="#c2855c" stroke="#8B5E3C" stroke-width="1.5"/>
-        <line x1="264" y1="142" x2="280" y2="142" stroke="#5a3820" stroke-width="0.9"/>
-        <line x1="264" y1="146" x2="280" y2="146" stroke="#5a3820" stroke-width="0.9"/>
-        <line x1="264" y1="150" x2="275" y2="150" stroke="#5a3820" stroke-width="0.9"/>
-
-        <!-- ══ ZONE 2: ROME (240–560) ══ -->
-        <!-- Sun glow -->
-        <circle cx="365" cy="28" r="26" fill="#ffd080" opacity="0.35"/>
-        <!-- Columns -->
-        <rect x="295" y="52"  width="13" height="76" fill="#e8ddd0"/>
-        <rect x="291" y="47"  width="21" height="7"  fill="#ddd5c8"/>
-        <rect x="291" y="126" width="21" height="6"  fill="#ddd5c8"/>
-        <rect x="329" y="52"  width="13" height="76" fill="#e0d8cc"/>
-        <rect x="325" y="47"  width="21" height="7"  fill="#ddd5c8"/>
-        <rect x="325" y="126" width="21" height="6"  fill="#ddd5c8"/>
-        <rect x="363" y="52"  width="13" height="76" fill="#e8ddd0"/>
-        <rect x="359" y="47"  width="21" height="7"  fill="#ddd5c8"/>
-        <rect x="359" y="126" width="21" height="6"  fill="#ddd5c8"/>
-        <!-- Pediment -->
-        <polygon points="278,47 388,47 333,20" fill="#ddd5c8" stroke="#c8c0b4" stroke-width="1.2"/>
-        <!-- Dome -->
-        <ellipse cx="474" cy="84" rx="52" ry="28" fill="#e0dbd2" stroke="#c8c0b4" stroke-width="1.5"/>
-        <rect x="422" y="84"  width="104" height="48" fill="#e8e0d5" stroke="#c8c0b4" stroke-width="1"/>
-        <!-- Arch doorway -->
-        <path d="M428 130 L428 98 Q474 68 520 98 L520 130" fill="none" stroke="#c8b8a0" stroke-width="2.5"/>
-        <!-- Road lines -->
-        <line x1="240" y1="146" x2="560" y2="146" stroke="#d0c8b8" stroke-width="1.5" opacity="0.7"/>
-
-        <!-- ══ ZONE 3: VICTORIAN (520–840) ══ -->
-        <!-- Factory building -->
-        <rect x="548"  y="68"  width="115" height="60" fill="#4a3a30"/>
-        <rect x="543"  y="62"  width="125" height="8"  fill="#3a2a20"/>
-        <!-- Lit factory windows -->
-        <rect x="560"  y="80"  width="15"  height="11" fill="#f0b840" opacity="0.9"/>
-        <rect x="583"  y="80"  width="15"  height="11" fill="#f0b840" opacity="0.9"/>
-        <rect x="606"  y="80"  width="15"  height="11" fill="#f0b840" opacity="0.9"/>
-        <rect x="560"  y="101" width="15"  height="10" fill="#e8a030" opacity="0.7"/>
-        <rect x="606"  y="101" width="15"  height="10" fill="#e8a030" opacity="0.7"/>
-        <!-- Smokestacks -->
-        <rect x="564"  y="18"  width="15"  height="44" fill="#3a2a20"/>
-        <rect x="590"  y="6"   width="17"  height="56" fill="#2a1a10"/>
-        <rect x="618"  y="28"  width="13"  height="34" fill="#3a2a20"/>
-        <!-- Smoke puffs -->
-        <circle cx="572"  cy="12" r="12"  fill="#8a8070" opacity="0.6"/>
-        <circle cx="582"  cy="5"  r="10"  fill="#707060" opacity="0.5"/>
-        <circle cx="599"  cy="2"  r="14"  fill="#8a8070" opacity="0.55"/>
-        <circle cx="611"  cy="6"  r="11"  fill="#707060" opacity="0.5"/>
-        <circle cx="625"  cy="20" r="9"   fill="#8a8070" opacity="0.5"/>
-        <!-- Large gear -->
-        <circle cx="748"  cy="100" r="36"  fill="none" stroke="#8a6a30" stroke-width="6"/>
-        <circle cx="748"  cy="100" r="20"  fill="none" stroke="#8a6a30" stroke-width="3"/>
-        <rect x="740"   y="60"   width="16"  height="11" rx="2"  fill="#8a6a30"/>
-        <rect x="740"   y="129"  width="16"  height="11" rx="2"  fill="#8a6a30"/>
-        <rect x="778"   y="92"   width="11"  height="16" rx="2"  fill="#8a6a30"/>
-        <rect x="708"   y="92"   width="11"  height="16" rx="2"  fill="#8a6a30"/>
-        <rect x="771"   y="70"   width="9"   height="13" rx="1"  fill="#8a6a30" transform="rotate(45 775 76)"/>
-        <rect x="714"   y="70"   width="9"   height="13" rx="1"  fill="#8a6a30" transform="rotate(-45 718 76)"/>
-        <rect x="771"   y="115"  width="9"   height="13" rx="1"  fill="#8a6a30" transform="rotate(-45 775 121)"/>
-        <rect x="714"   y="115"  width="9"   height="13" rx="1"  fill="#8a6a30" transform="rotate(45 718 121)"/>
-
-        <!-- ══ ZONE 4: CYBERPUNK (800–1100) ══ -->
-        <!-- Skyline buildings -->
-        <rect x="835"  y="48"   width="34"  height="80" fill="#0a1020"/>
-        <rect x="875"  y="26"   width="27"  height="102" fill="#080e1a"/>
-        <rect x="908"  y="65"   width="31"  height="63" fill="#0a1020"/>
-        <rect x="945"  y="14"   width="26"  height="114" fill="#080e1a"/>
-        <rect x="977"  y="55"   width="30"  height="73" fill="#0a1220"/>
-        <rect x="1013" y="30"   width="23"  height="98" fill="#080e1a"/>
-        <rect x="1042" y="70"   width="28"  height="58" fill="#0a1020"/>
-        <rect x="1076" y="22"   width="25"  height="106" fill="#080e1a"/>
-        <!-- Building window lights -->
-        <rect x="838"  y="55"   width="6" height="3" fill="#00d4ff" opacity="0.95"/>
-        <rect x="849"  y="64"   width="6" height="3" fill="#00d4ff" opacity="0.85"/>
-        <rect x="838"  y="74"   width="6" height="3" fill="#ff00ff" opacity="0.8"/>
-        <rect x="879"  y="34"   width="5" height="3" fill="#00d4ff" opacity="0.9"/>
-        <rect x="891"  y="46"   width="5" height="3" fill="#ff00ff" opacity="0.85"/>
-        <rect x="879"  y="58"   width="5" height="3" fill="#00d4ff" opacity="0.75"/>
-        <rect x="949"  y="22"   width="5" height="3" fill="#00d4ff" opacity="0.95"/>
-        <rect x="962"  y="36"   width="5" height="3" fill="#ff00ff" opacity="0.8"/>
-        <rect x="949"  y="50"   width="5" height="3" fill="#00d4ff" opacity="0.85"/>
-        <rect x="1016" y="40"   width="5" height="3" fill="#00d4ff" opacity="0.9"/>
-        <rect x="1028" y="54"   width="5" height="3" fill="#ff00ff" opacity="0.8"/>
-        <rect x="1079" y="30"   width="5" height="3" fill="#00d4ff" opacity="0.9"/>
-        <rect x="1092" y="46"   width="5" height="3" fill="#ff00ff" opacity="0.75"/>
-        <!-- Neon accent lines on buildings -->
-        <line x1="835"  y1="100" x2="869"  y2="100" stroke="#00d4ff" stroke-width="2" opacity="0.65"/>
-        <line x1="945"  y1="82"  x2="970"  y2="82"  stroke="#ff00ff" stroke-width="2" opacity="0.65"/>
-        <line x1="1042" y1="95"  x2="1070" y2="95"  stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
-        <!-- Ground grid -->
-        <line x1="800" y1="130" x2="1110" y2="130" stroke="#00d4ff" stroke-width="0.8" opacity="0.4"/>
-        <line x1="800" y1="140" x2="1110" y2="140" stroke="#00d4ff" stroke-width="0.8" opacity="0.3"/>
-        <!-- Circuit trace with nodes -->
-        <polyline points="840,128 880,128 880,118 940,118 940,128 985,128 985,110 1030,110 1030,128 1100,128" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.55"/>
-        <circle cx="880"  cy="128" r="2.5" fill="#00d4ff" opacity="0.9"/>
-        <circle cx="940"  cy="128" r="2.5" fill="#00d4ff" opacity="0.9"/>
-        <circle cx="985"  cy="128" r="2.5" fill="#ff00ff" opacity="0.9"/>
-        <circle cx="1030" cy="128" r="2.5" fill="#00d4ff" opacity="0.9"/>
-
-        <!-- ══ ZONE 5: COSMIC (1080–1400) ══ -->
-        <!-- Nebulae -->
-        <ellipse cx="1190" cy="70"  rx="70"  ry="44" fill="#7b2d8b" opacity="0.28"/>
-        <ellipse cx="1270" cy="50"  rx="55"  ry="32" fill="#9b1faf" opacity="0.22"/>
-        <ellipse cx="1340" cy="88"  rx="58"  ry="40" fill="#5a0080" opacity="0.28"/>
-        <ellipse cx="1220" cy="108" rx="48"  ry="30" fill="#c084fc" opacity="0.18"/>
-        <ellipse cx="1360" cy="108" rx="42"  ry="26" fill="#9d4edd" opacity="0.22"/>
-        <!-- Stars -->
-        <circle cx="1105" cy="12"  r="1.2" fill="#fff" opacity="0.95"/>
-        <circle cx="1132" cy="28"  r="0.8" fill="#fff" opacity="0.8"/>
-        <circle cx="1162" cy="8"   r="1.1" fill="#fff" opacity="0.9"/>
-        <circle cx="1188" cy="24"  r="0.7" fill="#fff" opacity="0.75"/>
-        <circle cx="1215" cy="10"  r="1.3" fill="#fff" opacity="0.95"/>
-        <circle cx="1242" cy="22"  r="0.9" fill="#fff" opacity="0.85"/>
-        <circle cx="1268" cy="14"  r="1.1" fill="#fff" opacity="0.9"/>
-        <circle cx="1295" cy="30"  r="0.8" fill="#fff" opacity="0.8"/>
-        <circle cx="1320" cy="10"  r="1.2" fill="#fff" opacity="0.9"/>
-        <circle cx="1350" cy="25"  r="0.7" fill="#fff" opacity="0.75"/>
-        <circle cx="1378" cy="16"  r="1.2" fill="#fff" opacity="0.9"/>
-        <circle cx="1128" cy="52"  r="0.7" fill="#fff" opacity="0.6"/>
-        <circle cx="1172" cy="45"  r="0.9" fill="#fff" opacity="0.7"/>
-        <circle cx="1218" cy="52"  r="0.7" fill="#fff" opacity="0.65"/>
-        <circle cx="1268" cy="46"  r="1.0" fill="#fff" opacity="0.75"/>
-        <circle cx="1316" cy="50"  r="0.8" fill="#fff" opacity="0.7"/>
-        <circle cx="1365" cy="42"  r="0.9" fill="#fff" opacity="0.8"/>
-        <!-- Constellation lines -->
-        <line x1="1105" y1="12"  x2="1132" y2="28"  stroke="#fff" stroke-width="0.4" opacity="0.22"/>
-        <line x1="1162" y1="8"   x2="1188" y2="24"  stroke="#fff" stroke-width="0.4" opacity="0.2"/>
-        <line x1="1215" y1="10"  x2="1242" y2="22"  stroke="#fff" stroke-width="0.4" opacity="0.22"/>
-        <line x1="1268" y1="14"  x2="1295" y2="30"  stroke="#fff" stroke-width="0.4" opacity="0.2"/>
-        <line x1="1320" y1="10"  x2="1350" y2="25"  stroke="#fff" stroke-width="0.4" opacity="0.2"/>
-        <!-- Geometric crown rings -->
-        <circle cx="1282" cy="96" r="62"  fill="none" stroke="#ffffff" stroke-width="2"   opacity="0.5"/>
-        <circle cx="1282" cy="96" r="47"  fill="none" stroke="#e0d0ff" stroke-width="1.4" opacity="0.42"/>
-        <circle cx="1282" cy="96" r="30"  fill="none" stroke="#ffffff" stroke-width="1"   opacity="0.38"/>
-        <!-- Crown diamond apex -->
-        <polygon points="1282,28 1286,48 1282,66 1278,48" fill="#ffffff" opacity="0.9"/>
-        <polygon points="1350,72 1358,78 1366,88" fill="#ffffff" opacity="0.55"/>
-        <polygon points="1212,72 1204,78 1196,88" fill="#ffffff" opacity="0.55"/>
-        <!-- Celestial figure silhouette -->
-        <ellipse cx="1282" cy="96"  rx="14" ry="18" fill="#1a0030" opacity="0.8"/>
-        <circle  cx="1282" cy="74"  r="11"           fill="#1a0030" opacity="0.8"/>
-        <!-- Stardust sparkles -->
-        <circle cx="1260" cy="82"  r="1.5" fill="#fff"    opacity="0.7"/>
-        <circle cx="1305" cy="88"  r="1.2" fill="#c084fc" opacity="0.85"/>
-        <circle cx="1270" cy="112" r="1.0" fill="#fff"    opacity="0.65"/>
-        <circle cx="1295" cy="116" r="1.2" fill="#c084fc" opacity="0.75"/>
-
-        </g><!-- end scenes -->
-
-        <!-- Top + bottom fade overlays for blending -->
-        <rect x="0" y="0"   width="1400" height="440" fill="url(#pano-fade-top)"/>
-        <rect x="0" y="0"   width="1400" height="440" fill="url(#pano-fade-btm)"/>
-      </svg>
+      <img class="welcome-panorama-image" src="panorama_21-9.png" alt="" />
     </div>
     <div class="welcome-content">
       <h1 class="welcome-title">Prompt<span class="title-cursor">_</span> Quest 2 <span class="welcome-logo">🚀</span></h1>
@@ -227,7 +37,7 @@
           <span>⚙️ Admin Mode — click any level to jump to it</span>
           <button class="btn-exit-admin" onclick="AdminMode.exitAdminMode()">Exit Admin Mode</button>
         </div>
-        <div class="lp lp1" id="lp-btn-0">� Level 1</div>
+        <div class="lp lp1" id="lp-btn-0">🏺 Level 1</div>
         <div class="lp lp2" id="lp-btn-1">🏛️ Level 2</div>
         <div class="lp lp3" id="lp-btn-2">⚙️ Level 3</div>
         <div class="lp lp4" id="lp-btn-3">🌐 Level 4</div>
@@ -242,7 +52,7 @@
 
       <!-- WELCOME LEADERBOARD -->
       <div class="scoreboard-container">
-        <h3 class="scoreboard-title">🏆 This Week's Top 5</h3>
+        <h3 class="scoreboard-title">🏆 This Week's Rankings</h3>
         <table class="scoreboard-table" id="welcome-lb-table">
           <thead>
             <tr><th class="rank">#</th><th class="player-name">Player</th><th class="score-val">Score</th><th class="time-val">Time</th></tr>
@@ -451,6 +261,6 @@
     </div>
   </div>
 
-  <script src="game.js"></script>
+  <script src="game.js?v=welcome-panorama-3"></script>
 </body>
 </html>

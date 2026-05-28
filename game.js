@@ -4191,12 +4191,28 @@ const GameEngine = {
     if (!tbody) return;
     try {
       const entries = await Scoreboard.getOverall();
+      const sampleEntries = [
+        { name: 'Ava Promptsmith', totalScore: 180, totalTimeMs: 185000 },
+        { name: 'Diego Syntax', totalScore: 172, totalTimeMs: 193000 },
+        { name: 'Nora Tokens', totalScore: 168, totalTimeMs: 201000 },
+        { name: 'Mina Logic', totalScore: 162, totalTimeMs: 214000 },
+        { name: 'Leo Iteration', totalScore: 158, totalTimeMs: 227000 },
+        { name: 'Priya Context', totalScore: 151, totalTimeMs: 238000 },
+        { name: 'Sam Autocomplete', totalScore: 149, totalTimeMs: 244000 },
+        { name: 'Joao Copilot', totalScore: 144, totalTimeMs: 255000 },
+        { name: 'Elena Pipeline', totalScore: 139, totalTimeMs: 267000 },
+        { name: 'Rui Debugger', totalScore: 132, totalTimeMs: 279000 }
+      ];
+      const paddedEntries = [...(entries || [])];
+      sampleEntries.forEach(sample => {
+        if (!paddedEntries.some(entry => entry.name === sample.name)) paddedEntries.push(sample);
+      });
       const MEDALS = ['🥇', '🥈', '🥉'];
-      if (!entries || entries.length === 0) {
+      if (!paddedEntries || paddedEntries.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="lb-loading">No scores yet — be the first!</td></tr>';
         return;
       }
-      tbody.innerHTML = entries.slice(0, 5).map((e, i) => {
+      tbody.innerHTML = paddedEntries.slice(0, 12).map((e, i) => {
         const rank = MEDALS[i] || `${i + 1}`;
         return `<tr>
           <td class="rank">${rank}</td>
