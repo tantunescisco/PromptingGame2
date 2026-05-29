@@ -12,6 +12,7 @@
     <button id="quit-btn" title="Quit Game">🏠</button>
     <button id="music-toggle" onclick="MusicEngine.toggle()" title="Toggle Music">🎵</button>
     <button id="sfx-toggle" onclick="SoundEngine.toggle()" title="Toggle Sound Effects">🔔</button>
+    <button id="about-btn" title="About Prompt Quest 2">ℹ️</button>
   </div>
 
   <!-- SCREENS -->
@@ -264,6 +265,28 @@
       </div>
       <div class="admin-modal-actions">
         <button class="btn-admin-cancel" onclick="AdminMode.closePanel()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div id="about-modal" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+    <div class="admin-modal-box about-modal-box">
+      <div class="about-modal-header">
+        <div>
+          <h2 class="admin-modal-title" id="about-modal-title">About Prompt Quest 2</h2>
+          <p class="about-modal-version" id="about-version"></p>
+        </div>
+        <button class="about-close-btn" onclick="AboutModal.close()" aria-label="Close About dialog">✕</button>
+      </div>
+      <p class="admin-modal-desc about-modal-desc">Current build information and the project README in the active game theme.</p>
+      <div class="about-readme-frame">
+        <div id="about-readme-content" class="about-readme-content">
+          <p class="about-loading">Loading README...</p>
+        </div>
+      </div>
+      <div class="admin-modal-actions">
+        <button class="btn-admin-cancel" onclick="AboutModal.close()">Close</button>
       </div>
     </div>
   </div>

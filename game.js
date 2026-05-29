@@ -4,6 +4,8 @@
 
 "use strict";
 
+const APP_VERSION = "v2026.05.29";
+
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
 // ============================================================
@@ -2152,6 +2154,191 @@ const AdminMode = {
     GameState.levelTimes = [30000, 45000, 60000, 40000, 50000];
     GameState.badges = ['🌟', '💡', '🏆', '⚙️', '🤖'];
     GameEngine.showGameComplete();
+  }
+};
+
+const AboutModal = {
+  _cachedHtml: null,
+
+  open() {
+    const modal = document.getElementById('about-modal');
+    const versionEl = document.getElementById('about-version');
+    if (!modal || !versionEl) return;
+    versionEl.textContent = `Version ${APP_VERSION}`;
+    modal.classList.remove('hidden');
+    this._loadReadme();
+  },
+
+  close() {
+    document.getElementById('about-modal')?.classList.add('hidden');
+  },
+
+  async _loadReadme() {
+    const container = document.getElementById('about-readme-content');
+    if (!container) return;
+    if (this._cachedHtml) {
+      container.innerHTML = this._cachedHtml;
+      container.scrollTop = 0;
+      return;
+    }
+
+    container.innerHTML = '<p class="about-loading">Loading README...</p>';
+    try {
+      const response = await fetch(`README.md?v=${encodeURIComponent(APP_VERSION)}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`README request failed with ${response.status}`);
+      const markdown = await response.text();
+      this._cachedHtml = this._markdownToHtml(markdown);
+      container.innerHTML = this._cachedHtml;
+      container.scrollTop = 0;
+    } catch {
+      container.innerHTML = '<p class="about-error">Could not load README.md for this build.</p>';
+    }
+  },
+
+  _markdownToHtml(markdown) {
+    const lines = String(markdown || '').replace(/\r/g, '').split('\n');
+    const html = [];
+    let paragraph = [];
+    let listType = null;
+    let listItems = [];
+    let codeFence = null;
+    let codeLines = [];
+
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      html.push(`<p>${this._inline(paragraph.join(' '))}</p>`);
+      paragraph = [];
+    };
+
+    const flushList = () => {
+      if (!listType || !listItems.length) return;
+      html.push(`<${listType}>${listItems.map(item => `<li>${this._inline(item)}</li>`).join('')}</${listType}>`);
+      listType = null;
+      listItems = [];
+    };
+
+    const flushCode = () => {
+      if (!codeFence) return;
+      html.push(`<pre><code>${escHtml(codeLines.join('\n'))}</code></pre>`);
+      codeFence = null;
+      codeLines = [];
+    };
+
+    const parseTable = startIndex => {
+      const tableLines = [];
+      let index = startIndex;
+      while (index < lines.length && /^\|.*\|\s*$/.test(lines[index].trim())) {
+        tableLines.push(lines[index].trim());
+        index += 1;
+      }
+      if (tableLines.length < 2 || !/^\|?[\s:-]+\|[\s|:-]*$/.test(tableLines[1])) {
+        return null;
+      }
+
+      const splitRow = row => row.split('|').slice(1, -1).map(cell => cell.trim());
+      const headers = splitRow(tableLines[0]);
+      const bodyRows = tableLines.slice(2).map(splitRow);
+      const thead = `<thead><tr>${headers.map(cell => `<th>${this._inline(cell)}</th>`).join('')}</tr></thead>`;
+      const tbody = `<tbody>${bodyRows.map(row => `<tr>${row.map(cell => `<td>${this._inline(cell)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      return {
+        html: `<table>${thead}${tbody}</table>`,
+        nextIndex: index
+      };
+    };
+
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      const trimmed = line.trim();
+
+      if (trimmed.startsWith('```')) {
+        flushParagraph();
+        flushList();
+        if (codeFence) {
+          flushCode();
+        } else {
+          codeFence = trimmed.slice(3).trim() || 'plain';
+        }
+        continue;
+      }
+
+      if (codeFence) {
+        codeLines.push(line);
+        continue;
+      }
+
+      const table = /^\|.*\|\s*$/.test(trimmed) ? parseTable(index) : null;
+      if (table) {
+        flushParagraph();
+        flushList();
+        html.push(table.html);
+        index = table.nextIndex - 1;
+        continue;
+      }
+
+      if (!trimmed) {
+        flushParagraph();
+        flushList();
+        continue;
+      }
+
+      if (/^---+$/.test(trimmed)) {
+        flushParagraph();
+        flushList();
+        html.push('<hr>');
+        continue;
+      }
+
+      const headingMatch = trimmed.match(/^(#{1,4})\s+(.*)$/);
+      if (headingMatch) {
+        flushParagraph();
+        flushList();
+        const level = headingMatch[1].length;
+        html.push(`<h${level}>${this._inline(headingMatch[2])}</h${level}>`);
+        continue;
+      }
+
+      const quoteMatch = trimmed.match(/^>\s?(.*)$/);
+      if (quoteMatch) {
+        flushParagraph();
+        flushList();
+        html.push(`<blockquote>${this._inline(quoteMatch[1])}</blockquote>`);
+        continue;
+      }
+
+      const unorderedMatch = trimmed.match(/^[-*]\s+(.*)$/);
+      if (unorderedMatch) {
+        flushParagraph();
+        if (listType && listType !== 'ul') flushList();
+        listType = 'ul';
+        listItems.push(unorderedMatch[1]);
+        continue;
+      }
+
+      const orderedMatch = trimmed.match(/^\d+\.\s+(.*)$/);
+      if (orderedMatch) {
+        flushParagraph();
+        if (listType && listType !== 'ol') flushList();
+        listType = 'ol';
+        listItems.push(orderedMatch[1]);
+        continue;
+      }
+
+      if (listType) flushList();
+      paragraph.push(trimmed);
+    }
+
+    flushParagraph();
+    flushList();
+    flushCode();
+    return html.join('');
+  },
+
+  _inline(text) {
+    return escHtml(text)
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
   }
 };
 
@@ -4496,6 +4683,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const quitBtn = document.getElementById('quit-btn');
   if (quitBtn) quitBtn.addEventListener('click', () => GameEngine.quitGame());
 
+  const aboutBtn = document.getElementById('about-btn');
+  if (aboutBtn) aboutBtn.addEventListener('click', () => AboutModal.open());
+
   // Allow Enter key to start game from name field
   const nameInput = document.getElementById('player-name-input');
   if (nameInput) {
@@ -4563,5 +4753,12 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('admin-panel-modal')?.addEventListener('click', e => {
     if (e.target === e.currentTarget) AdminMode.closePanel();
+  });
+  document.getElementById('about-modal')?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) AboutModal.close();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') AboutModal.close();
   });
 });
