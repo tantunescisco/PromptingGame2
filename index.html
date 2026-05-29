@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Quest 2 - The Evolution of Civilization</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260529" />
 </head>
 <body>
   <!-- AUDIO CONTROLS (always visible) -->
@@ -36,11 +36,11 @@
         </div>
         <span id="name-error" class="name-error hidden">Please enter a name between 3 and 20 characters.</span>
       </div>
+      <div id="admin-mode-banner" class="admin-mode-banner hidden">
+        <span>⚙️ Admin Mode — click any level to jump to it</span>
+        <button class="btn-exit-admin" onclick="AdminMode.exitAdminMode()">Exit Admin Mode</button>
+      </div>
       <div class="level-previews">
-        <div id="admin-mode-banner" class="admin-mode-banner hidden">
-          <span>⚙️ Admin Mode — click any level to jump to it</span>
-          <button class="btn-exit-admin" onclick="AdminMode.exitAdminMode()">Exit Admin Mode</button>
-        </div>
         <div class="lp lp1" id="lp-btn-0">🌾 Level 1</div>
         <div class="lp lp2" id="lp-btn-1">🏛️ Level 2</div>
         <div class="lp lp3" id="lp-btn-2">⚙️ Level 3</div>
