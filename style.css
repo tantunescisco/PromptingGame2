@@ -1365,21 +1365,43 @@ body.level-5 .ex-char-zone { padding-top: 4px; }
 .ex-hud {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: fit-content;
-  padding: 10px 14px;
+  padding: 8px 10px;
   border-radius: 999px;
-  background: rgba(255, 248, 235, 0.84);
-  border: 1px solid rgba(133, 75, 28, 0.18);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 248, 235, 0.9);
+  border: 1px solid rgba(133, 75, 28, 0.16);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+  backdrop-filter: blur(12px) saturate(1.04);
   font-weight: 700;
   color: #4a2d14;
 }
 
 .ex-hud #exercise-counter,
+.ex-hud #score-display,
+.timer-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.58));
+  border: 1px solid rgba(123, 85, 47, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+.ex-hud #exercise-counter,
 .ex-hud #score-display {
   font-variant-numeric: tabular-nums;
+}
+
+.ex-hud #exercise-counter {
+  color: #5c3a18;
+}
+
+.ex-hud #score-display {
+  color: #7a470f;
 }
 
 .ex-left.feedback-open .ex-dialogue {
@@ -2609,6 +2631,15 @@ body.level-5 .sb-live-dot { color: #00ff88; }
   display: flex;
   gap: 6px;
 }
+#audio-controls button {
+  color: #fffdf7;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.18);
+  backdrop-filter: blur(10px) saturate(1.08);
+}
+#audio-controls button:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.9);
+  outline-offset: 2px;
+}
 body.level-1 #audio-controls,
 body.level-2 #audio-controls,
 body.level-3 #audio-controls,
@@ -2622,8 +2653,8 @@ body[data-screen="screen-level-intro"] #audio-controls {
   right: 16px;
 }
 #quit-btn {
-  background: rgba(200,50,30,0.15);
-  border: 2px solid rgba(255,100,80,0.5);
+  background: linear-gradient(180deg, rgba(212,67,45,0.28), rgba(135,28,17,0.24));
+  border: 2px solid rgba(255,126,98,0.56);
   border-radius: 50%;
   width: 42px;
   height: 42px;
@@ -2632,15 +2663,14 @@ body[data-screen="screen-level-intro"] #audio-controls {
   display: none;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
   transition: background 0.2s, transform 0.15s;
 }
-#quit-btn:hover { background: rgba(200,50,30,0.35); transform: scale(1.1); }
+#quit-btn:hover { background: linear-gradient(180deg, rgba(212,67,45,0.44), rgba(135,28,17,0.34)); transform: scale(1.08); }
 body.level-5 #quit-btn { border-color: rgba(255,80,60,0.7); }
 
 #music-toggle, #sfx-toggle {
-  background: rgba(0,0,0,0.18);
-  border: 2px solid rgba(255,255,255,0.3);
+  background: linear-gradient(180deg, rgba(23,35,53,0.34), rgba(10,18,33,0.24));
+  border: 2px solid rgba(255,255,255,0.38);
   border-radius: 50%;
   width: 42px;
   height: 42px;
@@ -2649,11 +2679,10 @@ body.level-5 #quit-btn { border-color: rgba(255,80,60,0.7); }
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
   transition: background 0.2s, transform 0.15s;
 }
-#music-toggle:hover, #sfx-toggle:hover { background: rgba(0,0,0,0.35); transform: scale(1.1); }
-#music-toggle.muted, #sfx-toggle.muted { opacity: 0.45; }
+#music-toggle:hover, #sfx-toggle:hover { background: linear-gradient(180deg, rgba(23,35,53,0.5), rgba(10,18,33,0.38)); transform: scale(1.08); }
+#music-toggle.muted, #sfx-toggle.muted { opacity: 0.58; filter: saturate(0.75); }
 body.level-5 #music-toggle, body.level-5 #sfx-toggle { border-color: #00ff88; color: #00ff88; background: rgba(0,255,136,0.08); }
 
 #about-btn {
@@ -2800,13 +2829,26 @@ body.level-5 #about-btn {
 .timer-display {
   font-weight: 700;
   font-size: 0.95rem;
-  color: var(--accent);
+  color: #5f3a1a;
   letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.45);
+}
+body.level-1 .timer-display {
+  color: #8c4d18;
+}
+body.level-2 .timer-display {
+  color: #7a4a05;
+}
+body.level-3 .timer-display {
+  color: #9a451b;
+}
+body.level-4 .timer-display {
+  color: #5a2da6;
 }
 body.level-5 .timer-display {
-  color: #00e5ff;
-  text-shadow: 0 0 8px rgba(0,229,255,0.5);
+  color: #0d7289;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55), 0 0 8px rgba(0,229,255,0.18);
   font-family: 'Share Tech Mono', monospace;
 }
 
