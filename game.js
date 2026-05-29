@@ -1803,7 +1803,47 @@ const GameState = {
   timerInterval: null,
   levelTimes: [],
   pollInterval: null,
-  levelExercises: []   // randomly selected exercises for the current level
+  levelExercises: [],  // randomly selected exercises for the current level
+  currentStage: 'welcome'
+};
+
+const ProgressStore = {
+  _lsKey: 'pq_progress_v1',
+
+  _normalizeName(name) {
+    return String(name || '').trim().toLowerCase();
+  },
+
+  _loadAll() {
+    try { return JSON.parse(localStorage.getItem(this._lsKey)) || {}; }
+    catch { return {}; }
+  },
+
+  _saveAll(all) {
+    try { localStorage.setItem(this._lsKey, JSON.stringify(all)); } catch {}
+  },
+
+  load(name) {
+    const key = this._normalizeName(name);
+    if (!key) return null;
+    return this._loadAll()[key] || null;
+  },
+
+  save(progress) {
+    const key = this._normalizeName(progress?.playerName);
+    if (!key) return;
+    const all = this._loadAll();
+    all[key] = { ...progress, savedAt: Date.now() };
+    this._saveAll(all);
+  },
+
+  clear(name) {
+    const key = this._normalizeName(name);
+    if (!key) return;
+    const all = this._loadAll();
+    delete all[key];
+    this._saveAll(all);
+  }
 };
 
 // ============================================================
@@ -2119,19 +2159,22 @@ const AdminMode = {
 // TIMER
 // ============================================================
 const Timer = {
-  start() {
-    GameState.levelStartTime = Date.now();
-    GameState.levelElapsed = 0;
+  start(initialElapsed = 0) {
+    GameState.levelStartTime = Date.now() - initialElapsed;
+    GameState.levelElapsed = initialElapsed;
     clearInterval(GameState.timerInterval);
-    GameState.timerInterval = setInterval(() => {
-      const elapsed = Date.now() - GameState.levelStartTime;
-      const totalMs = elapsed;
+    const renderElapsed = totalMs => {
       const secs = Math.floor(totalMs / 1000);
       const mins = Math.floor(secs / 60);
       const ss = String(secs % 60).padStart(2, '0');
       const el = document.getElementById('timer-display');
       if (el) el.textContent = `⏱ ${mins}:${ss}`;
       GameState.levelElapsed = totalMs;
+    };
+    renderElapsed(initialElapsed);
+    GameState.timerInterval = setInterval(() => {
+      const elapsed = Date.now() - GameState.levelStartTime;
+      renderElapsed(elapsed);
     }, 500);
   },
 
@@ -3045,7 +3088,15 @@ function showScreen(id) {
   if (quitBtn) quitBtn.style.display = id === 'screen-welcome' ? 'none' : 'flex';
 
   document.body.classList.toggle('welcome', id === 'screen-welcome');
-  if (id === 'screen-welcome') GameEngine._renderWelcomeLeaderboard();
+  if (id === 'screen-welcome') {
+    GameState.currentStage = 'welcome';
+    const nameInput = document.getElementById('player-name-input');
+    if (nameInput && GameState.playerName && GameState.playerName !== 'Player') {
+      nameInput.value = GameState.playerName;
+    }
+    GameEngine._renderWelcomeLeaderboard();
+    GameEngine._updateWelcomeResumeCta();
+  }
 }
 
 function setTheme(levelClass) {
@@ -3132,7 +3183,7 @@ const CharacterEngine = {
   _humanImages: [
     'civil1_human.png',
     'civil2_human.png',
-    'civil3_human.png',
+    'civil3_human.png?v=20260529',
     'civil4_human.png',
     'civil5_human.png'
   ],
@@ -3532,6 +3583,172 @@ const CharacterEngine = {
 // ============================================================
 const GameEngine = {
 
+  _getResumeLookupName(preferredName = '') {
+    const candidate = String(preferredName || '').trim()
+      || String(document.getElementById('player-name-input')?.value || '').trim()
+      || String(GameState.playerName || '').trim();
+    return candidate && candidate !== 'Player' ? candidate : '';
+  },
+
+  _prepareNewGame(name) {
+    GameState.playerName = name;
+    GameState.currentLevel = 0;
+    GameState.currentExercise = 0;
+    GameState.score = 0;
+    GameState.totalScore = 0;
+    GameState.badges = [];
+    GameState.selectedChoice = null;
+    GameState.matchingState = { selected: null, pairs: {} };
+    GameState.hintUsed = false;
+    GameState.answers = {};
+    GameState.levelStartTime = 0;
+    GameState.levelElapsed = 0;
+    GameState.levelTimes = [];
+    GameState.levelExercises = [];
+    GameState.currentStage = 'intro';
+  },
+
+  _findExerciseById(levelIndex, exerciseId) {
+    return GAME_DATA.levels[levelIndex]?.exercises.find(ex => ex.id === exerciseId) || null;
+  },
+
+  _getResumeTarget(progress) {
+    if (!progress || !progress.playerName) return null;
+    const currentLevel = Number(progress.currentLevel) || 0;
+    if (progress.stage === 'game-complete' || progress.stage === 'welcome') return null;
+    if (progress.stage === 'level-complete') {
+      const nextLevel = currentLevel + 1;
+      if (nextLevel >= GAME_DATA.levels.length) return null;
+      return { levelIndex: nextLevel, stage: 'intro' };
+    }
+    if (currentLevel >= GAME_DATA.levels.length) return null;
+    return {
+      levelIndex: currentLevel,
+      stage: progress.stage === 'exercise' ? 'exercise' : 'intro'
+    };
+  },
+
+  _buildProgress(stage = GameState.currentStage) {
+    const elapsed = stage === 'exercise' && GameState.levelStartTime
+      ? Date.now() - GameState.levelStartTime
+      : (GameState.levelElapsed || 0);
+    return {
+      playerName: GameState.playerName,
+      stage,
+      currentLevel: GameState.currentLevel,
+      currentExercise: GameState.currentExercise,
+      score: GameState.score,
+      totalScore: GameState.totalScore,
+      badges: [...GameState.badges],
+      answers: { ...GameState.answers },
+      levelTimes: [...GameState.levelTimes],
+      levelExerciseIds: GameState.levelExercises.map(ex => ex.id),
+      levelElapsed: Math.max(0, elapsed)
+    };
+  },
+
+  _persistProgress(stage = GameState.currentStage) {
+    const playerName = this._getResumeLookupName(GameState.playerName);
+    if (!playerName) return null;
+    const snapshot = this._buildProgress(stage);
+    snapshot.playerName = playerName;
+    ProgressStore.save(snapshot);
+    this._updateWelcomeResumeCta(snapshot);
+    return snapshot;
+  },
+
+  _clearProgress(name = GameState.playerName) {
+    const playerName = this._getResumeLookupName(name);
+    if (playerName) ProgressStore.clear(playerName);
+    this._updateWelcomeResumeCta();
+  },
+
+  _updateWelcomeResumeCta(progress = null) {
+    const snapshot = progress || ProgressStore.load(this._getResumeLookupName());
+    const target = this._getResumeTarget(snapshot);
+    [0, 1, 2, 3, 4].forEach(i => {
+      const el = document.getElementById('lp-btn-' + i);
+      if (!el) return;
+      el.classList.remove('resume-clickable');
+      el.removeAttribute('data-resume-level');
+      if (!el.classList.contains('admin-clickable')) el.title = '';
+    });
+    if (!target) return;
+    const el = document.getElementById('lp-btn-' + target.levelIndex);
+    if (!el) return;
+    el.classList.add('resume-clickable');
+    el.setAttribute('data-resume-level', 'true');
+    if (!el.classList.contains('admin-clickable')) {
+      const verb = snapshot?.stage === 'level-complete' ? 'Continue' : 'Resume';
+      el.title = `${verb} at Level ${target.levelIndex + 1}`;
+    }
+  },
+
+  _restoreProgress(progress) {
+    const target = this._getResumeTarget(progress);
+    if (!target) return false;
+    const level = GAME_DATA.levels[target.levelIndex];
+    if (!level) return false;
+
+    const nameInput = document.getElementById('player-name-input');
+    const nameError = document.getElementById('name-error');
+    if (nameInput) {
+      nameInput.value = progress.playerName;
+      nameInput.classList.remove('input-error');
+    }
+    if (nameError) nameError.classList.add('hidden');
+
+    GameState.playerName = progress.playerName;
+    GameState.currentLevel = target.levelIndex;
+    GameState.totalScore = Number(progress.totalScore) || 0;
+    GameState.badges = Array.isArray(progress.badges) ? [...progress.badges] : [];
+    GameState.levelTimes = Array.isArray(progress.levelTimes) ? [...progress.levelTimes] : [];
+    GameState.selectedChoice = null;
+    GameState.matchingState = { selected: null, pairs: {} };
+    GameState.hintUsed = false;
+
+    if (
+      target.stage === 'exercise' &&
+      target.levelIndex === Number(progress.currentLevel) &&
+      Array.isArray(progress.levelExerciseIds) &&
+      progress.levelExerciseIds.length
+    ) {
+      const restoredExercises = progress.levelExerciseIds
+        .map(id => this._findExerciseById(target.levelIndex, id))
+        .filter(Boolean);
+      if (restoredExercises.length === progress.levelExerciseIds.length) {
+        GameState.score = Number(progress.score) || 0;
+        GameState.answers = progress.answers && typeof progress.answers === 'object' ? { ...progress.answers } : {};
+        GameState.levelExercises = restoredExercises;
+        GameState.currentExercise = Math.min(
+          Number(progress.currentExercise) || 0,
+          Math.max(restoredExercises.length - 1, 0)
+        );
+        GameState.currentStage = 'exercise';
+        setTheme(level.theme);
+        Timer.start(Number(progress.levelElapsed) || 0);
+        this.renderExercise();
+        return true;
+      }
+    }
+
+    GameState.score = 0;
+    GameState.answers = {};
+    GameState.currentExercise = 0;
+    GameState.levelExercises = [];
+    GameState.currentStage = 'intro';
+    setTheme(level.theme);
+    this.showLevelIntro();
+    return true;
+  },
+
+  _resumeFromWelcome(levelIndex) {
+    const progress = ProgressStore.load(this._getResumeLookupName());
+    const target = this._getResumeTarget(progress);
+    if (!target || target.levelIndex !== levelIndex) return;
+    this._restoreProgress(progress);
+  },
+
   async startGame() {
     // Read and validate player name (3–20 chars required)
     const nameInput = document.getElementById('player-name-input');
@@ -3555,6 +3772,19 @@ const GameEngine = {
       return;
     }
 
+    const savedProgress = ProgressStore.load(raw);
+    const resumeTarget = this._getResumeTarget(savedProgress);
+    if (resumeTarget) {
+      const resumeLevel = GAME_DATA.levels[resumeTarget.levelIndex];
+      const shouldResume = window.confirm(
+        `Resume your previous game as "${raw}"?\n\n` +
+        `You will continue from ${resumeLevel ? `Level ${resumeLevel.id}: ${resumeLevel.title}` : `Level ${resumeTarget.levelIndex + 1}`}.`
+      );
+      if (shouldResume) {
+        return this._restoreProgress(savedProgress);
+      }
+    }
+
     // Check for duplicate name against existing leaderboard entries
     if (startBtn) { startBtn.disabled = true; startBtn.textContent = 'Checking…'; }
     try {
@@ -3572,14 +3802,8 @@ const GameEngine = {
 
     if (nameError) nameError.classList.add('hidden');
     if (nameInput) nameInput.classList.remove('input-error');
-    GameState.playerName = raw;
-
-    GameState.currentLevel = 0;
-    GameState.score = 0;
-    GameState.totalScore = 0;
-    GameState.badges = [];
-    GameState.answers = {};
-    GameState.levelTimes = [];
+    this._clearProgress(raw);
+    this._prepareNewGame(raw);
     setTheme('level-1');
     this.showLevelIntro();
   },
@@ -3589,6 +3813,7 @@ const GameEngine = {
     clearInterval(GameState.fireworksInterval);
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     MusicEngine._stopAll();
+    this._clearProgress();
     setTheme('');
     document.body.className = '';
     showScreen('screen-welcome');
@@ -3599,6 +3824,9 @@ const GameEngine = {
     this._stopPolling();
     clearInterval(GameState.fireworksInterval);
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
+    if (GameState.currentStage && GameState.currentStage !== 'welcome' && GameState.currentStage !== 'game-complete') {
+      this._persistProgress(GameState.currentStage);
+    }
     Timer.stop();
     MusicEngine._stopAll();
     setTheme('');
@@ -3609,6 +3837,7 @@ const GameEngine = {
 
   showLevelIntro() {
     const level = GAME_DATA.levels[GameState.currentLevel];
+    GameState.currentStage = 'intro';
     document.getElementById('intro-badge').textContent = level.badge;
     document.getElementById('intro-title').textContent = `Level ${level.id}: ${level.title}`;
     document.getElementById('intro-subtitle').textContent = level.subtitle;
@@ -3616,6 +3845,7 @@ const GameEngine = {
     setTheme(level.theme);
     MusicEngine.play(GameState.currentLevel);
     showScreen('screen-level-intro');
+    this._persistProgress('intro');
   },
 
   startLevel() {
@@ -3734,7 +3964,9 @@ const GameEngine = {
 
     CharacterEngine.show(GameState.currentLevel);
     CharacterEngine.setDialogue(GameState.currentLevel, exercise.inputType);
+    GameState.currentStage = 'exercise';
     showScreen('screen-exercise');
+    this._persistProgress('exercise');
   },
 
   renderMatching(exercise, container) {
@@ -3978,7 +4210,9 @@ const GameEngine = {
       `🏆 Level ${level.id} Scoreboard${online ? ' <span class="sb-live-dot">● LIVE</span>' : ''}`;
     this._renderScoreboardTable('level-scoreboard-body', updated, GameState.playerName, false);
 
+    GameState.currentStage = 'level-complete';
     showScreen('screen-level-complete');
+    this._persistProgress('level-complete');
 
     // Live polling — refresh every 5s while on this screen
     clearInterval(GameState.pollInterval);
@@ -4046,6 +4280,8 @@ const GameEngine = {
   },
 
   async showGameComplete() {
+    GameState.currentStage = 'game-complete';
+    this._clearProgress();
     document.body.className = 'game-complete';
     setTheme('');
     MusicEngine.playVictory();
@@ -4270,8 +4506,23 @@ window.addEventListener('DOMContentLoaded', () => {
       nameInput.classList.remove('input-error');
       const nameError = document.getElementById('name-error');
       if (nameError) nameError.classList.add('hidden');
+      GameEngine._updateWelcomeResumeCta();
     });
   }
+
+  const levelPreviews = document.querySelector('.level-previews');
+  if (levelPreviews) {
+    levelPreviews.addEventListener('click', e => {
+      const target = e.target.closest('.lp');
+      if (!target) return;
+      if (target.classList.contains('admin-clickable')) return;
+      const levelIndex = Number(String(target.id || '').replace('lp-btn-', ''));
+      if (Number.isNaN(levelIndex) || !target.classList.contains('resume-clickable')) return;
+      GameEngine._resumeFromWelcome(levelIndex);
+    });
+  }
+
+  GameEngine._updateWelcomeResumeCta();
 
   // Allow Enter key to submit admin login
   const adminPassInput = document.getElementById('admin-password');

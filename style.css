@@ -72,7 +72,7 @@ body.level-3 { /* ⚙️ Smog & Steel — Industrial Revolution */
   --text: #f2e0c0;
   --text-light: #c89a60;
   --font-heading: 'Special Elite', cursive;
-  --font-body: 'Special Elite', cursive;
+  --font-body: 'Roboto', sans-serif;
   --border-radius: 3px;
 }
 
@@ -685,6 +685,8 @@ body.welcome .welcome-desc .desc-line {
 body.welcome .name-entry {
   align-items: center;
   margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
 }
 body.welcome .name-entry-row {
   display: flex;
@@ -788,6 +790,8 @@ body.welcome .level-previews {
   max-width: 100%;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
+  z-index: 2;
 }
 body.welcome .lp {
   background: rgba(255,255,255,0.2);
@@ -822,6 +826,14 @@ body.welcome .lp.admin-clickable:hover {
   box-shadow: 0 6px 14px rgba(25,118,210,0.12);
   transform: translateY(-1px);
 }
+body.welcome .lp.resume-clickable {
+  box-shadow: 0 0 0 2px rgba(25,118,210,0.18), 0 8px 18px rgba(25,118,210,0.12);
+  transform: translateY(-1px);
+}
+body.welcome .lp.resume-clickable:hover {
+  box-shadow: 0 0 0 2px rgba(25,118,210,0.28), 0 10px 20px rgba(25,118,210,0.18);
+  transform: translateY(-2px);
+}
 body.welcome .scoreboard-container {
   background: rgba(227, 242, 253, 0.26);
   border: 1.5px solid rgba(25,118,210,0.68);
@@ -832,6 +844,8 @@ body.welcome .scoreboard-container {
   padding: 12px 14px;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
+  z-index: 1;
 }
 body.welcome .scoreboard-title {
   font-family: 'Fredoka One', cursive;
@@ -1332,6 +1346,13 @@ body.level-5 .ex-char-zone { padding-top: 4px; }
   .ex-char-zone { min-height: 124px; padding: 2px 0 88px; margin-top: 0; }
   .ex-left .level-character { width: 100px; }
   .ex-right { height: auto; padding: 16px; gap: 12px; }
+  body.level-3 .ex-right { padding: 12px; gap: 10px; }
+  body.level-3 .exercise-card { padding: 14px 14px 18px; }
+  body.level-3 #exercise-question {
+    font-size: clamp(1rem, 5vw, 1.28rem);
+    line-height: 1.46;
+    letter-spacing: 0.005em;
+  }
   .feedback-panel {
     left: 0;
     right: 0;
@@ -1382,6 +1403,7 @@ body.level-5 .ex-char-zone { padding-top: 4px; }
 
 /* Level-5 cosmic card */
 body.level-5 .exercise-card {
+  background: linear-gradient(180deg, rgba(18, 10, 46, 0.96), rgba(10, 6, 32, 0.94));
   border-color: #c084fc;
   box-shadow: 0 0 20px rgba(192,132,252,0.25), 0 0 60px rgba(192,132,252,0.1);
 }
@@ -1411,7 +1433,24 @@ body.level-5 .ex-type-badge {
   margin-bottom: 18px;
   line-height: 1.52;
   letter-spacing: 0.01em;
-  max-width: 26ch;
+  width: 100%;
+  max-width: none;
+}
+body.level-3 #exercise-question {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  color: #4a2f16;
+  letter-spacing: 0.015em;
+  line-height: 1.58;
+}
+body.level-3 .ex-context,
+body.level-3 .rewrite-label,
+body.level-3 .match-col-label {
+  color: #7a4d24;
+}
+body.level-3 #exercise-context strong,
+body.level-3 .rewrite-label strong {
+  color: #4a2f16;
 }
 .ex-context {
   background: rgba(0,0,0,0.04);
@@ -1428,6 +1467,10 @@ body.level-5 .ex-context {
   background: rgba(192,132,252,0.08);
   border-left-color: #c084fc;
   color: #d8b4fe;
+}
+body.level-5 #exercise-question {
+  color: #f6f0ff;
+  line-height: 1.5;
 }
 .ex-context.hidden { display: none; }
 
@@ -1469,6 +1512,13 @@ body.level-2 .choice-btn {
   font-weight: 500;
   color: #1e1530;
 }
+body.level-3 .choice-btn {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f2e0c0;
+  letter-spacing: 0.01em;
+}
 body.level-2 .choice-btn:hover { border-color: var(--primary); background: rgba(0,0,0,0.03); transform: translateY(-2px); }
 body.level-2 .choice-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
 body.level-4 .choice-btn {
@@ -1482,7 +1532,10 @@ body.level-4 .choice-btn.selected { border-color: var(--primary); background: rg
 body.level-5 .choice-btn {
   background: rgba(20, 8, 50, 0.85);
   border-color: #7c3aed;
-  color: #d8b4fe;
+  color: #f3e8ff;
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.65;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 body.level-5 .choice-btn:hover { border-color: #c084fc; color: #f0e6ff; box-shadow: 0 0 10px rgba(192,132,252,0.2); }
 body.level-5 .choice-btn.selected { background: rgba(192,132,252,0.2); border-color: #c084fc; color: #f0e6ff; }
@@ -1520,10 +1573,21 @@ body.level-2 textarea.prompt-input, body.level-2 input.prompt-input {
   color: #1e1530;
   line-height: 1.6;
 }
+body.level-3 textarea.prompt-input, body.level-3 input.prompt-input {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #f2e0c0;
+  line-height: 1.6;
+}
 textarea.prompt-input:focus, input.prompt-input:focus { border-color: var(--primary); }
 body.level-2 textarea.prompt-input:focus, body.level-2 input.prompt-input:focus {
   border-color: #6b2fa0;
   box-shadow: 0 0 8px rgba(107,47,160,0.2);
+}
+body.level-3 textarea.prompt-input:focus, body.level-3 input.prompt-input:focus {
+  border-color: #d4893a;
+  box-shadow: 0 0 10px rgba(212,137,58,0.24);
 }
 body.level-4 textarea.prompt-input, body.level-4 input.prompt-input {
   font-family: 'Roboto', sans-serif;
@@ -1539,8 +1603,8 @@ body.level-4 textarea.prompt-input:focus, body.level-4 input.prompt-input:focus 
 body.level-5 textarea.prompt-input, body.level-5 input.prompt-input {
   background: #0c0528;
   border-color: #7c3aed;
-  color: #d8b4fe;
-  font-family: 'Share Tech Mono', monospace;
+  color: #f3e8ff;
+  font-family: 'Roboto', sans-serif;
   caret-color: #c084fc;
 }
 body.level-5 textarea.prompt-input:focus { border-color: #c084fc; box-shadow: 0 0 12px rgba(192,132,252,.25); }
@@ -1595,7 +1659,53 @@ body.level-5 textarea.prompt-input:focus { border-color: #c084fc; box-shadow: 0 
 .match-item:hover { border-color: var(--primary); }
 .match-item.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
 .match-item.matched { border-color: #4caf50; background: #e8f5e9; color: #2e7d32; pointer-events: none; }
+body.level-3 .match-col-label,
+body.level-3 .match-item,
+body.level-3 .rewrite-label {
+  font-family: 'Roboto', sans-serif;
+}
+body.level-3 .match-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px 24px;
+  align-items: start;
+}
+body.level-3 .match-item {
+  background: rgba(58,37,18,0.96);
+  border-color: #b87333;
+  color: #f2e0c0;
+  padding: 14px 16px;
+  box-shadow: 0 10px 22px rgba(48,29,14,0.12);
+}
+body.level-3 .match-item:hover {
+  border-color: #d4893a;
+  background: rgba(72,45,22,0.98);
+  transform: translateY(-1px);
+}
+body.level-3 .match-item.selected {
+  background: #d4893a;
+  border-color: #f0c68a;
+  color: #24150a;
+}
+body.level-3 .match-item.matched {
+  background: rgba(124,179,66,0.18);
+  border-color: #7cb342;
+  color: #35511d;
+}
 body.level-5 .match-item.matched { background: rgba(192,132,252,.18); border-color: #c084fc; color: #f0e6ff; pointer-events: none; }
+body.level-5 .match-col-label,
+body.level-5 .match-item,
+body.level-5 .rewrite-label {
+  font-family: 'Roboto', sans-serif;
+}
+body.level-5 .match-item {
+  background: rgba(20, 8, 50, 0.85);
+  border-color: #7c3aed;
+  color: #f3e8ff;
+}
+body.level-5 .match-item:hover {
+  border-color: #c084fc;
+  background: rgba(34, 14, 72, 0.92);
+}
 
 /* Rewrite textarea label */
 .rewrite-label {
@@ -1648,7 +1758,12 @@ body.level-4 .hint-box {
   font-weight: 500;
   color: #a8d5e5;
 }
-body.level-5 .hint-box { background: rgba(192,132,252,0.1); border-color: #c084fc; color: #d8b4fe; }
+body.level-5 .hint-box {
+  background: rgba(192,132,252,0.12);
+  border-color: #c084fc;
+  color: #f0ddff;
+  font-family: 'Roboto', sans-serif;
+}
 .hint-box.hidden { display: none; }
 
 /* Exercise actions */
@@ -1672,6 +1787,17 @@ body.level-5 .hint-box { background: rgba(192,132,252,0.1); border-color: #c084f
   transition: all 0.2s;
 }
 .btn-hint:hover { border-color: #ffc107; color: #ffc107; }
+body.level-3 .btn-hint {
+  background: rgba(255,248,238,0.7);
+  border-color: rgba(184,115,51,0.8);
+  color: #6f4723;
+  min-width: 156px;
+}
+body.level-3 .btn-hint:hover {
+  background: rgba(255,244,228,0.96);
+  border-color: #d4893a;
+  color: #4a2f16;
+}
 
 .btn-submit {
   background: var(--btn-bg);
@@ -1688,14 +1814,29 @@ body.level-5 .hint-box { background: rgba(192,132,252,0.1); border-color: #c084f
   transition: all 0.2s;
 }
 .btn-submit:hover { filter: brightness(1.15); transform: scale(1.04); }
+body.level-3 .exercise-actions {
+  gap: 16px;
+  margin-top: 18px;
+}
+body.level-3 .btn-submit {
+  min-width: 220px;
+  box-shadow: 0 12px 24px rgba(153,88,27,0.22);
+}
+body.level-3 .btn-submit:hover {
+  box-shadow: 0 16px 28px rgba(153,88,27,0.28);
+}
 body.level-5 .btn-submit {
   background: transparent;
   border-color: #00e676;
   color: #00e676;
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Roboto', sans-serif;
   letter-spacing: 2px;
 }
 body.level-5 .btn-submit:hover { background: rgba(0,230,118,0.1); box-shadow: 0 0 16px rgba(0,230,118,.4); }
+body.level-5 .btn-hint {
+  font-family: 'Roboto', sans-serif;
+  color: #e9d5ff;
+}
 
 .btn-primary {
   background: var(--primary);
@@ -1831,7 +1972,8 @@ body.level-5 .btn-primary {
   #exercise-question {
     font-size: clamp(1.22rem, 1.5vw, 1.72rem);
     margin-bottom: 20px;
-    max-width: 27ch;
+    width: 100%;
+    max-width: none;
   }
 
   .ex-context {
@@ -2264,7 +2406,7 @@ body.level-5 #intro-title,
 body.level-5 #exercise-question,
 body.level-5 #complete-title,
 body.level-5 #final-title {
-  text-shadow: 0 0 12px var(--primary), 0 0 30px rgba(0,230,118,.3);
+  text-shadow: 0 0 8px rgba(192,132,252,0.45), 0 0 20px rgba(0,230,118,.16);
 }
 
 /* ============================================
@@ -2276,6 +2418,34 @@ body.level-5 #final-title {
   .match-grid { grid-template-columns: 1fr; }
   .exercise-actions { flex-direction: column; align-items: stretch; }
   .btn-submit, .btn-hint { width: 100%; text-align: center; }
+}
+
+@media (max-width: 720px) {
+  body.level-3 #exercise-question {
+    max-width: 100%;
+  }
+
+  body.level-3 .choice-grid,
+  body.level-3 .match-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.level-3 .choice-btn {
+    min-height: auto;
+    padding: 16px 18px;
+  }
+
+  body.level-3 .exercise-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.level-3 .btn-submit,
+  body.level-3 .btn-hint {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+  }
 }
 
 /* Scrollbar styling */
