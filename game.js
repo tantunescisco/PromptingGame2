@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "v2026.05.29";
+const APP_VERSION = "2026.05.29.05";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -2182,16 +2182,16 @@ const AboutModal = {
       return;
     }
 
-    container.innerHTML = '<p class="about-loading">Loading README...</p>';
+    container.innerHTML = '<p class="about-loading">Loading guide...</p>';
     try {
-      const response = await fetch(`README.md?v=${encodeURIComponent(APP_VERSION)}`, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`README request failed with ${response.status}`);
+      const response = await fetch(`ABOUT.md?v=${encodeURIComponent(APP_VERSION)}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`ABOUT request failed with ${response.status}`);
       const markdown = await response.text();
       this._cachedHtml = this._markdownToHtml(markdown);
       container.innerHTML = this._cachedHtml;
       container.scrollTop = 0;
     } catch {
-      container.innerHTML = '<p class="about-error">Could not load README.md for this build.</p>';
+      container.innerHTML = '<p class="about-error">Could not load the in-game guide for this build.</p>';
     }
   },
 

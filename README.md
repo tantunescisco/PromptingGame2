@@ -77,7 +77,7 @@ Live demo: [https://tantunescisco.github.io/PromptingGame2/](https://tantunescis
 - Admin mode allows jumping directly to any level from the welcome chips
 - Admin mode includes leaderboard reset and completion-screen preview actions
 - Welcome screen visually highlights resumable level chips when a matching saved run exists
-- About button in the top-right control cluster opens the current game version and README in the active theme
+- About button in the top-right control cluster opens the current game version and a learner guide in the active theme
 
 ### Audio and presentation
 
@@ -156,6 +156,7 @@ PromptingGame2/
 |-- index.html
 |-- style.css
 |-- game.js
+|-- ABOUT.md
 |-- README.md
 |-- completionscreen.md
 |-- completion.png
@@ -190,7 +191,7 @@ Primary game systems include:
 - `CharacterEngine`: era character rendering and final timeline visuals
 - `GameEngine`: screen flow, exercise rendering, scoring, saving, restoring, and leaderboard rendering
 - `AdminMode`: hidden admin tools for login, level jumping, reset, and preview flows
-- `AboutModal`: loads and renders the current `README.md` inside a themed modal
+- `AboutModal`: loads and renders `ABOUT.md` inside a themed modal
 
 ### `style.css`
 
