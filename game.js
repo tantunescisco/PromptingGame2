@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.16";
+const APP_VERSION = "2026.05.29.20";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -1803,6 +1803,11 @@ const GameState = {
   timerInterval: null,
   levelTimes: [],
   pollInterval: null,
+  fireworksInterval: null,
+  completionFusionInterval: null,
+  completionFusionTimeouts: [],
+  completionUiTimeouts: [],
+  _parallaxCleanup: null,
   levelExercises: [],  // randomly selected exercises for the current level
   currentStage: 'welcome'
 };
@@ -3391,6 +3396,9 @@ const LEVEL_BACKGROUND_IMAGES = [
 ];
 
 const LEVEL_EVOLUTION_MS = 7200;
+const FINAL_SYNCHRONIZER_INDEX = 5;
+const GAME_COMPLETE_FUSION_INTERVAL_MS = 10000;
+const GAME_COMPLETE_FUSION_REVEAL_DELAY_MS = 3600;
 
 function starRating(correct, total) {
   const pct = correct / total;
@@ -3472,7 +3480,8 @@ const CharacterEngine = {
     'civil2_human.png',
     'civil3_human.png?v=20260529',
     'civil4_human.png',
-    'civil5_human.png'
+    'civil5_human.png',
+    'civil6_human.png'
   ],
 
   _svgs: [
@@ -4100,6 +4109,9 @@ const GameEngine = {
   restartGame() {
     this._stopPolling();
     clearInterval(GameState.fireworksInterval);
+    GameState.fireworksInterval = null;
+    this._clearGameCompleteFusionLoop();
+    this._clearGameCompleteUiTimeouts();
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     MusicEngine._stopAll();
     this._clearProgress();
@@ -4112,6 +4124,9 @@ const GameEngine = {
   quitGame() {
     this._stopPolling();
     clearInterval(GameState.fireworksInterval);
+    GameState.fireworksInterval = null;
+    this._clearGameCompleteFusionLoop();
+    this._clearGameCompleteUiTimeouts();
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     if (GameState.currentStage && GameState.currentStage !== 'welcome' && GameState.currentStage !== 'game-complete') {
       this._persistProgress(GameState.currentStage);
@@ -4494,7 +4509,7 @@ const GameEngine = {
     if (!screen || !currentCharEl || !nextCharEl || !currentBgEl || !nextBgEl || !fromLabelEl || !toLabelEl) return;
 
     const hasNextLevel = levelIndex < GAME_DATA.levels.length - 1;
-    const nextIndex = hasNextLevel ? levelIndex + 1 : levelIndex;
+    const nextIndex = hasNextLevel ? levelIndex + 1 : FINAL_SYNCHRONIZER_INDEX;
     const currentLevel = GAME_DATA.levels[levelIndex];
     const nextLevel = hasNextLevel ? GAME_DATA.levels[nextIndex] : null;
     const currentChar = CharacterEngine._humanImages[levelIndex] ?? null;
@@ -4506,23 +4521,23 @@ const GameEngine = {
       ? `<img src="${currentChar}" alt="${currentLevel.title} guide" draggable="false" />`
       : '';
     nextCharEl.innerHTML = nextChar
-      ? `<img src="${nextChar}" alt="${hasNextLevel ? nextLevel.title : 'Civilization synchronized'} guide" draggable="false" />`
+      ? `<img src="${nextChar}" alt="${hasNextLevel ? nextLevel.title : 'Civilization Synchronizer'} guide" draggable="false" />`
       : '';
     nextCharEl.classList.toggle('complete-character-ascended', !hasNextLevel);
 
     fromLabelEl.textContent = `From ${currentLevel.title}`;
     toLabelEl.textContent = hasNextLevel
       ? `Into ${nextLevel.title}`
-      : 'Into Civilization Synchronized';
+      : 'Into Civilization Synchronizer';
     if (titleEl) {
       titleEl.textContent = hasNextLevel
         ? `Level ${currentLevel.id} Evolves Into Level ${nextLevel.id}`
-        : 'Civilization Reaches Full Synchronization';
+        : 'Star Archon Evolves Into Civilization Synchronizer';
     }
     if (captionEl) {
       captionEl.textContent = hasNextLevel
         ? `Guide and world transform together. After the evolution completes, continue into ${nextLevel.title}.`
-        : 'Guide and world converge into the synchronized finale. Continue when the evolution completes.';
+        : 'The final architect awakens. When the evolution completes, check your score to enter the synchronized finale.';
     }
 
     this._setLevelEvolutionButtonState(false, hasNextLevel);
@@ -4613,12 +4628,158 @@ const GameEngine = {
     }
   },
 
+  _queueGameCompleteTimeout(callback, delayMs) {
+    const timeoutId = setTimeout(() => {
+      GameState.completionFusionTimeouts = GameState.completionFusionTimeouts.filter(id => id !== timeoutId);
+      callback();
+    }, delayMs);
+    GameState.completionFusionTimeouts.push(timeoutId);
+    return timeoutId;
+  },
+
+  _queueGameCompleteUiTimeout(callback, delayMs) {
+    const timeoutId = setTimeout(() => {
+      GameState.completionUiTimeouts = GameState.completionUiTimeouts.filter(id => id !== timeoutId);
+      callback();
+    }, delayMs);
+    GameState.completionUiTimeouts.push(timeoutId);
+    return timeoutId;
+  },
+
+  _clearGameCompleteUiTimeouts() {
+    GameState.completionUiTimeouts.forEach(clearTimeout);
+    GameState.completionUiTimeouts = [];
+  },
+
+  _clearGameCompleteFusionLoop() {
+    clearInterval(GameState.completionFusionInterval);
+    GameState.completionFusionInterval = null;
+    GameState.completionFusionTimeouts.forEach(clearTimeout);
+    GameState.completionFusionTimeouts = [];
+
+    const stage = document.getElementById('gc-fusion-stage');
+    if (stage) {
+      stage.classList.remove('gc-fusion-active', 'gc-synchronizer-visible');
+    }
+
+    const particles = document.getElementById('gc-fusion-particles');
+    if (particles) {
+      particles.innerHTML = '';
+    }
+  },
+
+  _buildGameCompleteTimeline(levelMeta) {
+    const timeline = document.getElementById('gc-timeline');
+    if (!timeline) return [];
+
+    timeline.innerHTML = '';
+    CharacterEngine._humanImages.slice(0, GAME_DATA.levels.length).forEach((imgSrc, i) => {
+      if (i > 0) {
+        const conn = document.createElement('div');
+        conn.className = 'gc-timeline-connector';
+        conn.style.setProperty('--fusion-delay', `${80 + (i - 1) * 110}ms`);
+        timeline.appendChild(conn);
+      }
+
+      const slot = document.createElement('div');
+      slot.className = 'gc-char-slot';
+      slot.style.setProperty('--fusion-delay', `${i * 140}ms`);
+      slot.innerHTML = `
+        <div class="gc-char-avatar"><img src="${imgSrc}" alt="${levelMeta[i].era}" /></div>
+        <div class="gc-char-era">${levelMeta[i].era}</div>
+        <div class="gc-char-tooltip">${levelMeta[i].topic}</div>
+      `;
+      timeline.appendChild(slot);
+    });
+
+    return [...timeline.querySelectorAll('.gc-char-slot')];
+  },
+
+  _createGameCompleteFusionParticles(slots) {
+    const stage = document.getElementById('gc-fusion-stage');
+    const particles = document.getElementById('gc-fusion-particles');
+    const card = document.getElementById('gc-synchronizer-card');
+    if (!stage || !particles || !card || !slots.length) return;
+
+    particles.innerHTML = '';
+
+    const stageRect = stage.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const centerX = cardRect.left - stageRect.left + cardRect.width / 2;
+    const centerY = cardRect.top - stageRect.top + cardRect.height / 2;
+    const colors = ['#ffd700', '#fff2a8', '#c084fc', '#2dd4bf', '#f9a8d4'];
+
+    slots.forEach((slot, slotIndex) => {
+      const avatar = slot.querySelector('.gc-char-avatar');
+      if (!avatar) return;
+
+      const rect = avatar.getBoundingClientRect();
+      const startX = rect.left - stageRect.left + rect.width / 2;
+      const startY = rect.top - stageRect.top + rect.height / 2;
+
+      for (let particleIndex = 0; particleIndex < 16; particleIndex++) {
+        const piece = document.createElement('div');
+        const color = colors[(slotIndex + particleIndex) % colors.length];
+        const jitterX = (Math.random() - 0.5) * rect.width * 0.7;
+        const jitterY = (Math.random() - 0.5) * rect.height * 0.9;
+        const tx = centerX - (startX + jitterX) + (Math.random() - 0.5) * 42;
+        const ty = centerY - (startY + jitterY) + (Math.random() - 0.5) * 34;
+        const size = 4 + Math.random() * 8;
+        const duration = 2500 + Math.random() * 1400;
+        const delay = slotIndex * 150 + Math.random() * 420;
+
+        piece.className = 'gc-fusion-particle';
+        piece.style.left = `${startX + jitterX}px`;
+        piece.style.top = `${startY + jitterY}px`;
+        piece.style.width = `${size}px`;
+        piece.style.height = `${size}px`;
+        piece.style.setProperty('--tx', `${tx}px`);
+        piece.style.setProperty('--ty', `${ty}px`);
+        piece.style.setProperty('--particle-color', color);
+        piece.style.setProperty('--particle-delay', `${delay}ms`);
+        piece.style.setProperty('--particle-duration', `${duration}ms`);
+        particles.appendChild(piece);
+      }
+    });
+  },
+
+  _runGameCompleteFusionCycle() {
+    if (GameState.currentStage !== 'game-complete') return;
+
+    const stage = document.getElementById('gc-fusion-stage');
+    const timeline = document.getElementById('gc-timeline');
+    if (!stage || !timeline) return;
+
+    const slots = [...timeline.querySelectorAll('.gc-char-slot')];
+    if (!slots.length) return;
+
+    stage.classList.remove('gc-fusion-active', 'gc-synchronizer-visible');
+    this._createGameCompleteFusionParticles(slots);
+
+    void stage.offsetWidth;
+    stage.classList.add('gc-fusion-active');
+
+    this._queueGameCompleteTimeout(() => {
+      if (GameState.currentStage === 'game-complete') {
+        stage.classList.add('gc-synchronizer-visible');
+      }
+    }, GAME_COMPLETE_FUSION_REVEAL_DELAY_MS);
+  },
+
+  _startGameCompleteFusionLoop() {
+    this._clearGameCompleteFusionLoop();
+    this._queueGameCompleteTimeout(() => this._runGameCompleteFusionCycle(), 2100);
+    GameState.completionFusionInterval = setInterval(() => {
+      this._runGameCompleteFusionCycle();
+    }, GAME_COMPLETE_FUSION_INTERVAL_MS);
+  },
+
   _setLevelEvolutionButtonState(isReady, hasNextLevel) {
     const button = document.getElementById('evolution-next-btn');
     if (!button) return;
     button.disabled = !isReady;
     button.classList.toggle('is-disabled', !isReady);
-    button.textContent = hasNextLevel ? 'Next Level →' : 'Final Completion →';
+    button.textContent = hasNextLevel ? 'Next Level →' : 'Check Score →';
   },
 
   _finishLevelTransition() {
@@ -4695,6 +4856,8 @@ const GameEngine = {
   async showGameComplete() {
     GameState.currentStage = 'game-complete';
     this._clearProgress();
+    this._clearGameCompleteFusionLoop();
+    this._clearGameCompleteUiTimeouts();
     document.body.className = 'game-complete';
     setTheme('');
     MusicEngine.playVictory();
@@ -4742,34 +4905,23 @@ const GameEngine = {
       { era: 'L5 · Star Archon',       topic: 'Prompt Chaining<br>Meta-Prompting' }
     ];
 
-    const timeline = document.getElementById('gc-timeline');
-    timeline.innerHTML = '';
-    CharacterEngine._humanImages.forEach((imgSrc, i) => {
-      if (i > 0) {
-        const conn = document.createElement('div');
-        conn.className = 'gc-timeline-connector';
-        timeline.appendChild(conn);
-      }
-      const slot = document.createElement('div');
-      slot.className = 'gc-char-slot';
-      slot.innerHTML = `
-        <div class="gc-char-avatar"><img src="${imgSrc}" alt="${levelMeta[i].era}" /></div>
-        <div class="gc-char-era">${levelMeta[i].era}</div>
-        <div class="gc-char-tooltip">${levelMeta[i].topic}</div>
-      `;
-      timeline.appendChild(slot);
-    });
+    const slots = this._buildGameCompleteTimeline(levelMeta);
+
+    const synchronizerImg = document.getElementById('gc-synchronizer-img');
+    if (synchronizerImg) {
+      synchronizerImg.src = CharacterEngine._humanImages[FINAL_SYNCHRONIZER_INDEX];
+    }
 
     // Sequential fade-in stagger (400ms between each)
-    const slots = timeline.querySelectorAll('.gc-char-slot');
     slots.forEach((slot, i) => {
-      setTimeout(() => slot.classList.add('gc-char-visible'), i * 400);
+      this._queueGameCompleteUiTimeout(() => slot.classList.add('gc-char-visible'), i * 260);
     });
 
     // Score counter — counts 0 → final over 1.5s (starts after last char fades in)
     const counterEl = document.getElementById('gc-score-counter');
     const target = GameState.totalScore;
-    setTimeout(() => {
+    counterEl.textContent = '0';
+    this._queueGameCompleteUiTimeout(() => {
       const start = performance.now();
       const duration = 1500;
       const tick = (now) => {
@@ -4779,7 +4931,7 @@ const GameEngine = {
         if (t < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
-    }, slots.length * 400 + 200);
+    }, slots.length * 260 + 260);
 
     // Mouse parallax on the cosmic background
     const screenEl = document.getElementById('screen-game-complete');
@@ -4800,6 +4952,7 @@ const GameEngine = {
     this._renderScoreboardTable('overall-scoreboard-body', overall, GameState.playerName, true);
 
     showScreen('screen-game-complete');
+    this._startGameCompleteFusionLoop();
 
     // Live polling — refresh every 5s
     clearInterval(GameState.pollInterval);
