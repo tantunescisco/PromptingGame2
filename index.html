@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Quest 2 - The Evolution of Civilization</title>
-  <link rel="stylesheet" href="style.css?v=2026052911" />
+  <link rel="stylesheet" href="style.css?v=2026052912" />
 </head>
 <body>
   <!-- AUDIO CONTROLS (always visible) -->
@@ -141,8 +141,26 @@
   </div>
 
   <div id="screen-level-complete" class="screen">
-    <div class="screen-bg-image level-screen-bg" aria-hidden="true"></div>
+    <div id="complete-bg-current" class="screen-bg-image level-complete-bg level-complete-bg-current" aria-hidden="true"></div>
+    <div id="complete-bg-next" class="screen-bg-image level-complete-bg level-complete-bg-next" aria-hidden="true"></div>
     <div class="level-complete-content">
+      <div class="level-complete-evolution" aria-hidden="true">
+        <div class="level-evolution-track">
+          <div class="evolution-stage evolution-stage-current">
+            <span id="complete-from-label" class="evolution-stage-label"></span>
+            <div class="evolution-character-shell">
+              <div id="complete-character-current" class="complete-character complete-character-current"></div>
+            </div>
+          </div>
+          <div class="evolution-burst">✦</div>
+          <div class="evolution-stage evolution-stage-next">
+            <span id="complete-to-label" class="evolution-stage-label"></span>
+            <div class="evolution-character-shell evolution-character-shell-next">
+              <div id="complete-character-next" class="complete-character complete-character-next"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="complete-badge" class="complete-badge"></div>
       <h2 id="complete-title"></h2>
       <p id="complete-summary"></p>
@@ -293,6 +311,6 @@
     </div>
   </div>
 
-  <script src="game.js?v=2026052911"></script>
+  <script src="game.js?v=2026052912"></script>
 </body>
 </html>

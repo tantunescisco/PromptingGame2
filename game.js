@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.11";
+const APP_VERSION = "2026.05.29.12";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -3366,6 +3366,14 @@ function setTheme(levelClass) {
   if (levelClass) document.body.classList.add(levelClass);
 }
 
+const LEVEL_BACKGROUND_IMAGES = [
+  'civil1.png',
+  'civil2.png',
+  'civil3.png',
+  'civil4.png',
+  'civil5.png'
+];
+
 function starRating(correct, total) {
   const pct = correct / total;
   if (pct >= 0.9) return '⭐⭐⭐';
@@ -4446,6 +4454,56 @@ const GameEngine = {
     }
   },
 
+  _buildLevelCompleteBg(imagePath, isFinalEvolution = false) {
+    const overlay = isFinalEvolution
+      ? "linear-gradient(180deg, rgba(5, 7, 20, 0.48), rgba(5, 7, 20, 0.72)), radial-gradient(circle at 50% 35%, rgba(192,132,252,0.22), transparent 54%), radial-gradient(circle at 78% 18%, rgba(45,212,191,0.14), transparent 42%)"
+      : "linear-gradient(180deg, rgba(10, 12, 18, 0.42), rgba(10, 12, 18, 0.28) 34%, rgba(10, 12, 18, 0.52)), radial-gradient(circle at 70% 24%, rgba(var(--primary-rgb, 255,111,0), 0.16), transparent 38%)";
+    return `${overlay}, url('${imagePath}')`;
+  },
+
+  _setLevelCompleteEvolution(levelIndex) {
+    const screen = document.getElementById('screen-level-complete');
+    const currentCharEl = document.getElementById('complete-character-current');
+    const nextCharEl = document.getElementById('complete-character-next');
+    const currentBgEl = document.getElementById('complete-bg-current');
+    const nextBgEl = document.getElementById('complete-bg-next');
+    const fromLabelEl = document.getElementById('complete-from-label');
+    const toLabelEl = document.getElementById('complete-to-label');
+    if (!screen || !currentCharEl || !nextCharEl || !currentBgEl || !nextBgEl || !fromLabelEl || !toLabelEl) return;
+
+    const hasNextLevel = levelIndex < GAME_DATA.levels.length - 1;
+    const nextIndex = hasNextLevel ? levelIndex + 1 : levelIndex;
+    const currentLevel = GAME_DATA.levels[levelIndex];
+    const nextLevel = hasNextLevel ? GAME_DATA.levels[nextIndex] : null;
+    const currentChar = CharacterEngine._humanImages[levelIndex] ?? null;
+    const nextChar = CharacterEngine._humanImages[nextIndex] ?? null;
+    const currentBg = LEVEL_BACKGROUND_IMAGES[levelIndex] ?? null;
+    const nextBg = hasNextLevel ? (LEVEL_BACKGROUND_IMAGES[nextIndex] ?? currentBg) : 'completion.png';
+
+    currentCharEl.innerHTML = currentChar
+      ? `<img src="${currentChar}" alt="${currentLevel.title} guide" draggable="false" />`
+      : '';
+    nextCharEl.innerHTML = nextChar
+      ? `<img src="${nextChar}" alt="${hasNextLevel ? nextLevel.title : 'Civilization synchronized'} guide" draggable="false" />`
+      : '';
+    nextCharEl.classList.toggle('complete-character-ascended', !hasNextLevel);
+
+    fromLabelEl.textContent = `From ${currentLevel.title}`;
+    toLabelEl.textContent = hasNextLevel
+      ? `Into ${nextLevel.title}`
+      : 'Into Civilization Synchronized';
+
+    if (currentBg) currentBgEl.style.backgroundImage = this._buildLevelCompleteBg(currentBg, false);
+    if (nextBg) nextBgEl.style.backgroundImage = this._buildLevelCompleteBg(nextBg, !hasNextLevel);
+
+    screen.classList.remove('evolution-active');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        screen.classList.add('evolution-active');
+      });
+    });
+  },
+
   async showLevelComplete() {
     const level = GAME_DATA.levels[GameState.currentLevel];
     const correct = GameState.levelExercises.filter((_, i) => GameState.answers && GameState.answers[i]).length;
@@ -4474,6 +4532,7 @@ const GameEngine = {
 
     GameState.currentStage = 'level-complete';
     showScreen('screen-level-complete');
+    this._setLevelCompleteEvolution(GameState.currentLevel);
     this._persistProgress('level-complete');
 
     // Live polling — refresh every 5s while on this screen
