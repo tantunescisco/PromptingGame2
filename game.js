@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.25";
+const APP_VERSION = "2026.05.29.33";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -3072,95 +3072,254 @@ const MusicEngine = {
     this.schedulers.push(setInterval(tick, beatMs));
   },
 
-  // ── Victory / Game Complete: D major, triangle, 340 ms/step, 8-phrase sequencer + fanfare
+  // ── Victory / Game Complete: cinematic orchestral-synth victory loop
   playVictory() {
     this._stopAll();
     this.currentLevel = null;
     if (!this.enabled) return;
     const ctx = this._ctx();
 
-    // D major scale: D E F# G A B C# D
+    const bpm = 96;
+    const quarterMs = Math.round((60000 / bpm));
+    const eighthMs = Math.round(quarterMs / 2);
+    const introMs = quarterMs * 8;
+    const themeGain = ctx.createGain();
+    themeGain.gain.setValueAtTime(0, ctx.currentTime);
+    themeGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 2.2);
+    themeGain.connect(this.masterGain);
+
     const scale = [293.66, 329.63, 369.99, 392, 440, 493.88, 554.37, 587.33];
-    const beatMs = 340;
-
-    // Opening fanfare — plays once
-    const fanfare = [
-      [0, 0.0], [2, 0.3], [4, 0.6], [4, 0.9], [5, 1.2], [6, 1.5], [7, 1.9]
+    const progressions = [
+      [146.83, 293.66, 369.99, 440],
+      [123.47, 246.94, 369.99, 493.88],
+      [98, 196, 293.66, 392],
+      [110, 220, 329.63, 440]
     ];
-    fanfare.forEach(([note, time]) => {
-      this._note(ctx, scale[note], ctx.currentTime + time, 0.35, 'triangle', 0.22);
-      this._note(ctx, scale[note] * 0.5, ctx.currentTime + time, 0.4, 'triangle', 0.10);
-    });
 
-    // Sustained victory chord after fanfare (D major triad)
-    [293.66, 369.99, 440].forEach(f => {
-      this._note(ctx, f, ctx.currentTime + 2.3, 1.5, 'sine', 0.12);
-    });
+    const playVoice = (freq, start, dur, {
+      wave = 'triangle',
+      gain = 0.08,
+      attack = 0.02,
+      release = 0.18,
+      filterType = null,
+      filterFreq = 1200,
+      q = 0.7,
+      detune = 0,
+      vibrato = 0
+    } = {}) => {
+      const osc = ctx.createOscillator();
+      const amp = ctx.createGain();
+      osc.type = wave;
+      osc.frequency.setValueAtTime(freq, start);
+      if (detune) osc.detune.setValueAtTime(detune, start);
+      if (vibrato > 0) {
+        osc.frequency.linearRampToValueAtTime(freq * (1 + vibrato), start + dur * 0.5);
+        osc.frequency.linearRampToValueAtTime(freq, start + dur);
+      }
+      amp.gain.setValueAtTime(0, start);
+      amp.gain.linearRampToValueAtTime(gain, start + attack);
+      amp.gain.setValueAtTime(gain, Math.max(start + attack, start + dur - release));
+      amp.gain.linearRampToValueAtTime(0, start + dur);
 
-    // ── 8 distinct 8-step phrases ────────────────────────────────────────
-    const phrA = [7, 5, 4, 2, 4, 5, 7, null];          // main: joyful descend
-    const phrB = [4, 5, 6, null, 6, 7, 6, null];        // rise to peak
-    const phrC = [2, 4, 5, null, 5, 4, 2, null];        // mid-range celebration
-    const phrD = [7, null, 5, null, 4, null, 2, null];  // sparse fanfare echo
-    const phrE = [0, 2, 4, 5, 6, 7, null, null];        // full ascending triumph
-    const phrF = [5, 4, 2, null, 4, 5, 7, null];        // climb to peak
-    const phrG = [7, 6, 5, 4, 2, null, null, null];     // descend with trail
-    const phrH = [4, 2, 0, null, 2, 4, 2, 0];           // settle home
+      let lastNode = osc;
+      if (filterType) {
+        const filter = ctx.createBiquadFilter();
+        filter.type = filterType;
+        filter.frequency.setValueAtTime(filterFreq, start);
+        filter.Q.value = q;
+        osc.connect(filter);
+        lastNode = filter;
+      }
 
-    // 8 entries × 8 steps × 340 ms ≈ 21.8 s cycle (after 3.8 s fanfare)
-    const sequence = [phrA, phrA, phrB, phrC, phrD, phrE, phrF, phrA];
-
-    const startLoop = () => {
-      let gs = 0;
-      const tick = () => {
-        const now = ctx.currentTime;
-        const phrase = sequence[Math.floor(gs / 8) % sequence.length];
-        const m = phrase[gs % 8];
-        if (m !== null) {
-          const jump = (gs % 8 === 0) && Math.random() < 0.25;
-          this._note(ctx, scale[m] * (jump ? 2 : 1), now, 0.28, 'triangle', jump ? 0.08 : 0.16);
-          if (gs % 8 === 0) this._note(ctx, scale[m] * 2, now, 0.2, 'sine', 0.04);
-        }
-        gs++;
-      };
-      tick();
-      this.schedulers.push(setInterval(tick, beatMs));
-
-      // Harmony counter-line (16-step independent cycle)
-      const harmPat = [
-        null, null, 0, null, null, null, 2, null,
-        null, 4,    null, null, null, 2, null, null,
-      ];
-      let hs = 0;
-      const harmTick = () => {
-        const h = harmPat[hs % harmPat.length];
-        if (h !== null) this._note(ctx, scale[h] * 0.5, ctx.currentTime, 0.4, 'triangle', 0.06);
-        hs++;
-      };
-      harmTick();
-      this.schedulers.push(setInterval(harmTick, beatMs));
-
-      // Warm bass (D pedal)
-      const bassNotes = [146.83, 146.83, 174.61, 146.83];
-      let bi = 0;
-      const bassTick = () => {
-        this._note(ctx, bassNotes[bi++ % bassNotes.length], ctx.currentTime, 0.5, 'triangle', 0.10);
-      };
-      bassTick();
-      this.schedulers.push(setInterval(bassTick, beatMs * 4));
-
-      // Shimmer chords
-      const chords = [[293.66, 369.99, 440], [329.63, 392, 493.88]];
-      let ci = 0;
-      const chordTick = () => {
-        chords[ci++ % chords.length].forEach(f => this._note(ctx, f, ctx.currentTime, 1.2, 'sine', 0.04));
-      };
-      chordTick();
-      this.schedulers.push(setInterval(chordTick, beatMs * 8));
+      lastNode.connect(amp);
+      amp.connect(themeGain);
+      osc.start(start);
+      osc.stop(start + dur + 0.05);
+      this.oscillators.push(osc);
     };
 
-    // Start phrase loop after fanfare finishes
-    this.schedulers.push(setTimeout(startLoop, 3800));
+    const playStack = (freq, start, dur, profile) => {
+      profile.forEach(layer => {
+        playVoice(freq * (layer.ratio ?? 1), start + (layer.offset ?? 0), dur, layer);
+      });
+    };
+
+    const playChord = (freqs, start, dur, gain = 0.04) => {
+      freqs.forEach((freq, index) => {
+        playStack(freq, start, dur, [
+          { wave: 'sawtooth', gain: gain * 0.9, attack: 0.32, release: 0.55, filterType: 'lowpass', filterFreq: 840 + index * 110, detune: -4 },
+          { wave: 'sawtooth', gain: gain * 0.9, attack: 0.38, release: 0.6, filterType: 'lowpass', filterFreq: 1040 + index * 120, detune: 4 },
+          { wave: 'triangle', gain: gain * 0.45, attack: 0.24, release: 0.4, filterType: 'lowpass', filterFreq: 620 + index * 60 }
+        ]);
+      });
+    };
+
+    const playBrass = (freq, start, dur, gain = 0.11) => {
+      playStack(freq, start, dur, [
+        { wave: 'sawtooth', gain, attack: 0.05, release: 0.22, filterType: 'lowpass', filterFreq: 1600, q: 1.1, detune: -5, vibrato: 0.01 },
+        { wave: 'square', gain: gain * 0.58, attack: 0.04, release: 0.18, filterType: 'lowpass', filterFreq: 1250, q: 0.8, detune: 5 }
+      ]);
+    };
+
+    const playSub = (freq, start, dur, gain = 0.12) => {
+      playStack(freq, start, dur, [
+        { wave: 'sine', gain, attack: 0.01, release: 0.18 },
+        { wave: 'triangle', gain: gain * 0.3, attack: 0.01, release: 0.12, filterType: 'lowpass', filterFreq: 180 }
+      ]);
+    };
+
+    const playGlock = (freq, start, gain = 0.045) => {
+      playStack(freq, start, 0.46, [
+        { wave: 'sine', gain, attack: 0.005, release: 0.42 },
+        { wave: 'triangle', ratio: 2, gain: gain * 0.45, attack: 0.003, release: 0.26 },
+        { wave: 'sine', ratio: 3, gain: gain * 0.18, attack: 0.002, release: 0.18 }
+      ]);
+    };
+
+    const playNoisePulse = (start, dur = 0.08, gain = 0.02, band = 3800, highpass = 1800) => {
+      const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) {
+        const decay = Math.pow(1 - i / len, 1.6);
+        data[i] = (Math.random() * 2 - 1) * decay;
+      }
+      const src = ctx.createBufferSource();
+      const hp = ctx.createBiquadFilter();
+      const bp = ctx.createBiquadFilter();
+      const amp = ctx.createGain();
+      hp.type = 'highpass';
+      hp.frequency.value = highpass;
+      bp.type = 'bandpass';
+      bp.frequency.value = band;
+      bp.Q.value = 1.2;
+      amp.gain.setValueAtTime(gain, start);
+      amp.gain.exponentialRampToValueAtTime(0.001, start + dur);
+      src.buffer = buf;
+      src.connect(hp);
+      hp.connect(bp);
+      bp.connect(amp);
+      amp.connect(themeGain);
+      src.start(start);
+      src.stop(start + dur + 0.02);
+    };
+
+    const introChords = [progressions[0], progressions[1], progressions[2], progressions[3]];
+    introChords.forEach((chord, bar) => {
+      const start = ctx.currentTime + bar * quarterMs * 2;
+      playChord(chord, start, 1.9, 0.032 + bar * 0.004);
+      playSub(chord[0] * 0.5, start, 1.2, 0.09);
+    });
+
+    [
+      [4, 0.2, 0.65], [5, 0.85, 0.7], [6, 1.55, 0.72], [7, 2.2, 0.9],
+      [6, 2.95, 0.65], [7, 3.45, 1.15], [5, 4.2, 0.85], [7, 4.9, 1.25]
+    ].forEach(([note, offset, dur]) => {
+      playBrass(scale[note], ctx.currentTime + offset, dur, note >= 6 ? 0.13 : 0.1);
+      playBrass(scale[note] * 0.5, ctx.currentTime + offset, dur + 0.1, 0.05);
+    });
+
+    [
+      [7, 1.25], [6, 2.45], [7, 3.75], [5, 4.65]
+    ].forEach(([note, offset]) => {
+      playGlock(scale[note] * 2, ctx.currentTime + offset, 0.04);
+      playGlock(scale[note], ctx.currentTime + offset + 0.18, 0.026);
+    });
+
+    const loopMelody = [
+      [4, null, 5, null, 7, null, 6, null],
+      [7, null, 6, 5, null, 4, null, 2],
+      [4, 5, null, 7, null, 6, 5, null],
+      [7, null, 5, null, 4, null, 2, null],
+      [5, null, 6, null, 7, null, 6, null],
+      [4, null, 5, 7, null, 5, 4, null],
+      [2, null, 4, null, 5, null, 7, null],
+      [6, 5, null, 4, null, 2, null, null]
+    ];
+    const loopPlucks = [
+      [7, null, null, 6, null, null, 5, null],
+      [null, 6, null, null, 5, null, null, 4],
+      [7, null, 6, null, null, 5, null, null],
+      [null, 5, null, 4, null, null, 2, null]
+    ];
+
+    const startLoop = () => {
+      let melodyStep = 0;
+      let pluckStep = 0;
+      let bassStep = 0;
+      let chordStep = 0;
+      let percStep = 0;
+
+      const melodyTick = () => {
+        const now = ctx.currentTime;
+        const phrase = loopMelody[Math.floor(melodyStep / 8) % loopMelody.length];
+        const note = phrase[melodyStep % 8];
+        if (note !== null) {
+          playBrass(scale[note], now, 0.46, 0.075 + (melodyStep % 8 === 0 ? 0.018 : 0));
+          if (melodyStep % 4 === 0) playBrass(scale[note] * 0.5, now, 0.6, 0.035);
+        }
+        melodyStep++;
+      };
+      melodyTick();
+      this.schedulers.push(setInterval(melodyTick, quarterMs));
+
+      const pluckTick = () => {
+        const now = ctx.currentTime;
+        const phrase = loopPlucks[Math.floor(pluckStep / 8) % loopPlucks.length];
+        const note = phrase[pluckStep % 8];
+        if (note !== null) {
+          playGlock(scale[note] * 2, now, 0.03);
+          playVoice(scale[note] * 2, now, 0.32, {
+            wave: 'triangle',
+            gain: 0.022,
+            attack: 0.01,
+            release: 0.22,
+            filterType: 'lowpass',
+            filterFreq: 2200
+          });
+        }
+        pluckStep++;
+      };
+      pluckTick();
+      this.schedulers.push(setInterval(pluckTick, eighthMs));
+
+      const chordTick = () => {
+        const chord = progressions[chordStep++ % progressions.length];
+        playChord(chord, ctx.currentTime, 2.4, 0.034);
+      };
+      chordTick();
+      this.schedulers.push(setInterval(chordTick, quarterMs * 4));
+
+      const bassRoots = [73.42, 61.74, 49, 55];
+      const bassPattern = [1, 1, 1.5, 1];
+      const bassTick = () => {
+        const root = bassRoots[Math.floor(bassStep / 4) % bassRoots.length];
+        const multiplier = bassPattern[bassStep % bassPattern.length];
+        playSub(root * multiplier, ctx.currentTime, 0.5, bassStep % 4 === 0 ? 0.125 : 0.095);
+        bassStep++;
+      };
+      bassTick();
+      this.schedulers.push(setInterval(bassTick, quarterMs));
+
+      const percTick = () => {
+        const now = ctx.currentTime;
+        if (percStep % 8 === 0 || percStep % 8 === 4) {
+          playSub(41.2, now, 0.22, 0.08);
+        }
+        if (percStep % 8 === 2 || percStep % 8 === 6) {
+          playNoisePulse(now, 0.11, 0.018, 2100, 900);
+        }
+        playNoisePulse(now, 0.045, percStep % 2 === 0 ? 0.012 : 0.008, 5200, 3200);
+        if (percStep % 8 === 7) {
+          playNoisePulse(now, 0.06, 0.01, 6400, 4100);
+        }
+        percStep++;
+      };
+      percTick();
+      this.schedulers.push(setInterval(percTick, eighthMs));
+    };
+
+    this.schedulers.push(setTimeout(startLoop, introMs));
   }
 };
 
@@ -3392,6 +3551,9 @@ const LEVEL_BACKGROUND_IMAGES = [
   'civil4.png',
   'civil5.png'
 ];
+
+const FINAL_SYNCHRONIZER_BG = 'civil6.png';
+const COMPLETION_BG_IMAGE = `completion.png?v=${encodeURIComponent(APP_VERSION)}`;
 
 const LEVEL_EVOLUTION_MS = 7200;
 const FINAL_SYNCHRONIZER_INDEX = 5;
@@ -4490,6 +4652,22 @@ const GameEngine = {
     return `${overlay}, url('${imagePath}')`;
   },
 
+  _getLevelCompleteBackgroundImage(levelIndex) {
+    return levelIndex === GAME_DATA.levels.length - 1
+      ? FINAL_SYNCHRONIZER_BG
+      : (LEVEL_BACKGROUND_IMAGES[levelIndex] ?? null);
+  },
+
+  _setLevelCompleteBackground(levelIndex) {
+    const bgEl = document.querySelector('#screen-level-complete .level-screen-bg');
+    if (!bgEl) return;
+
+    const bgImage = this._getLevelCompleteBackgroundImage(levelIndex);
+    bgEl.style.backgroundImage = bgImage
+      ? this._buildLevelCompleteBg(bgImage, false)
+      : '';
+  },
+
   _setLevelCompleteEvolution(levelIndex) {
     const screen = document.getElementById('screen-level-evolution');
     const currentCharEl = document.getElementById('evolution-character-current');
@@ -4509,7 +4687,9 @@ const GameEngine = {
     const currentChar = CharacterEngine._humanImages[levelIndex] ?? null;
     const nextChar = CharacterEngine._humanImages[nextIndex] ?? null;
     const currentBg = LEVEL_BACKGROUND_IMAGES[levelIndex] ?? null;
-    const nextBg = hasNextLevel ? (LEVEL_BACKGROUND_IMAGES[nextIndex] ?? currentBg) : 'completion.png';
+    const nextBg = hasNextLevel
+      ? (LEVEL_BACKGROUND_IMAGES[nextIndex] ?? currentBg)
+      : FINAL_SYNCHRONIZER_BG;
 
     currentCharEl.innerHTML = currentChar
       ? `<img src="${currentChar}" alt="${currentLevel.title} guide" draggable="false" />`
@@ -4570,6 +4750,7 @@ const GameEngine = {
 
     this._stopPolling();
     this._populateLevelCompleteContent(levelIndex, 4, timeMs, score, rows, online);
+    this._setLevelCompleteBackground(levelIndex);
 
     GameState.currentStage = 'level-complete';
     showScreen('screen-level-complete');
@@ -4597,6 +4778,7 @@ const GameEngine = {
       updated,
       online
     );
+    this._setLevelCompleteBackground(GameState.currentLevel);
 
     GameState.currentStage = 'level-complete';
     showScreen('screen-level-complete');
@@ -4757,6 +4939,7 @@ const GameEngine = {
     this._clearProgress();
     this._clearGameCompleteUiTimeouts();
     document.body.className = 'game-complete';
+    document.body.style.setProperty('--completion-bg-image', `url('${COMPLETION_BG_IMAGE}')`);
     setTheme('');
     MusicEngine.playVictory();
 
@@ -4770,17 +4953,23 @@ const GameEngine = {
     // Rank matrix
     let rankName, rankTier;
     if (pct >= 100) {
-      rankName = 'Omniscient System Archon';
-      rankTier = '✦ Perfect Run — Flawless Execution ✦';
+      rankName = 'Civilization Synchronizer';
+      rankTier = '✦ Perfect Synchronization — Unified Prompt Mastery ✦';
+    } else if (pct >= 90) {
+      rankName = 'Star Archon';
+      rankTier = 'Cosmic Command of Chaining and Meta-Prompting';
     } else if (pct >= 80) {
-      rankName = 'Quantum Logic Engineer';
-      rankTier = 'Superior Command of Prompt Architecture';
+      rankName = 'Cyberpunk Hacker';
+      rankTier = 'Elite Output Control and Format Engineering';
     } else if (pct >= 60) {
-      rankName = 'Industrial Automator';
-      rankTier = 'Solid Foundations in Prompt Craft';
+      rankName = 'Victorian Engineer';
+      rankTier = 'Strong System Prompting and Role Precision';
+    } else if (pct >= 40) {
+      rankName = 'Roman Orator';
+      rankTier = 'Confident Tone, Context, and Constraint Control';
     } else {
-      rankName = 'Apprentice Clay Scribe';
-      rankTier = 'The Journey Has Just Begun';
+      rankName = 'Clay Scribe';
+      rankTier = 'Foundations of Specificity, Audience, and Roles';
     }
 
     // Stat cards
@@ -4796,12 +4985,12 @@ const GameEngine = {
 
     // Build character evolution timeline
     const levelMeta = [
-      { era: 'L1 · Clay Scribe',       topic: 'Clarity & Specificity<br>Audience & Roles' },
-      { era: 'L2 · Roman Orator',      topic: 'Tone, Context & Constraints<br>Rhetoric & Persuasion' },
-      { era: 'L3 · Victorian Engineer', topic: 'Role Prompting<br>System Prompts' },
-      { era: 'L4 · Cyberpunk Hacker',  topic: 'Format Engineering<br>Output Control' },
-      { era: 'L5 · Star Archon',       topic: 'Prompt Chaining<br>Meta-Prompting' },
-      { era: 'L6 · Civilization Synchronizer', topic: 'Unified Prompt Mastery<br>Civilization Synchronized' }
+      { era: 'L1 · Clay Scribe',       topic: 'Achievement:<br>Clear Prompt Foundations<br>Specificity, audience, and roles' },
+      { era: 'L2 · Roman Orator',      topic: 'Achievement:<br>Persuasive Context Control<br>Tone, rhetoric, and constraints' },
+      { era: 'L3 · Victorian Engineer', topic: 'Achievement:<br>Precision Prompt Architecture<br>Role prompting and system prompts' },
+      { era: 'L4 · Cyberpunk Hacker',  topic: 'Achievement:<br>Output Override Mastery<br>Format engineering and response control' },
+      { era: 'L5 · Star Archon',       topic: 'Achievement:<br>Cosmic Chain Command<br>Prompt chaining and meta-prompting' },
+      { era: 'Civilization Synchronizer', topic: 'Achievement:<br>Civilization Synchronized<br>Unified prompt mastery' }
     ];
 
     const slots = this._buildGameCompleteTimeline(levelMeta);

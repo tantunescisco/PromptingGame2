@@ -457,9 +457,9 @@ body.game-complete { --completion-bg-image: url('completion.png'); }
 
 .level-screen-bg {
   background-image:
-    linear-gradient(180deg, rgba(10, 12, 18, 0.42) 0%, rgba(10, 12, 18, 0.28) 34%, rgba(10, 12, 18, 0.52) 100%),
+    linear-gradient(180deg, rgba(10, 12, 18, 0.28) 0%, rgba(10, 12, 18, 0.14) 34%, rgba(10, 12, 18, 0.36) 100%),
     var(--screen-bg-image);
-  filter: saturate(1.04) contrast(1.03);
+  filter: saturate(1.1) contrast(1.04) brightness(1.08);
   transform: scale(1.02);
 }
 
@@ -1193,11 +1193,11 @@ body.welcome .name-error {
   overflow: hidden;
 }
 /* Per-level left panel backgrounds */
-body.level-1 .ex-left { background: linear-gradient(180deg, rgba(37, 13, 3, 0.6), rgba(37, 13, 3, 0.82)), center / cover no-repeat var(--screen-bg-image); }
-body.level-2 .ex-left { background: linear-gradient(180deg, rgba(27, 8, 47, 0.58), rgba(27, 8, 47, 0.82)), center / cover no-repeat var(--screen-bg-image); }
-body.level-3 .ex-left { background: linear-gradient(180deg, rgba(20, 12, 6, 0.58), rgba(20, 12, 6, 0.82)), center / cover no-repeat var(--screen-bg-image); }
-body.level-4 .ex-left { background: linear-gradient(180deg, rgba(5, 12, 31, 0.52), rgba(5, 12, 31, 0.84)), center / cover no-repeat var(--screen-bg-image); }
-body.level-5 .ex-left { background: linear-gradient(180deg, rgba(6, 0, 30, 0.56), rgba(6, 0, 30, 0.86)), center / cover no-repeat var(--screen-bg-image); }
+body.level-1 .ex-left { background: linear-gradient(180deg, rgba(37, 13, 3, 0.38), rgba(37, 13, 3, 0.64)), center / cover no-repeat var(--screen-bg-image); }
+body.level-2 .ex-left { background: linear-gradient(180deg, rgba(27, 8, 47, 0.34), rgba(27, 8, 47, 0.62)), center / cover no-repeat var(--screen-bg-image); }
+body.level-3 .ex-left { background: linear-gradient(180deg, rgba(20, 12, 6, 0.36), rgba(20, 12, 6, 0.64)), center / cover no-repeat var(--screen-bg-image); }
+body.level-4 .ex-left { background: linear-gradient(180deg, rgba(5, 12, 31, 0.28), rgba(5, 12, 31, 0.58)), center / cover no-repeat var(--screen-bg-image); }
+body.level-5 .ex-left { background: linear-gradient(180deg, rgba(6, 0, 30, 0.32), rgba(6, 0, 30, 0.6)), center / cover no-repeat var(--screen-bg-image); }
 /* Top accent strip */
 .ex-left::before {
   content: '';
@@ -1213,8 +1213,8 @@ body.level-5 .ex-left { background: linear-gradient(180deg, rgba(6, 0, 30, 0.56)
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.18) 26%, rgba(0,0,0,0.46) 100%),
-    radial-gradient(ellipse at 50% 34%, rgba(255,255,255,0.12) 0%, transparent 62%);
+    linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.12) 26%, rgba(0,0,0,0.28) 100%),
+    radial-gradient(ellipse at 50% 34%, rgba(255,255,255,0.16) 0%, transparent 66%);
   pointer-events: none;
   z-index: 0;
 }
@@ -2624,7 +2624,7 @@ body.level-5 #screen-level-intro .concept-box h4 {
 #screen-game-complete {
   --px: 0;
   --py: 0;
-  align-items: center;
+  align-items: flex-start;
   background: #050714;
   overflow-y: auto;
 }
@@ -2635,8 +2635,8 @@ body.level-5 #screen-level-intro .concept-box h4 {
   position: fixed;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(5,7,20,0.5) 0%, rgba(5,7,20,0.32) 28%, rgba(5,7,20,0.62) 100%),
-    linear-gradient(120deg, rgba(5,7,20,0.44) 0%, rgba(5,7,20,0.08) 42%, rgba(5,7,20,0.54) 100%),
+    linear-gradient(180deg, rgba(5,7,20,0.34) 0%, rgba(5,7,20,0.18) 28%, rgba(5,7,20,0.42) 100%),
+    linear-gradient(120deg, rgba(5,7,20,0.28) 0%, rgba(5,7,20,0.04) 42%, rgba(5,7,20,0.36) 100%),
     radial-gradient(ellipse 80% 60% at 20% 40%, rgba(139,92,246,0.24) 0%, transparent 70%),
     radial-gradient(ellipse 60% 50% at 80% 20%, rgba(20,184,166,0.16) 0%, transparent 60%),
     radial-gradient(ellipse 90% 70% at 50% 90%, rgba(124,58,237,0.18) 0%, transparent 65%),
@@ -2649,7 +2649,7 @@ body.level-5 #screen-level-intro .concept-box h4 {
   transition: transform 0.12s linear;
   pointer-events: none;
   z-index: 0;
-  filter: brightness(1.15) saturate(1.08);
+  filter: brightness(1.22) saturate(1.12) contrast(1.03);
   animation: gc-nebula-drift 18s ease-in-out infinite alternate;
 }
 #screen-game-complete::after {
@@ -2664,9 +2664,9 @@ body.level-5 #screen-level-intro .concept-box h4 {
   z-index: 1;
 }
 @keyframes gc-nebula-drift {
-  0%   { filter: hue-rotate(0deg) brightness(1.12) saturate(1.05); }
-  50%  { filter: hue-rotate(14deg) brightness(1.2) saturate(1.1); }
-  100% { filter: hue-rotate(-8deg) brightness(1.08) saturate(1.04); }
+  0%   { filter: hue-rotate(0deg) brightness(1.18) saturate(1.08); }
+  50%  { filter: hue-rotate(14deg) brightness(1.26) saturate(1.14); }
+  100% { filter: hue-rotate(-8deg) brightness(1.14) saturate(1.08); }
 }
 
 .gc-canvas {
@@ -2735,9 +2735,9 @@ body.level-5 #screen-level-intro .concept-box h4 {
   gap: 8px;
   width: 100%;
   flex-wrap: nowrap;
-  overflow-x: hidden;
-  overflow-y: visible;
-  padding: 16px 12px 14px;
+  overflow: visible;
+  padding: 86px 12px 14px;
+  margin-top: -70px;
   background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
   border: 1px solid rgba(255,215,0,0.12);
   border-radius: 28px;
@@ -2843,6 +2843,7 @@ body.level-5 #screen-level-intro .concept-box h4 {
   border: 1px solid rgba(255,215,0,0.42);
   border-radius: 12px;
   font-size: 0.72rem;
+  font-weight: 700;
   color: #f0eeff;
   line-height: 1.42;
   text-align: center;
@@ -2918,8 +2919,10 @@ body.level-5 #screen-level-intro .concept-box h4 {
 @media (max-width: 640px) {
   .gc-stats { grid-template-columns: 1fr; }
   .gc-timeline {
+    overflow-y: visible;
     overflow-x: auto;
     padding: 16px 14px 16px;
+    margin-top: 0;
   }
   .gc-char-slot {
     width: 118px;
@@ -2989,19 +2992,66 @@ body.level-5 #screen-level-intro .concept-box h4 {
 /* Leaderboard inside completion */
 .gc-leaderboard {
   width: 100%;
+  max-height: 520px;
+  overflow-y: auto;
   background: rgba(255,255,255,0.08) !important;
   border-color: rgba(255,215,0,0.2) !important;
   box-shadow: 0 10px 32px rgba(0,0,0,0.18) !important;
+  padding: 14px 16px !important;
 }
 .gc-leaderboard .scoreboard-title {
   color: #ffd700 !important;
   text-align: center !important;
+  font-size: 0.92rem !important;
+  margin-bottom: 10px !important;
 }
-.gc-leaderboard .scoreboard-table th { color: #a0b4e8 !important; border-bottom-color: rgba(255,215,0,0.2) !important; }
-.gc-leaderboard .scoreboard-table td { color: #f0eeff !important; border-bottom-color: rgba(255,255,255,0.05) !important; }
+.gc-leaderboard .scoreboard-table {
+  font-size: 0.8rem !important;
+}
+.gc-leaderboard .scoreboard-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 8px !important;
+  font-size: 0.64rem !important;
+  color: #a0b4e8 !important;
+  border-bottom-color: rgba(255,215,0,0.2) !important;
+  background: rgba(11, 14, 34, 0.96);
+}
+.gc-leaderboard .scoreboard-table td {
+  padding: 6px 8px !important;
+  font-size: 0.82rem !important;
+  color: #f0eeff !important;
+  border-bottom-color: rgba(255,255,255,0.05) !important;
+}
+.gc-leaderboard .scoreboard-table td.rank {
+  width: 28px !important;
+  font-size: 1rem !important;
+}
+.gc-leaderboard .scoreboard-table td.player-name {
+  font-size: 0.88rem !important;
+}
+.gc-leaderboard .scoreboard-table td.score-val,
+.gc-leaderboard .scoreboard-table td.time-val {
+  font-variant-numeric: tabular-nums;
+}
 .gc-leaderboard .scoreboard-table td.score-val { color: #ffd700 !important; }
 .gc-leaderboard .scoreboard-table td.player-name { color: #c084fc !important; }
 .gc-leaderboard .scoreboard-table tr.current-player td { background: rgba(255,215,0,0.06) !important; }
+.gc-leaderboard::-webkit-scrollbar {
+  width: 10px;
+}
+.gc-leaderboard::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 999px;
+}
+.gc-leaderboard::-webkit-scrollbar-thumb {
+  background: rgba(255,215,0,0.3);
+  border-radius: 999px;
+}
+.gc-leaderboard::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,215,0,0.45);
+}
 
 /* ============================================
    LEVEL-SPECIFIC DECORATIONS
