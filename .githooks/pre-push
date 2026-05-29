@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+ROOT=$(git rev-parse --show-toplevel)
+cd "$ROOT" || exit 1
+
+LAST_SUBJECT=$(git log -1 --pretty=%s)
+case "$LAST_SUBJECT" in
+  Bump\ version\ to\ *\ for\ push)
+    exit 0
+    ;;
+esac
+
+NEXT_VERSION=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$ROOT/scripts/bump-version.ps1")
+NEXT_VERSION=$(printf '%s' "$NEXT_VERSION" | tr -d '\r')
+
+git add game.js ABOUT.md index.html
+
+if ! git diff --cached --quiet -- game.js ABOUT.md index.html; then
+  git commit --no-verify -m "Bump version to $NEXT_VERSION for push" -- game.js ABOUT.md index.html >/dev/null
+  echo "Version bumped to $NEXT_VERSION for push. Re-run git push to publish the new version."
+  exit 1
+fi

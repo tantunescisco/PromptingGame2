@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+ROOT=$(git rev-parse --show-toplevel)
+cd "$ROOT" || exit 1
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$ROOT/scripts/bump-version.ps1" >/dev/null
+git add game.js ABOUT.md index.html

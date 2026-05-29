@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.05";
+const APP_VERSION = "2026.05.29.06";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -1440,15 +1440,13 @@ const GAME_DATA = {
       completeBadge: "✨ Singularity Architect",
       theme: "level-5",
       concept: `
-        <h4>🌌 Post-Humanity — The Age of AI Architecture</h4>
-        <p>The Singularity is the hypothetical moment when artificial intelligence surpasses human intelligence. At that frontier, <strong>prompting becomes engineering</strong> — reasoning pipelines replace simple Q&A.</p>
-        <p>You are no longer just asking an AI. You are <strong>designing systems</strong>, <strong>orchestrating agents</strong>, and building AI pipelines that reason, self-improve, and operate at scales no human could manage alone.</p>
-        <ul style="margin:8px 0 0 16px; line-height:2">
-          <li><strong>Few-Shot Prompting</strong> — Give examples before the task to guide output style</li>
-          <li><strong>Chain-of-Thought (CoT)</strong> — Ask the AI to "think step by step" for reasoning tasks</li>
-          <li><strong>Prompt Chaining</strong> — Break complex tasks into a sequence of connected prompts</li>
-          <li><strong>Temperature / Constraints</strong> — Control creativity vs. precision</li>
-          <li><strong>Meta-prompting</strong> — Use AI to improve your own prompts</li>
+        <h4>🌌 Post-Humanity — AI Architecture</h4>
+        <p>At the Singularity, <strong>prompting becomes system design</strong>: you guide models with examples, reasoning steps, chained stages, and tighter constraints.</p>
+        <ul style="margin:6px 0 0 16px; line-height:1.55">
+          <li><strong>Few-shot</strong> — show examples first</li>
+          <li><strong>Chain-of-thought</strong> — break reasoning into steps</li>
+          <li><strong>Prompt chaining</strong> — split complex work into stages</li>
+          <li><strong>Meta-prompting</strong> — use AI to improve prompts</li>
         </ul>
       `,
       exercises: [
