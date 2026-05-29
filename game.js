@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.10";
+const APP_VERSION = "2026.05.29.11";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
