@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.13";
+const APP_VERSION = "2026.05.29.14";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -2150,6 +2150,22 @@ const AdminMode = {
     GameState.levelTimes = [30000, 45000, 60000, 40000, 50000];
     GameState.badges = ['🌟', '💡', '🏆', '⚙️', '🤖'];
     GameEngine.showGameComplete();
+  },
+
+  async previewLevelComplete(levelIndex) {
+    this.closePanel();
+    GameState.playerName = GameState.playerName || 'Admin';
+    GameState.currentLevel = levelIndex;
+    GameState.score = Math.min((levelIndex + 1) * 34, 200);
+    GameState.totalScore = GameState.score;
+    GameState.answers = { 0: true, 1: true, 2: true, 3: true };
+    GameState.levelExercises = GAME_DATA.levels[levelIndex].exercises.slice(0, 4);
+    GameState.levelTimes = Array.from({ length: levelIndex + 1 }, (_, idx) => 42000 + idx * 6000);
+    GameState.badges = GAME_DATA.levels
+      .slice(0, levelIndex)
+      .map(level => level.completeBadge);
+    setTheme(`level-${levelIndex + 1}`);
+    await GameEngine.showLevelCompletePreview(levelIndex);
   }
 };
 
@@ -3374,6 +3390,8 @@ const LEVEL_BACKGROUND_IMAGES = [
   'civil5.png'
 ];
 
+const LEVEL_EVOLUTION_MS = 7200;
+
 function starRating(correct, total) {
   const pct = correct / total;
   if (pct >= 0.9) return '⭐⭐⭐';
@@ -3851,6 +3869,8 @@ const CharacterEngine = {
 // MAIN GAME ENGINE
 // ============================================================
 const GameEngine = {
+  _levelEvolutionTimer: null,
+
 
   _getResumeLookupName(preferredName = '') {
     const candidate = String(preferredName || '').trim()
@@ -4462,13 +4482,15 @@ const GameEngine = {
   },
 
   _setLevelCompleteEvolution(levelIndex) {
-    const screen = document.getElementById('screen-level-complete');
-    const currentCharEl = document.getElementById('complete-character-current');
-    const nextCharEl = document.getElementById('complete-character-next');
-    const currentBgEl = document.getElementById('complete-bg-current');
-    const nextBgEl = document.getElementById('complete-bg-next');
-    const fromLabelEl = document.getElementById('complete-from-label');
-    const toLabelEl = document.getElementById('complete-to-label');
+    const screen = document.getElementById('screen-level-evolution');
+    const currentCharEl = document.getElementById('evolution-character-current');
+    const nextCharEl = document.getElementById('evolution-character-next');
+    const currentBgEl = document.getElementById('evolution-bg-current');
+    const nextBgEl = document.getElementById('evolution-bg-next');
+    const fromLabelEl = document.getElementById('evolution-from-label');
+    const toLabelEl = document.getElementById('evolution-to-label');
+    const titleEl = document.getElementById('evolution-title');
+    const captionEl = document.getElementById('evolution-caption');
     if (!screen || !currentCharEl || !nextCharEl || !currentBgEl || !nextBgEl || !fromLabelEl || !toLabelEl) return;
 
     const hasNextLevel = levelIndex < GAME_DATA.levels.length - 1;
@@ -4492,6 +4514,18 @@ const GameEngine = {
     toLabelEl.textContent = hasNextLevel
       ? `Into ${nextLevel.title}`
       : 'Into Civilization Synchronized';
+    if (titleEl) {
+      titleEl.textContent = hasNextLevel
+        ? `Level ${currentLevel.id} Evolves Into Level ${nextLevel.id}`
+        : 'Civilization Reaches Full Synchronization';
+    }
+    if (captionEl) {
+      captionEl.textContent = hasNextLevel
+        ? `Guide and world transform together. After the evolution completes, continue into ${nextLevel.title}.`
+        : 'Guide and world converge into the synchronized finale. Continue when the evolution completes.';
+    }
+
+    this._setLevelEvolutionButtonState(false, hasNextLevel);
 
     if (currentBg) currentBgEl.style.backgroundImage = this._buildLevelCompleteBg(currentBg, false);
     if (nextBg) nextBgEl.style.backgroundImage = this._buildLevelCompleteBg(nextBg, !hasNextLevel);
@@ -4504,6 +4538,34 @@ const GameEngine = {
     });
   },
 
+  _populateLevelCompleteContent(levelIndex, correct, timeMs, score, rows, online) {
+    const level = GAME_DATA.levels[levelIndex];
+    document.getElementById('complete-badge').textContent = level.badge;
+    document.getElementById('complete-title').textContent = `Level ${level.id} Complete!`;
+    document.getElementById('complete-summary').textContent =
+      `You've mastered "${level.title}"! Score: ${score} pts · Time: ${Timer.format(timeMs)}`;
+    document.getElementById('complete-stars').textContent = starRating(correct, 4);
+    document.getElementById('complete-badge-earned').innerHTML =
+      `🏅 Badge Earned: <strong>${level.completeBadge}</strong>`;
+    document.getElementById('sb-level-title').innerHTML =
+      `🏆 Level ${level.id} Scoreboard${online ? ' <span class="sb-live-dot">● LIVE</span>' : ''}`;
+    this._renderScoreboardTable('level-scoreboard-body', rows, GameState.playerName, false, 10);
+  },
+
+  async showLevelCompletePreview(levelIndex) {
+    const level = GAME_DATA.levels[levelIndex];
+    const timeMs = 42000 + levelIndex * 6000;
+    const score = Math.min((levelIndex + 1) * 34, 200);
+    const rows = await Scoreboard.getLevel(level.id);
+    const online = await Scoreboard._isOnline();
+
+    this._stopPolling();
+    this._populateLevelCompleteContent(levelIndex, 4, timeMs, score, rows, online);
+
+    GameState.currentStage = 'level-complete';
+    showScreen('screen-level-complete');
+  },
+
   async showLevelComplete() {
     const level = GAME_DATA.levels[GameState.currentLevel];
     const correct = GameState.levelExercises.filter((_, i) => GameState.answers && GameState.answers[i]).length;
@@ -4513,26 +4575,22 @@ const GameEngine = {
     MusicEngine.playLevelComplete(GameState.currentLevel);
     SoundEngine.playLevelComplete(GameState.currentLevel);
 
-    document.getElementById('complete-badge').textContent = level.badge;
-    document.getElementById('complete-title').textContent = `Level ${level.id} Complete!`;
-    document.getElementById('complete-summary').textContent =
-      `You've mastered "${level.title}"! Score: ${GameState.score} pts · Time: ${Timer.format(timeMs)}`;
-    document.getElementById('complete-stars').textContent = starRating(correct, GameState.levelExercises.length);
-    document.getElementById('complete-badge-earned').innerHTML =
-      `🏅 Badge Earned: <strong>${level.completeBadge}</strong>`;
-
     GameState.badges.push(level.completeBadge);
 
     // Save and render level scoreboard
     const updated = await Scoreboard.saveLevel(level.id, GameState.playerName, GameState.score, timeMs);
     const online  = await Scoreboard._isOnline();
-    document.getElementById('sb-level-title').innerHTML =
-      `🏆 Level ${level.id} Scoreboard${online ? ' <span class="sb-live-dot">● LIVE</span>' : ''}`;
-    this._renderScoreboardTable('level-scoreboard-body', updated, GameState.playerName, false, 10);
+    this._populateLevelCompleteContent(
+      GameState.currentLevel,
+      correct,
+      timeMs,
+      GameState.score,
+      updated,
+      online
+    );
 
     GameState.currentStage = 'level-complete';
     showScreen('screen-level-complete');
-    this._setLevelCompleteEvolution(GameState.currentLevel);
     this._persistProgress('level-complete');
 
     // Live polling — refresh every 5s while on this screen
@@ -4546,6 +4604,33 @@ const GameEngine = {
   _stopPolling() {
     clearInterval(GameState.pollInterval);
     GameState.pollInterval = null;
+  },
+
+  _clearLevelEvolutionTimer() {
+    if (this._levelEvolutionTimer) {
+      clearTimeout(this._levelEvolutionTimer);
+      this._levelEvolutionTimer = null;
+    }
+  },
+
+  _setLevelEvolutionButtonState(isReady, hasNextLevel) {
+    const button = document.getElementById('evolution-next-btn');
+    if (!button) return;
+    button.disabled = !isReady;
+    button.classList.toggle('is-disabled', !isReady);
+    button.textContent = hasNextLevel ? 'Next Level →' : 'Final Completion →';
+  },
+
+  _finishLevelTransition() {
+    this._clearLevelEvolutionTimer();
+    GameState.currentLevel++;
+    if (GameState.currentLevel >= GAME_DATA.levels.length) {
+      this.showGameComplete();
+    } else {
+      setTheme(GAME_DATA.levels[GameState.currentLevel].theme);
+      MusicEngine.play(GameState.currentLevel);
+      this.showLevelIntro();
+    }
   },
 
   _launchFireworks() {
@@ -4590,14 +4675,21 @@ const GameEngine = {
 
   nextLevel() {
     this._stopPolling();
-    GameState.currentLevel++;
-    if (GameState.currentLevel >= GAME_DATA.levels.length) {
-      this.showGameComplete();
-    } else {
-      setTheme(GAME_DATA.levels[GameState.currentLevel].theme);
-      MusicEngine.play(GameState.currentLevel);
-      this.showLevelIntro();
-    }
+    this._clearLevelEvolutionTimer();
+    GameState.currentStage = 'level-evolution';
+    showScreen('screen-level-evolution');
+    this._setLevelCompleteEvolution(GameState.currentLevel);
+    this._levelEvolutionTimer = setTimeout(() => {
+      const hasNextLevel = GameState.currentLevel < GAME_DATA.levels.length - 1;
+      this._setLevelEvolutionButtonState(true, hasNextLevel);
+      this._levelEvolutionTimer = null;
+    }, LEVEL_EVOLUTION_MS);
+  },
+
+  completeLevelEvolution() {
+    const button = document.getElementById('evolution-next-btn');
+    if (button?.disabled) return;
+    this._finishLevelTransition();
   },
 
   async showGameComplete() {
