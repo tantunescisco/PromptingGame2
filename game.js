@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.39";
+const APP_VERSION = "2026.05.29.44";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -2427,13 +2427,34 @@ const MusicEngine = {
   toggle() {
     this.enabled = !this.enabled;
     const btn = document.getElementById('music-toggle');
-    btn.classList.toggle('muted', !this.enabled);
+    btn?.classList.toggle('muted', !this.enabled);
     if (this.masterGain) this.masterGain.gain.value = this.enabled ? 0.18 : 0;
-    if (this.enabled && this.currentLevel !== null) {
-      this.play(this.currentLevel);
+    if (this.enabled) {
+      this._resumeCurrentTrack();
     } else if (!this.enabled) {
       this._stopAll();
     }
+  },
+
+  _resumeCurrentTrack() {
+    const stage = GameState.currentStage;
+    if (stage === 'welcome') {
+      this.playWelcome();
+      return;
+    }
+    if (stage === 'game-complete') {
+      this.playVictory();
+      return;
+    }
+    if ((stage === 'level-complete' || stage === 'level-evolution') && Number.isInteger(GameState.currentLevel)) {
+      this.playLevelComplete(GameState.currentLevel);
+      return;
+    }
+    if (Number.isInteger(GameState.currentLevel)) {
+      this.play(GameState.currentLevel);
+      return;
+    }
+    this.playWelcome();
   },
 
   play(levelIndex) {
@@ -3540,7 +3561,9 @@ function showScreen(id) {
 
 function setTheme(levelClass) {
   document.body.className = document.body.className
-    .replace(/level-\d/g, '').trim();
+    .replace(/level-\d/g, '')
+    .replace(/game-complete/g, '')
+    .trim();
   if (levelClass) document.body.classList.add(levelClass);
 }
 
@@ -3950,13 +3973,56 @@ const CharacterEngine = {
     },
   ],
 
+  _promptDialogues: [
+    {
+      choice: ['Choose one tablet before we continue.', 'Point to the clearest inscription first.'],
+      freetext: ['Write your prompt on the tablet first.', 'The stylus waits for your wording.'],
+      matching: ['Pair every symbol before you proceed.', 'Complete each link on the tablet first.']
+    },
+    {
+      choice: ['Select the strongest argument before proceeding.', 'Choose the statement that best survives scrutiny.'],
+      freetext: ['State your argument before you advance.', 'Write your reasoning clearly first.'],
+      matching: ['Match every concept before moving on.', 'Complete the full set of correspondences first.']
+    },
+    {
+      choice: ['Pick the best design before I start the engine.', 'Select one solution so the gears can engage.'],
+      freetext: ['Draft the blueprint before we proceed.', 'Write the prompt with proper engineering detail first.'],
+      matching: ['Match every component before we power this machine.', 'Complete each pairing before the mechanism moves.']
+    },
+    {
+      choice: ['Lock in one option before I run the sequence.', 'Select a path so the system can execute.'],
+      freetext: ['Type the command before we push it live.', 'Write the prompt syntax before you submit.'],
+      matching: ['Map every signal before the network routes.', 'Complete all connections before we continue.']
+    },
+    {
+      choice: ['Choose the resonance you want to follow first.', 'Select one reality before we continue.'],
+      freetext: ['Transmit your prompt before we cross the threshold.', 'Write the message before the cosmos can answer.'],
+      matching: ['Complete every alignment before we ascend.', 'Match all frequencies before the portal opens.']
+    }
+  ],
+
   setDialogue(levelIndex, exerciseType) {
     const el = document.getElementById('char-dialogue-text');
     if (!el) return;
+    document.querySelector('.ex-dialogue')?.classList.remove('is-warning');
     const bank = this._dialogues[levelIndex];
     if (!bank) { el.textContent = ''; return; }
     const lines = bank[exerciseType] || bank.default;
     el.textContent = lines[Math.floor(Math.random() * lines.length)];
+  },
+
+  clearPrompt(levelIndex, exerciseType) {
+    this.setDialogue(levelIndex, exerciseType);
+  },
+
+  prompt(levelIndex, promptType) {
+    const bubble = document.querySelector('.ex-dialogue');
+    const textEl = document.getElementById('char-dialogue-text');
+    if (!bubble || !textEl) return;
+    const bank = this._promptDialogues[levelIndex];
+    const lines = bank?.[promptType] || ['Complete the step before moving on.'];
+    textEl.textContent = lines[Math.floor(Math.random() * lines.length)];
+    bubble.classList.add('is-warning');
   },
 
   _currentState: 'idle',
@@ -4019,6 +4085,7 @@ const CharacterEngine = {
     if (!el) return;
     // Reset state classes on each new question
     el.classList.remove('char-thinking', 'char-success', 'char-partial', 'char-failure');
+    document.querySelector('.ex-dialogue')?.classList.remove('is-warning');
     this._currentState = 'idle';
     const imgSrc = this._humanImages[levelIndex] ?? null;
     if (!imgSrc) { el.innerHTML = ''; return; }
@@ -4378,6 +4445,7 @@ const GameEngine = {
         btn.textContent = choice.text;
         btn.dataset.id = choice.id;
         btn.addEventListener('click', () => {
+          CharacterEngine.clearPrompt(GameState.currentLevel, exercise.inputType);
           grid.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
           GameState.selectedChoice = choice.id;
@@ -4394,6 +4462,7 @@ const GameEngine = {
       ta.className = 'prompt-input';
       ta.placeholder = exercise.placeholder || 'Type your prompt here...';
       ta.id = 'freetext-input';
+      ta.addEventListener('input', () => CharacterEngine.clearPrompt(GameState.currentLevel, exercise.inputType));
       inputArea.appendChild(label);
       inputArea.appendChild(ta);
 
@@ -4473,6 +4542,7 @@ const GameEngine = {
   handleMatchClick(div, side) {
     const ms = GameState.matchingState;
     if (div.classList.contains('matched')) return;
+    CharacterEngine.clearPrompt(GameState.currentLevel, 'matching');
 
     if (side === 'left') {
       // Deselect previous left
@@ -4512,7 +4582,7 @@ const GameEngine = {
 
     if (exercise.inputType === 'choice') {
       if (!GameState.selectedChoice) {
-        alert('Please select an answer!');
+        CharacterEngine.prompt(GameState.currentLevel, 'choice');
         return;
       }
       isCorrect = GameState.selectedChoice === exercise.correct;
@@ -4522,7 +4592,7 @@ const GameEngine = {
       const ta = document.getElementById('freetext-input');
       userAnswer = ta ? ta.value.trim() : '';
       if (userAnswer.length < 10) {
-        alert('Please write your prompt first!');
+        CharacterEngine.prompt(GameState.currentLevel, 'freetext');
         return;
       }
       const grade = checkFreeText(userAnswer, exercise);
@@ -4543,7 +4613,7 @@ const GameEngine = {
       const allMatched = Object.keys(correct).every(k => ms.pairs[k] === correct[k]);
       const allPaired = Object.keys(ms.pairs).length === Object.keys(correct).length;
       if (!allPaired) {
-        alert('Please match all items!');
+        CharacterEngine.prompt(GameState.currentLevel, 'matching');
         return;
       }
       isCorrect = allMatched;
@@ -4938,9 +5008,9 @@ const GameEngine = {
     GameState.currentStage = 'game-complete';
     this._clearProgress();
     this._clearGameCompleteUiTimeouts();
-    document.body.className = 'game-complete';
-    document.body.style.setProperty('--completion-bg-image', `url('${COMPLETION_BG_IMAGE}')`);
     setTheme('');
+    document.body.classList.add('game-complete');
+    document.body.style.setProperty('--completion-bg-image', `url('${COMPLETION_BG_IMAGE}')`);
     MusicEngine.playVictory();
 
     // Cosmic fireworks
