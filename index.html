@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Quest 2 - The Evolution of Civilization</title>
-  <link rel="stylesheet" href="style.css?v=20260529" />
+  <link rel="stylesheet" href="style.css?v=20260529c" />
 </head>
 <body>
   <!-- AUDIO CONTROLS (always visible) -->
@@ -236,13 +236,11 @@
   <div id="admin-login-modal" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
     <div class="admin-modal-box">
       <h2 class="admin-modal-title" id="admin-login-title">🔐 Admin Access</h2>
-      <p class="admin-modal-desc">Enter your admin credentials to continue.</p>
+      <p class="admin-modal-desc">Enter the admin password to continue.</p>
       <div class="admin-form">
-        <label for="admin-username">Username</label>
-        <input type="email" id="admin-username" placeholder="admin@example.com" autocomplete="off" />
         <label for="admin-password">Password</label>
-        <input type="password" id="admin-password" placeholder="Password" />
-        <div id="admin-login-error" class="admin-error hidden">Invalid credentials. Please try again.</div>
+        <input type="password" id="admin-password" placeholder="Enter admin password" />
+        <div id="admin-login-error" class="admin-error hidden">Invalid password. Please try again.</div>
       </div>
       <div class="admin-modal-actions">
         <button class="btn-admin-cancel" onclick="AdminMode.closeLogin()">Cancel</button>
@@ -295,6 +293,6 @@
     </div>
   </div>
 
-  <script src="game.js?v=20260529"></script>
+  <script src="game.js?v=20260529b"></script>
 </body>
 </html>

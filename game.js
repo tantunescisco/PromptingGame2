@@ -2049,16 +2049,15 @@ const Scoreboard = {
 // ADMIN MODE
 // ============================================================
 const AdminMode = {
-  _CREDS: { user: 'tantunes', pass: 'Cisco!123' },
+  _CREDS: { pass: 'Cisco!123' },
 
   showLogin() {
     const modal = document.getElementById('admin-login-modal');
     if (!modal) return;
-    document.getElementById('admin-username').value = '';
     document.getElementById('admin-password').value = '';
     document.getElementById('admin-login-error').classList.add('hidden');
     modal.classList.remove('hidden');
-    setTimeout(() => document.getElementById('admin-username').focus(), 60);
+    setTimeout(() => document.getElementById('admin-password').focus(), 60);
   },
 
   closeLogin() {
@@ -2066,9 +2065,8 @@ const AdminMode = {
   },
 
   handleLogin() {
-    const user = document.getElementById('admin-username').value.trim();
     const pass = document.getElementById('admin-password').value;
-    if (user === this._CREDS.user && pass === this._CREDS.pass) {
+    if (pass === this._CREDS.pass) {
       this._activateAdminLevelButtons();
       this.closeLogin();
     } else {
@@ -3273,7 +3271,10 @@ function showScreen(id) {
 
   const quitBtn = document.getElementById('quit-btn');
   if (quitBtn) quitBtn.style.display = id === 'screen-welcome' ? 'none' : 'flex';
+  const audioControls = document.getElementById('audio-controls');
+  if (audioControls) audioControls.style.display = 'flex';
 
+  document.body.setAttribute('data-screen', id);
   document.body.classList.toggle('welcome', id === 'screen-welcome');
   if (id === 'screen-welcome') {
     GameState.currentStage = 'welcome';
@@ -4395,7 +4396,7 @@ const GameEngine = {
     const online  = await Scoreboard._isOnline();
     document.getElementById('sb-level-title').innerHTML =
       `🏆 Level ${level.id} Scoreboard${online ? ' <span class="sb-live-dot">● LIVE</span>' : ''}`;
-    this._renderScoreboardTable('level-scoreboard-body', updated, GameState.playerName, false);
+    this._renderScoreboardTable('level-scoreboard-body', updated, GameState.playerName, false, 10);
 
     GameState.currentStage = 'level-complete';
     showScreen('screen-level-complete');
@@ -4405,7 +4406,7 @@ const GameEngine = {
     clearInterval(GameState.pollInterval);
     GameState.pollInterval = setInterval(async () => {
       const live = await Scoreboard.getLevel(level.id);
-      this._renderScoreboardTable('level-scoreboard-body', live, GameState.playerName, false);
+      this._renderScoreboardTable('level-scoreboard-body', live, GameState.playerName, false, 10);
     }, 5000);
   },
 
@@ -4642,7 +4643,7 @@ const GameEngine = {
     }
   },
 
-  _renderScoreboardTable(tbodyId, entries, currentPlayer, isOverall) {
+  _renderScoreboardTable(tbodyId, entries, currentPlayer, isOverall, maxRows = 20) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
 
@@ -4650,7 +4651,7 @@ const GameEngine = {
     const scoreKey = isOverall ? 'totalScore' : 'score';
     const timeKey  = isOverall ? 'totalTimeMs' : 'timeMs';
 
-    tbody.innerHTML = entries.slice(0, 20).map((e, i) => {
+    tbody.innerHTML = entries.slice(0, maxRows).map((e, i) => {
       const rank = MEDALS[i] || `${i + 1}`;
       const isCurrent = e.name === currentPlayer;
       const rowClass = isCurrent ? 'current-player new-entry' : '';
