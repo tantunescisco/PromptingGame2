@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.05.29.21";
+const APP_VERSION = "2026.05.29.25";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -1804,8 +1804,6 @@ const GameState = {
   levelTimes: [],
   pollInterval: null,
   fireworksInterval: null,
-  completionFusionInterval: null,
-  completionFusionTimeouts: [],
   completionUiTimeouts: [],
   _parallaxCleanup: null,
   levelExercises: [],  // randomly selected exercises for the current level
@@ -3397,8 +3395,6 @@ const LEVEL_BACKGROUND_IMAGES = [
 
 const LEVEL_EVOLUTION_MS = 7200;
 const FINAL_SYNCHRONIZER_INDEX = 5;
-const GAME_COMPLETE_FUSION_INTERVAL_MS = 10000;
-const GAME_COMPLETE_FUSION_REVEAL_DELAY_MS = 3600;
 
 function starRating(correct, total) {
   const pct = correct / total;
@@ -4110,7 +4106,6 @@ const GameEngine = {
     this._stopPolling();
     clearInterval(GameState.fireworksInterval);
     GameState.fireworksInterval = null;
-    this._clearGameCompleteFusionLoop();
     this._clearGameCompleteUiTimeouts();
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     MusicEngine._stopAll();
@@ -4125,7 +4120,6 @@ const GameEngine = {
     this._stopPolling();
     clearInterval(GameState.fireworksInterval);
     GameState.fireworksInterval = null;
-    this._clearGameCompleteFusionLoop();
     this._clearGameCompleteUiTimeouts();
     if (GameState._parallaxCleanup) { GameState._parallaxCleanup(); GameState._parallaxCleanup = null; }
     if (GameState.currentStage && GameState.currentStage !== 'welcome' && GameState.currentStage !== 'game-complete') {
@@ -4628,15 +4622,6 @@ const GameEngine = {
     }
   },
 
-  _queueGameCompleteTimeout(callback, delayMs) {
-    const timeoutId = setTimeout(() => {
-      GameState.completionFusionTimeouts = GameState.completionFusionTimeouts.filter(id => id !== timeoutId);
-      callback();
-    }, delayMs);
-    GameState.completionFusionTimeouts.push(timeoutId);
-    return timeoutId;
-  },
-
   _queueGameCompleteUiTimeout(callback, delayMs) {
     const timeoutId = setTimeout(() => {
       GameState.completionUiTimeouts = GameState.completionUiTimeouts.filter(id => id !== timeoutId);
@@ -4651,127 +4636,41 @@ const GameEngine = {
     GameState.completionUiTimeouts = [];
   },
 
-  _clearGameCompleteFusionLoop() {
-    clearInterval(GameState.completionFusionInterval);
-    GameState.completionFusionInterval = null;
-    GameState.completionFusionTimeouts.forEach(clearTimeout);
-    GameState.completionFusionTimeouts = [];
-
-    const stage = document.getElementById('gc-fusion-stage');
-    if (stage) {
-      stage.classList.remove('gc-fusion-active', 'gc-synchronizer-visible');
-    }
-
-    const particles = document.getElementById('gc-fusion-particles');
-    if (particles) {
-      particles.innerHTML = '';
-    }
-  },
-
   _buildGameCompleteTimeline(levelMeta) {
     const timeline = document.getElementById('gc-timeline');
     if (!timeline) return [];
 
     timeline.innerHTML = '';
-    CharacterEngine._humanImages.slice(0, GAME_DATA.levels.length).forEach((imgSrc, i) => {
+    const setSlotHoverState = (slot, isHovered) => {
+      slot.classList.toggle('is-hovered', isHovered);
+    };
+
+    levelMeta.forEach((meta, i) => {
+      const imgSrc = CharacterEngine._humanImages[i] ?? null;
+      if (!imgSrc) return;
+
       if (i > 0) {
         const conn = document.createElement('div');
         conn.className = 'gc-timeline-connector';
-        conn.style.setProperty('--fusion-delay', `${80 + (i - 1) * 110}ms`);
         timeline.appendChild(conn);
       }
 
       const slot = document.createElement('div');
       slot.className = 'gc-char-slot';
-      slot.style.setProperty('--fusion-delay', `${i * 140}ms`);
+      slot.tabIndex = 0;
       slot.innerHTML = `
-        <div class="gc-char-avatar"><img src="${imgSrc}" alt="${levelMeta[i].era}" /></div>
-        <div class="gc-char-era">${levelMeta[i].era}</div>
-        <div class="gc-char-tooltip">${levelMeta[i].topic}</div>
+        <div class="gc-char-avatar"><img src="${imgSrc}" alt="${meta.era}" /></div>
+        <div class="gc-char-era">${meta.era}</div>
+        <div class="gc-char-tooltip">${meta.topic}</div>
       `;
+      slot.addEventListener('pointerenter', () => setSlotHoverState(slot, true));
+      slot.addEventListener('pointerleave', () => setSlotHoverState(slot, false));
+      slot.addEventListener('focus', () => setSlotHoverState(slot, true));
+      slot.addEventListener('blur', () => setSlotHoverState(slot, false));
       timeline.appendChild(slot);
     });
 
     return [...timeline.querySelectorAll('.gc-char-slot')];
-  },
-
-  _createGameCompleteFusionParticles(slots) {
-    const stage = document.getElementById('gc-fusion-stage');
-    const particles = document.getElementById('gc-fusion-particles');
-    const card = document.getElementById('gc-synchronizer-card');
-    if (!stage || !particles || !card || !slots.length) return;
-
-    particles.innerHTML = '';
-
-    const stageRect = stage.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    const centerX = cardRect.left - stageRect.left + cardRect.width / 2;
-    const centerY = cardRect.top - stageRect.top + cardRect.height / 2;
-    const colors = ['#ffd700', '#fff2a8', '#c084fc', '#2dd4bf', '#f9a8d4'];
-
-    slots.forEach((slot, slotIndex) => {
-      const avatar = slot.querySelector('.gc-char-avatar');
-      if (!avatar) return;
-
-      const rect = avatar.getBoundingClientRect();
-      const startX = rect.left - stageRect.left + rect.width / 2;
-      const startY = rect.top - stageRect.top + rect.height / 2;
-
-      for (let particleIndex = 0; particleIndex < 16; particleIndex++) {
-        const piece = document.createElement('div');
-        const color = colors[(slotIndex + particleIndex) % colors.length];
-        const jitterX = (Math.random() - 0.5) * rect.width * 0.7;
-        const jitterY = (Math.random() - 0.5) * rect.height * 0.9;
-        const tx = centerX - (startX + jitterX) + (Math.random() - 0.5) * 42;
-        const ty = centerY - (startY + jitterY) + (Math.random() - 0.5) * 34;
-        const size = 4 + Math.random() * 8;
-        const duration = 2500 + Math.random() * 1400;
-        const delay = slotIndex * 150 + Math.random() * 420;
-
-        piece.className = 'gc-fusion-particle';
-        piece.style.left = `${startX + jitterX}px`;
-        piece.style.top = `${startY + jitterY}px`;
-        piece.style.width = `${size}px`;
-        piece.style.height = `${size}px`;
-        piece.style.setProperty('--tx', `${tx}px`);
-        piece.style.setProperty('--ty', `${ty}px`);
-        piece.style.setProperty('--particle-color', color);
-        piece.style.setProperty('--particle-delay', `${delay}ms`);
-        piece.style.setProperty('--particle-duration', `${duration}ms`);
-        particles.appendChild(piece);
-      }
-    });
-  },
-
-  _runGameCompleteFusionCycle() {
-    if (GameState.currentStage !== 'game-complete') return;
-
-    const stage = document.getElementById('gc-fusion-stage');
-    const timeline = document.getElementById('gc-timeline');
-    if (!stage || !timeline) return;
-
-    const slots = [...timeline.querySelectorAll('.gc-char-slot')];
-    if (!slots.length) return;
-
-    stage.classList.remove('gc-fusion-active', 'gc-synchronizer-visible');
-    this._createGameCompleteFusionParticles(slots);
-
-    void stage.offsetWidth;
-    stage.classList.add('gc-fusion-active');
-
-    this._queueGameCompleteTimeout(() => {
-      if (GameState.currentStage === 'game-complete') {
-        stage.classList.add('gc-synchronizer-visible');
-      }
-    }, GAME_COMPLETE_FUSION_REVEAL_DELAY_MS);
-  },
-
-  _startGameCompleteFusionLoop() {
-    this._clearGameCompleteFusionLoop();
-    this._queueGameCompleteTimeout(() => this._runGameCompleteFusionCycle(), 2100);
-    GameState.completionFusionInterval = setInterval(() => {
-      this._runGameCompleteFusionCycle();
-    }, GAME_COMPLETE_FUSION_INTERVAL_MS);
   },
 
   _setLevelEvolutionButtonState(isReady, hasNextLevel) {
@@ -4856,7 +4755,6 @@ const GameEngine = {
   async showGameComplete() {
     GameState.currentStage = 'game-complete';
     this._clearProgress();
-    this._clearGameCompleteFusionLoop();
     this._clearGameCompleteUiTimeouts();
     document.body.className = 'game-complete';
     setTheme('');
@@ -4902,15 +4800,11 @@ const GameEngine = {
       { era: 'L2 · Roman Orator',      topic: 'Tone, Context & Constraints<br>Rhetoric & Persuasion' },
       { era: 'L3 · Victorian Engineer', topic: 'Role Prompting<br>System Prompts' },
       { era: 'L4 · Cyberpunk Hacker',  topic: 'Format Engineering<br>Output Control' },
-      { era: 'L5 · Star Archon',       topic: 'Prompt Chaining<br>Meta-Prompting' }
+      { era: 'L5 · Star Archon',       topic: 'Prompt Chaining<br>Meta-Prompting' },
+      { era: 'L6 · Civilization Synchronizer', topic: 'Unified Prompt Mastery<br>Civilization Synchronized' }
     ];
 
     const slots = this._buildGameCompleteTimeline(levelMeta);
-
-    const synchronizerImg = document.getElementById('gc-synchronizer-img');
-    if (synchronizerImg) {
-      synchronizerImg.src = CharacterEngine._humanImages[FINAL_SYNCHRONIZER_INDEX];
-    }
 
     // Sequential fade-in stagger (400ms between each)
     slots.forEach((slot, i) => {
@@ -4952,7 +4846,6 @@ const GameEngine = {
     this._renderScoreboardTable('overall-scoreboard-body', overall, GameState.playerName, true);
 
     showScreen('screen-game-complete');
-    this._startGameCompleteFusionLoop();
 
     // Live polling — refresh every 5s
     clearInterval(GameState.pollInterval);
