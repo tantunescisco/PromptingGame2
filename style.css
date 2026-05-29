@@ -1434,6 +1434,12 @@ body.level-5 .ex-char-zone { padding-top: 4px; }
   position: relative;
 }
 
+body.level-4 .exercise-card {
+  background: linear-gradient(180deg, rgba(15, 26, 54, 0.96), rgba(8, 17, 38, 0.94));
+  border-color: rgba(0, 180, 216, 0.72);
+  box-shadow: 0 0 18px rgba(0,180,216,0.18), 0 0 50px rgba(0,180,216,0.08);
+}
+
 /* Level-5 cosmic card */
 body.level-5 .exercise-card {
   background: linear-gradient(180deg, rgba(18, 10, 46, 0.96), rgba(10, 6, 32, 0.94));
@@ -1485,6 +1491,10 @@ body.level-3 #exercise-context strong,
 body.level-3 .rewrite-label strong {
   color: #4a2f16;
 }
+body.level-4 #exercise-question {
+  color: #f2fbff;
+  line-height: 1.5;
+}
 .ex-context {
   background: rgba(0,0,0,0.04);
   border-left: 4px solid var(--card-border);
@@ -1500,6 +1510,11 @@ body.level-5 .ex-context {
   background: rgba(192,132,252,0.08);
   border-left-color: #c084fc;
   color: #d8b4fe;
+}
+body.level-4 .ex-context {
+  background: rgba(0,180,216,0.08);
+  border-left-color: #00b4d8;
+  color: #c8ebf4;
 }
 body.level-5 #exercise-question {
   color: #f6f0ff;
@@ -1559,8 +1574,12 @@ body.level-4 .choice-btn {
   font-size: 1rem;
   font-weight: 500;
   color: #eaf8ff;
+  background: rgba(9, 22, 50, 0.88);
+  border-color: #00b4d8;
+  line-height: 1.62;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
-body.level-4 .choice-btn:hover { border-color: var(--primary); background: rgba(0,200,240,0.1); transform: translateY(-2px); }
+body.level-4 .choice-btn:hover { border-color: var(--primary); background: rgba(0,200,240,0.14); transform: translateY(-2px); }
 body.level-4 .choice-btn.selected { border-color: var(--primary); background: rgba(0,200,240,0.25); color: #fff; }
 body.level-5 .choice-btn {
   background: rgba(20, 8, 50, 0.85);
@@ -1628,6 +1647,8 @@ body.level-4 textarea.prompt-input, body.level-4 input.prompt-input {
   font-weight: 400;
   color: #eaf8ff;
   line-height: 1.6;
+  background: rgba(9, 22, 50, 0.92);
+  border-color: #00b4d8;
 }
 body.level-4 textarea.prompt-input:focus, body.level-4 input.prompt-input:focus {
   border-color: #00c8f0;
@@ -1725,6 +1746,25 @@ body.level-3 .match-item.matched {
   color: #35511d;
 }
 body.level-5 .match-item.matched { background: rgba(192,132,252,.18); border-color: #c084fc; color: #f0e6ff; pointer-events: none; }
+body.level-4 .match-col-label,
+body.level-4 .match-item,
+body.level-4 .rewrite-label {
+  font-family: 'Roboto', sans-serif;
+}
+body.level-4 .match-item {
+  background: rgba(9, 22, 50, 0.88);
+  border-color: #00b4d8;
+  color: #eaf8ff;
+}
+body.level-4 .match-item:hover {
+  border-color: #00c8f0;
+  background: rgba(0,200,240,0.12);
+}
+body.level-4 .match-item.matched {
+  background: rgba(0,180,216,0.18);
+  border-color: #00c8f0;
+  color: #eaf8ff;
+}
 body.level-5 .match-col-label,
 body.level-5 .match-item,
 body.level-5 .rewrite-label {
@@ -1790,6 +1830,14 @@ body.level-4 .hint-box {
   font-size: 0.96rem;
   font-weight: 500;
   color: #a8d5e5;
+}
+body.level-4 .btn-hint {
+  color: #c8ebf4;
+  border-color: rgba(0,180,216,0.75);
+}
+body.level-4 .btn-hint:hover {
+  color: #f2fbff;
+  border-color: #00c8f0;
 }
 body.level-5 .hint-box {
   background: rgba(192,132,252,0.12);
