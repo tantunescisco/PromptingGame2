@@ -1977,7 +1977,13 @@ body.level-2 .hint-box {
   font-weight: 500;
   color: #4a1f6e;
 }
-body.level-3 .hint-box { background: rgba(186,104,255,0.12); border-color: #b388ff; color: #f0d9ff; }
+body.level-3 .hint-box {
+  background: linear-gradient(180deg, rgba(18, 12, 7, 0.88), rgba(39, 27, 15, 0.92));
+  border-color: rgba(212, 137, 58, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 214, 158, 0.08);
+  color: #ffe2b8;
+  font-weight: 600;
+}
 body.level-4 .hint-box {
   background: rgba(0,180,216,0.12);
   border: 1px dashed #00b4d8;
