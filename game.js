@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.06.03.07";
+const APP_VERSION = "2026.06.03.08";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -1903,6 +1903,14 @@ const Scoreboard = {
     };
   },
 
+  _normalizeLevelEntries(levelId, entries) {
+    if (!Array.isArray(entries)) return [];
+    return entries
+      .map(entry => this._sanitizeEntry(levelId, entry))
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
+  },
+
   _aggregateOverall(levelEntriesById) {
     const validLevelIds = this._validLevelIds();
     const best = {};
@@ -1952,9 +1960,7 @@ const Scoreboard = {
     const r    = await fetch(`${FIREBASE_URL}/scores/${levelId}.json`);
     const data = await r.json();
     if (!data || typeof data !== 'object') return [];
-    return Object.values(data)
-      .filter(e => e && e.name)
-      .sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
+    return this._normalizeLevelEntries(levelId, Object.values(data));
   },
 
   async _fbOverall() {
@@ -1991,9 +1997,12 @@ const Scoreboard = {
 
   // ── Public API (3-tier, async) ────────────────────────────
   async saveLevel(levelId, name, score, timeMs) {
+    const sanitized = this._sanitizeEntry(levelId, { name, score, timeMs });
+    if (!sanitized) return this.getLevel(levelId);
+
     // Tier 1 — Firebase
     if (this._fbEnabled) {
-      try { return await this._fbSave(levelId, name, score, timeMs); } catch {}
+      try { return await this._fbSave(levelId, sanitized.name, sanitized.score, sanitized.timeMs); } catch {}
     }
     // Tier 2 — REST API
     if (await this._isApiOnline()) {
@@ -2001,13 +2010,13 @@ const Scoreboard = {
         const r = await fetch(`/api/scores/${levelId}`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ name, score, timeMs })
+          body:    JSON.stringify(sanitized)
         });
-        if (r.ok) return await r.json();
+        if (r.ok) return this._normalizeLevelEntries(levelId, await r.json());
       } catch {}
     }
     // Tier 3 — localStorage
-    return this._lsSave(levelId, name, score, timeMs);
+    return this._lsSave(levelId, sanitized.name, sanitized.score, sanitized.timeMs);
   },
 
   async getLevel(levelId) {
@@ -2017,7 +2026,7 @@ const Scoreboard = {
     if (await this._isApiOnline()) {
       try {
         const r = await fetch(`/api/scores/${levelId}`);
-        if (r.ok) return await r.json();
+        if (r.ok) return this._normalizeLevelEntries(levelId, await r.json());
       } catch {}
     }
     return this._lsGet(levelId);
@@ -2045,13 +2054,13 @@ const Scoreboard = {
     const all = this._lsLoad();
     if (!all[levelId]) all[levelId] = [];
     all[levelId].push({ name, score, timeMs, date: Date.now() });
-    all[levelId].sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
+    all[levelId] = this._normalizeLevelEntries(levelId, all[levelId]);
     try { localStorage.setItem(this._lsKey, JSON.stringify(all)); } catch {}
     return all[levelId];
   },
   _lsGet(levelId) {
     const all = this._lsLoad();
-    return [...(all[levelId] || [])].sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
+    return this._normalizeLevelEntries(levelId, all[levelId] || []);
   },
   _lsOverall() {
     return this._aggregateOverall(this._lsLoad());
