@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.06.01.04";
+const APP_VERSION = "2026.06.03.02";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -1876,6 +1876,67 @@ const Scoreboard = {
   _apiOnline:  null,              // null = not yet checked
   _fbEnabled:  !!FIREBASE_URL,   // true when Firebase URL is configured
 
+  _validLevelIds() {
+    return new Set(GAME_DATA.levels.map(level => String(level.id)));
+  },
+
+  _maxLevelScore(levelId) {
+    const level = GAME_DATA.levels.find(entry => String(entry.id) === String(levelId));
+    return level ? Math.min(level.exercises.length, 4) * 10 : 0;
+  },
+
+  _maxOverallScore() {
+    return GAME_DATA.levels.reduce((sum, level) => sum + this._maxLevelScore(level.id), 0);
+  },
+
+  _sanitizeEntry(levelId, entry) {
+    if (!entry || !entry.name) return null;
+    const name = String(entry.name).trim();
+    if (!name) return null;
+    const maxScore = this._maxLevelScore(levelId);
+    const rawScore = Number(entry.score);
+    const rawTimeMs = Number(entry.timeMs);
+    return {
+      name,
+      score: Math.max(0, Math.min(Number.isFinite(rawScore) ? rawScore : 0, maxScore)),
+      timeMs: Math.max(0, Number.isFinite(rawTimeMs) ? rawTimeMs : 0)
+    };
+  },
+
+  _aggregateOverall(levelEntriesById) {
+    const validLevelIds = this._validLevelIds();
+    const best = {};
+
+    Object.entries(levelEntriesById).forEach(([lid, entries]) => {
+      if (!validLevelIds.has(String(lid)) || !Array.isArray(entries)) return;
+
+      const seen = {};
+      entries.forEach(entry => {
+        const candidate = this._sanitizeEntry(lid, entry);
+        if (!candidate) return;
+        const existing = seen[candidate.name];
+        if (!existing || candidate.score > existing.score ||
+            (candidate.score === existing.score && candidate.timeMs < existing.timeMs)) {
+          seen[candidate.name] = candidate;
+        }
+      });
+
+      Object.values(seen).forEach(entry => {
+        if (!best[entry.name]) best[entry.name] = { name: entry.name, totalScore: 0, totalTimeMs: 0 };
+        best[entry.name].totalScore += entry.score;
+        best[entry.name].totalTimeMs += entry.timeMs;
+      });
+    });
+
+    const maxOverallScore = this._maxOverallScore();
+    return Object.values(best)
+      .map(entry => ({
+        ...entry,
+        totalScore: Math.min(entry.totalScore, maxOverallScore)
+      }))
+      .sort((a, b) => b.totalScore - a.totalScore || a.totalTimeMs - b.totalTimeMs);
+  },
+
   // ── Firebase helpers ─────────────────────────────────────
   async _fbSave(levelId, name, score, timeMs) {
     // POST appends a new entry with an auto-generated key (no race condition)
@@ -1900,25 +1961,13 @@ const Scoreboard = {
     const r    = await fetch(`${FIREBASE_URL}/scores.json`);
     const data = await r.json();
     if (!data || typeof data !== 'object') return [];
-    // data = { "1": { "-key": {entry}, ... }, "2": { ... }, ... }
-    const best = {};
-    Object.entries(data).forEach(([lid, levelObj]) => {
-      if (!levelObj || typeof levelObj !== 'object') return;
-      const seen = {};
-      Object.values(levelObj).forEach(e => {
-        if (!e || !e.name) return;
-        const k = `${e.name}\x00${lid}`;
-        if (!seen[k] || e.score > seen[k].score ||
-            (e.score === seen[k].score && e.timeMs < seen[k].timeMs)) seen[k] = e;
-      });
-      Object.values(seen).forEach(e => {
-        if (!best[e.name]) best[e.name] = { name: e.name, totalScore: 0, totalTimeMs: 0 };
-        best[e.name].totalScore  += e.score;
-        best[e.name].totalTimeMs += e.timeMs;
-      });
-    });
-    return Object.values(best)
-      .sort((a, b) => b.totalScore - a.totalScore || a.totalTimeMs - b.totalTimeMs);
+    const normalized = Object.fromEntries(
+      Object.entries(data).map(([lid, levelObj]) => [
+        lid,
+        levelObj && typeof levelObj === 'object' ? Object.values(levelObj) : []
+      ])
+    );
+    return this._aggregateOverall(normalized);
   },
 
   // ── REST API (server.py) availability check ───────────────
@@ -2005,22 +2054,7 @@ const Scoreboard = {
     return [...(all[levelId] || [])].sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
   },
   _lsOverall() {
-    const all  = this._lsLoad();
-    const best = {};
-    Object.keys(all).forEach(lid => {
-      const seen = {};
-      all[lid].forEach(e => {
-        const k = e.name + '\x00' + lid;
-        if (!seen[k] || e.score > seen[k].score ||
-            (e.score === seen[k].score && e.timeMs < seen[k].timeMs)) seen[k] = e;
-      });
-      Object.values(seen).forEach(e => {
-        if (!best[e.name]) best[e.name] = { name: e.name, totalScore: 0, totalTimeMs: 0 };
-        best[e.name].totalScore  += e.score;
-        best[e.name].totalTimeMs += e.timeMs;
-      });
-    });
-    return Object.values(best).sort((a, b) => b.totalScore - a.totalScore || a.totalTimeMs - b.totalTimeMs);
+    return this._aggregateOverall(this._lsLoad());
   },
 
   // ── Admin: reset all scores across all tiers ──────────────

@@ -8,7 +8,7 @@ Prompt Quest 2 teaches prompt engineering as a progression of increasingly power
 
 ## Version And Author
 
-- Version: 2026.05.29.45
+- Version: 2026.06.03.01
 - Author: Tiago Antunes
 - Email: tantunes@cisco.com
 - Role: Technical Consulting Engineering Technical Leader
