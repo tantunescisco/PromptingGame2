@@ -5038,6 +5038,51 @@ const GameEngine = {
     this._finishLevelTransition();
   },
 
+  _getAchievementRank(totalScore, maxScore = 200) {
+    const safeMax = Math.max(1, Number(maxScore) || 200);
+    const pct = Math.round((Math.max(0, Number(totalScore) || 0) / safeMax) * 100);
+    if (pct >= 100) {
+      return {
+        pct,
+        name: 'Civilization Synchronizer',
+        tier: '✦ Perfect Synchronization — Unified Prompt Mastery ✦'
+      };
+    }
+    if (pct >= 90) {
+      return {
+        pct,
+        name: 'Star Archon',
+        tier: 'Cosmic Command of Chaining and Meta-Prompting'
+      };
+    }
+    if (pct >= 80) {
+      return {
+        pct,
+        name: 'Cyberpunk Hacker',
+        tier: 'Elite Output Control and Format Engineering'
+      };
+    }
+    if (pct >= 60) {
+      return {
+        pct,
+        name: 'Victorian Engineer',
+        tier: 'Strong System Prompting and Role Precision'
+      };
+    }
+    if (pct >= 40) {
+      return {
+        pct,
+        name: 'Roman Orator',
+        tier: 'Confident Tone, Context, and Constraint Control'
+      };
+    }
+    return {
+      pct,
+      name: 'Clay Scribe',
+      tier: 'Foundations of Specificity, Audience, and Roles'
+    };
+  },
+
   async showGameComplete() {
     GameState.currentStage = 'game-complete';
     this._clearProgress();
@@ -5052,34 +5097,12 @@ const GameEngine = {
 
     const MAX_SCORE = 200;
     const totalTime = GameState.levelTimes.reduce((s, t) => s + t, 0);
-    const pct = Math.round((GameState.totalScore / MAX_SCORE) * 100);
-
-    // Rank matrix
-    let rankName, rankTier;
-    if (pct >= 100) {
-      rankName = 'Civilization Synchronizer';
-      rankTier = '✦ Perfect Synchronization — Unified Prompt Mastery ✦';
-    } else if (pct >= 90) {
-      rankName = 'Star Archon';
-      rankTier = 'Cosmic Command of Chaining and Meta-Prompting';
-    } else if (pct >= 80) {
-      rankName = 'Cyberpunk Hacker';
-      rankTier = 'Elite Output Control and Format Engineering';
-    } else if (pct >= 60) {
-      rankName = 'Victorian Engineer';
-      rankTier = 'Strong System Prompting and Role Precision';
-    } else if (pct >= 40) {
-      rankName = 'Roman Orator';
-      rankTier = 'Confident Tone, Context, and Constraint Control';
-    } else {
-      rankName = 'Clay Scribe';
-      rankTier = 'Foundations of Specificity, Audience, and Roles';
-    }
+    const achievementRank = this._getAchievementRank(GameState.totalScore, MAX_SCORE);
 
     // Stat cards
-    document.getElementById('gc-rank-name').textContent = rankName;
-    document.getElementById('gc-rank-tier').textContent = rankTier;
-    document.getElementById('gc-accuracy-rate').textContent = `Accuracy: ${pct}% of ${MAX_SCORE} pts`;
+    document.getElementById('gc-rank-name').textContent = achievementRank.name;
+    document.getElementById('gc-rank-tier').textContent = achievementRank.tier;
+    document.getElementById('gc-accuracy-rate').textContent = `Accuracy: ${achievementRank.pct}% of ${MAX_SCORE} pts`;
     document.getElementById('gc-time-display').textContent = Timer.format(totalTime);
     const mins = totalTime / 60000;
     const ppm = mins > 0 ? (GameState.totalScore / mins).toFixed(1) : '—';
@@ -5190,20 +5213,22 @@ const GameEngine = {
       const entries = await Scoreboard.getOverall();
       const MEDALS = ['🥇', '🥈', '🥉'];
       if (!entries || entries.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="lb-loading">No scores yet — be the first!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="lb-loading">No scores yet — be the first!</td></tr>';
         return;
       }
       tbody.innerHTML = entries.slice(0, 5).map((e, i) => {
         const rank = MEDALS[i] || `${i + 1}`;
+        const achievementRank = this._getAchievementRank(e.totalScore);
         return `<tr>
           <td class="rank">${rank}</td>
           <td class="player-name">${escHtml(e.name)}</td>
+          <td class="rank-achieved">${escHtml(achievementRank.name)}</td>
           <td class="score-val">${e.totalScore} pts</td>
           <td class="time-val">${Timer.format(e.totalTimeMs)}</td>
         </tr>`;
       }).join('');
     } catch {
-      tbody.innerHTML = '<tr><td colspan="4" class="lb-loading">Could not load scores.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="lb-loading">Could not load scores.</td></tr>';
     }
   },
 
@@ -5219,9 +5244,13 @@ const GameEngine = {
       const rank = MEDALS[i] || `${i + 1}`;
       const isCurrent = e.name === currentPlayer;
       const rowClass = isCurrent ? 'current-player new-entry' : '';
+      const rankCell = isOverall
+        ? `<td class="rank-achieved">${escHtml(this._getAchievementRank(e[scoreKey]).name)}</td>`
+        : '';
       return `<tr class="${rowClass}">
         <td class="rank">${rank}</td>
         <td class="player-name">${escHtml(e.name)}</td>
+        ${rankCell}
         <td class="score-val">${e[scoreKey]} pts</td>
         <td class="time-val">${Timer.format(e[timeKey])}</td>
       </tr>`;
