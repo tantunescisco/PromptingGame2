@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.06.03.10";
+const APP_VERSION = "2026.06.03.11";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -2128,6 +2128,7 @@ const AdminMode = {
     [0, 1, 2, 3, 4].forEach(i => {
       const el = document.getElementById('lp-btn-' + i);
       if (!el) return;
+      if (el.classList.contains('admin-clickable')) return;
       el.classList.add('admin-clickable');
       el.title = 'Admin: click to jump to this level';
       el.addEventListener('click', () => AdminMode.jumpToLevel(i));
@@ -2200,12 +2201,13 @@ const AdminMode = {
 
   async previewLevelComplete(levelIndex) {
     this.closePanel();
+    const level = GAME_DATA.levels[levelIndex];
     GameState.playerName = GameState.playerName || 'Admin';
     GameState.currentLevel = levelIndex;
-    GameState.score = Math.min((levelIndex + 1) * 34, 200);
+    GameState.score = Scoreboard._maxLevelScore(level.id);
     GameState.totalScore = GameState.score;
     GameState.answers = { 0: true, 1: true, 2: true, 3: true };
-    GameState.levelExercises = GAME_DATA.levels[levelIndex].exercises.slice(0, 4);
+    GameState.levelExercises = level.exercises.slice(0, 4);
     GameState.levelTimes = Array.from({ length: levelIndex + 1 }, (_, idx) => 42000 + idx * 6000);
     GameState.badges = GAME_DATA.levels
       .slice(0, levelIndex)
@@ -4857,7 +4859,7 @@ const GameEngine = {
   async showLevelCompletePreview(levelIndex) {
     const level = GAME_DATA.levels[levelIndex];
     const timeMs = 42000 + levelIndex * 6000;
-    const score = Math.min((levelIndex + 1) * 34, 200);
+    const score = Scoreboard._maxLevelScore(level.id);
     const rows = await Scoreboard.getLevel(level.id);
     const online = await Scoreboard._isOnline();
 
@@ -5187,12 +5189,7 @@ const GameEngine = {
   },
 
   copyCompletionSummary() {
-    const pct = Math.round((GameState.totalScore / 200) * 100);
-    let rank;
-    if (pct >= 100)      rank = 'Omniscient System Archon';
-    else if (pct >= 80)  rank = 'Quantum Logic Engineer';
-    else if (pct >= 60)  rank = 'Industrial Automator';
-    else                 rank = 'Apprentice Clay Scribe';
+    const rank = this._getAchievementRank(GameState.totalScore, 200).name;
 
     const text = `I just evolved human civilization from Clay to Stars by mastering Prompt Engineering! 🌌 Score: ${GameState.totalScore}/200 | Rank: ${rank}. Can you beat me? 🚀 Play at https://tantunescisco.github.io/PromptingGame2/`;
 
