@@ -183,6 +183,16 @@ const Scoreboard = {
     return this._lsOverall();
   },
 
+  async resetLeaderboard() {
+    const service = await this._firebaseService();
+    if (service) return service.resetLeaderboard();
+    if (this._fbEnabled || await this._isApiOnline()) {
+      throw new Error('The shared leaderboard is unavailable. Please try again.');
+    }
+    try { localStorage.removeItem(this._lsKey); } catch {}
+    return true;
+  },
+
   // ── localStorage fallback ─────────────────────────────────
   _lsLoad() {
     try { return JSON.parse(localStorage.getItem(this._lsKey)) || {}; }

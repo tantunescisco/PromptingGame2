@@ -4,6 +4,7 @@ window.PromptQuestScoreService = {
   configured: false,
   ready: Promise.resolve(false),
   saveScore: async () => false,
+  resetLeaderboard: async () => { throw new Error('Shared scoreboard is unavailable.'); },
   signInAdmin: async () => false,
   signOutAdmin: async () => {},
   isAdmin: async () => false
@@ -36,6 +37,19 @@ if (firebaseConfig?.apiKey && firebaseConfig?.projectId) {
           (entry.score === current.score && entry.timeMs < current.timeMs)) {
         await databaseModule.set(scoreRef, { ...entry, date: Date.now() });
       }
+      return true;
+    };
+    service.resetLeaderboard = async () => {
+      if (!await service.isAdmin()) throw new Error('Administrator access is required.');
+      const scoresRef = databaseModule.ref(database, 'scores');
+      const scores = (await databaseModule.get(scoresRef)).val();
+      const removals = [];
+      Object.entries(scores || {}).forEach(([levelId, entries]) => {
+        Object.keys(entries || {}).forEach(uid => {
+          removals.push(databaseModule.remove(databaseModule.ref(database, `scores/${levelId}/${uid}`)));
+        });
+      });
+      await Promise.all(removals);
       return true;
     };
     service.isAdmin = async () => (await databaseModule.get(adminRef())).val() === true;

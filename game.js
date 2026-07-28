@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.07.28.17";
+const APP_VERSION = "2026.07.28.19";
 
 // GAME DATA is loaded from game-data.js before this runtime.
 
@@ -159,6 +159,42 @@ const AdminMode = {
     const previewArea = document.getElementById('admin-preview-area');
     if (previewArea) previewArea.classList.add('hidden');
     Scoreboard._firebaseService().then(service => service?.signOutAdmin());
+  },
+
+  showResetLeaderboardConfirmation() {
+    const modal = document.getElementById('admin-reset-modal');
+    if (!modal) return;
+    document.getElementById('admin-reset-error')?.classList.add('hidden');
+    modal.classList.remove('hidden');
+  },
+
+  closeResetLeaderboardConfirmation() {
+    document.getElementById('admin-reset-modal')?.classList.add('hidden');
+  },
+
+  async resetLeaderboard() {
+    const confirmButton = document.getElementById('admin-reset-confirm-btn');
+    const error = document.getElementById('admin-reset-error');
+    if (confirmButton) {
+      confirmButton.disabled = true;
+      confirmButton.textContent = 'Deleting...';
+    }
+    error?.classList.add('hidden');
+    try {
+      await Scoreboard.resetLeaderboard();
+      this.closeResetLeaderboardConfirmation();
+      await GameEngine._renderWelcomeLeaderboard();
+    } catch (resetError) {
+      if (error) {
+        error.textContent = resetError?.message || 'Unable to reset the leaderboard.';
+        error.classList.remove('hidden');
+      }
+    } finally {
+      if (confirmButton) {
+        confirmButton.disabled = false;
+        confirmButton.textContent = 'Delete Scores';
+      }
+    }
   },
 
   jumpToLevel(levelIndex) {

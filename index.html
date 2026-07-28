@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Quest 2 - The Evolution of Civilization</title>
-  <link rel="stylesheet" href="style.css?v=2026072817" />
+  <link rel="stylesheet" href="style.css?v=2026072819" />
 </head>
 <body>
   <!-- AUDIO CONTROLS (always visible) -->
@@ -53,6 +53,7 @@
       <div id="admin-preview-area" class="admin-preview-area hidden">
         <div class="admin-action-row">
           <button class="btn-admin-preview" onclick="AdminMode.previewVictory()">🎦 Preview Completion</button>
+          <button class="btn-admin-danger" onclick="AdminMode.showResetLeaderboardConfirmation()">Reset Leaderboard</button>
         </div>
         <div class="admin-action-row admin-level-end-row" aria-label="Admin level completion previews">
           <button class="btn-admin-level-end" onclick="AdminMode.previewLevelComplete(0)">L1End</button>
@@ -302,6 +303,18 @@
     </div>
   </div>
 
+  <div id="admin-reset-modal" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="admin-reset-title">
+    <div class="admin-modal-box">
+      <h2 class="admin-modal-title" id="admin-reset-title">Reset Leaderboard?</h2>
+      <p class="admin-modal-desc">This permanently deletes every shared score. This action cannot be undone.</p>
+      <div id="admin-reset-error" class="admin-error hidden"></div>
+      <div class="admin-modal-actions">
+        <button class="btn-admin-cancel" onclick="AdminMode.closeResetLeaderboardConfirmation()">Cancel</button>
+        <button id="admin-reset-confirm-btn" class="btn-admin-danger" onclick="AdminMode.resetLeaderboard()">Delete Scores</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ABOUT MODAL -->
   <div id="about-modal" class="admin-overlay about-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
     <div class="admin-modal-box about-modal-box">
@@ -329,9 +342,9 @@
   </div>
 
   <script src="firebase-config.js?v=20260728"></script>
-  <script src="firebase-client.js?v=20260728"></script>
+  <script src="firebase-client.js?v=2026072818"></script>
   <script src="game-data.js?v=2026072805"></script>
-  <script src="scoreboard.js?v=2026072805"></script>
-  <script src="game.js?v=2026072817"></script>
+  <script src="scoreboard.js?v=2026072818"></script>
+  <script src="game.js?v=2026072819"></script>
 </body>
 </html>
