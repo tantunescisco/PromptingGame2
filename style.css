@@ -2247,6 +2247,31 @@ body.level-5 #screen-level-intro .btn-primary {
   overflow: visible;
   line-height: 1.45;
 }
+.feedback-coaching {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: rgba(255,255,255,0.08);
+}
+.feedback-ingredient-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+}
+.feedback-ingredient-list span {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+.feedback-ingredient-list.is-included { color: #278247; }
+.feedback-ingredient-list.is-missing { color: var(--primary); }
+body.level-3 .feedback-ingredient-list.is-included { color: #d9f2b4; }
+body.level-5 .feedback-ingredient-list.is-included { color: #72f0ac; }
 .feedback-panel .feedback-tip {
   background: rgba(255,255,255,0.04);
   font-size: 0.88rem;

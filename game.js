@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.07.28.02";
+const APP_VERSION = "2026.07.28.03";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -3592,20 +3592,29 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+function analyzeFreeText(answer, exercise) {
+  const trimmed = String(answer || '').trim();
+  const lower = trimmed.toLowerCase();
+  const minLength = exercise.minLength || 30;
+  const matched = (exercise.keywords || []).filter(keyword => lower.includes(keyword.toLowerCase()));
+  const missing = (exercise.keywords || []).filter(keyword => !matched.includes(keyword));
+  const keywordHits = matched.length;
+  const fullThreshold = exercise.keywordsForFull || 4;
+  const halfThreshold = exercise.keywordsForHalf || 2;
+  const minMet = trimmed.length >= minLength;
+  const grade = !minMet ? 'none'
+    : keywordHits >= fullThreshold ? 'full'
+    : keywordHits >= halfThreshold ? 'partial'
+    : 'none';
+  return { grade, matched, missing, keywordHits, fullThreshold, minLength, minMet, length: trimmed.length };
+}
+
 // Freetext scoring — returns 'full', 'partial', or 'none'
 // full:    minLength met + keywordHits >= exercise.keywordsForFull  (default 4)
 // partial: minLength met + keywordHits >= exercise.keywordsForHalf  (default 2)
 // none:    below partial thresholds
 function checkFreeText(answer, exercise) {
-  const lower = answer.toLowerCase();
-  const minMet = answer.length >= (exercise.minLength || 30);
-  if (!minMet) return 'none';
-  const keywordHits = (exercise.keywords || []).filter(k => lower.includes(k.toLowerCase())).length;
-  const fullThreshold = exercise.keywordsForFull || 4;
-  const halfThreshold = exercise.keywordsForHalf || 2;
-  if (keywordHits >= fullThreshold) return 'full';
-  if (keywordHits >= halfThreshold) return 'partial';
-  return 'none';
+  return analyzeFreeText(answer, exercise).grade;
 }
 
 // ============================================================
@@ -4573,6 +4582,7 @@ const GameEngine = {
     const exercise = GameState.levelExercises[GameState.currentExercise];
     let isCorrect = false;
     let freetextGrade = null;  // 'full', 'partial', or 'none' for freetext
+    let freeTextAnalysis = null;
     let userAnswer = '';
 
     if (exercise.inputType === 'choice') {
@@ -4590,7 +4600,8 @@ const GameEngine = {
         CharacterEngine.prompt(GameState.currentLevel, 'freetext');
         return;
       }
-      const grade = checkFreeText(userAnswer, exercise);
+      freeTextAnalysis = analyzeFreeText(userAnswer, exercise);
+      const grade = freeTextAnalysis.grade;
       if (grade === 'full') { isCorrect = true; freetextGrade = 'full'; }
       else if (grade === 'partial') { isCorrect = true; freetextGrade = 'partial'; }
       else { isCorrect = false; freetextGrade = 'none'; }
@@ -4653,11 +4664,11 @@ const GameEngine = {
       else                                           SoundEngine.playWrong(GameState.currentLevel);
 
       if (submitBtn) submitBtn.disabled = false;
-      this.showFeedback(isCorrect, exercise, points, freetextGrade);
+      this.showFeedback(isCorrect, exercise, points, freetextGrade, freeTextAnalysis);
     }, 1000);
   },
 
-  showFeedback(isCorrect, exercise, points, freetextGrade) {
+  showFeedback(isCorrect, exercise, points, freetextGrade, freeTextAnalysis = null) {
     const isPartial = freetextGrade === 'partial';
     const isFull    = isCorrect && !isPartial;
 
@@ -4680,8 +4691,9 @@ const GameEngine = {
       ? `Partial credit: ${points} points! Your answer covered some key aspects but missed a few important details. See the explanation below.`
       : "Don't worry — the explanation below will help you master this concept.";
 
+    const coachingHtml = freeTextAnalysis ? this._renderFreeTextCoaching(freeTextAnalysis) : '';
     const expEl = document.getElementById('feedback-explanation');
-    expEl.innerHTML = `<strong>📖 Explanation:</strong><br>${exercise.explanation}`;
+    expEl.innerHTML = `${coachingHtml}<strong>📖 Explanation:</strong><br>${exercise.explanation}`;
     expEl.classList.remove('hidden');
 
     document.getElementById('feedback-tip').textContent = exercise.tip || '';
@@ -4691,6 +4703,20 @@ const GameEngine = {
     document.querySelector('.ex-left')?.classList.add('feedback-open');
     document.querySelector('.exercise-card')?.classList.remove('is-submitting');
     panel.classList.add('show');
+  },
+
+  _renderFreeTextCoaching(analysis) {
+    const formatItems = items => items.map(item => `<span>${escHtml(item)}</span>`).join('');
+    const included = analysis.matched.length
+      ? `<div><strong>Included:</strong><div class="feedback-ingredient-list is-included">${formatItems(analysis.matched.slice(0, 5))}</div></div>`
+      : '<div><strong>Included:</strong> No target prompt ingredients detected yet.</div>';
+    const missing = analysis.grade === 'full' || !analysis.missing.length
+      ? ''
+      : `<div><strong>Add next:</strong><div class="feedback-ingredient-list is-missing">${formatItems(analysis.missing.slice(0, 3))}</div></div>`;
+    const lengthNote = analysis.minMet
+      ? ''
+      : `<div><strong>Length:</strong> Add at least ${analysis.minLength - analysis.length} more characters to develop the prompt.</div>`;
+    return `<div class="feedback-coaching"><strong>Prompt check</strong>${included}${missing}${lengthNote}</div>`;
   },
 
   hideFeedback() {
