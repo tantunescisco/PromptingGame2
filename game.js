@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.07.28.12";
+const APP_VERSION = "2026.07.28.16";
 
 // GAME DATA is loaded from game-data.js before this runtime.
 
@@ -196,6 +196,7 @@ const AdminMode = {
       .slice(0, levelIndex)
       .map(level => level.completeBadge);
     setTheme(`level-${levelIndex + 1}`);
+    MusicEngine.playLevelComplete(levelIndex);
     await GameEngine.showLevelCompletePreview(levelIndex);
   }
 };
@@ -3091,6 +3092,33 @@ const GameEngine = {
       : '';
   },
 
+  _preloadEvolutionImage(imagePath) {
+    if (!imagePath) return Promise.resolve();
+    return new Promise(resolve => {
+      const image = new Image();
+      image.onload = () => {
+        const decoded = typeof image.decode === 'function' ? image.decode() : Promise.resolve();
+        decoded.catch(() => {}).finally(resolve);
+      };
+      image.onerror = resolve;
+      image.src = imagePath;
+    });
+  },
+
+  _preloadLevelEvolutionAssets(levelIndex) {
+    const hasNextLevel = levelIndex < GAME_DATA.levels.length - 1;
+    const nextIndex = hasNextLevel ? levelIndex + 1 : FINAL_SYNCHRONIZER_INDEX;
+    const nextBackground = hasNextLevel
+      ? LEVEL_BACKGROUND_IMAGES[nextIndex]
+      : FINAL_SYNCHRONIZER_BG;
+    return Promise.all([
+      LEVEL_BACKGROUND_IMAGES[levelIndex],
+      nextBackground,
+      CharacterEngine._humanImages[levelIndex],
+      CharacterEngine._humanImages[nextIndex]
+    ].map(imagePath => this._preloadEvolutionImage(imagePath)));
+  },
+
   _setLevelCompleteEvolution(levelIndex) {
     const screen = document.getElementById('screen-level-evolution');
     const currentCharEl = document.getElementById('evolution-character-current');
@@ -3176,8 +3204,10 @@ const GameEngine = {
     this._stopPolling();
     this._populateLevelCompleteContent(levelIndex, 4, timeMs, score, rows, online);
     this._setLevelCompleteBackground(levelIndex);
+    this._preloadLevelEvolutionAssets(levelIndex);
 
     GameState.currentStage = 'level-complete';
+    MusicEngine.playLevelComplete(levelIndex);
     showScreen('screen-level-complete');
   },
 
@@ -3208,6 +3238,7 @@ const GameEngine = {
       online
     );
     this._setLevelCompleteBackground(GameState.currentLevel);
+    this._preloadLevelEvolutionAssets(GameState.currentLevel);
 
     GameState.currentStage = 'level-complete';
     showScreen('screen-level-complete');
@@ -3344,7 +3375,7 @@ const GameEngine = {
     setTimeout(() => container.remove(), duration * 1000 + 100);
   },
 
-  nextLevel() {
+  async nextLevel() {
     if (GameState.replayMode) {
       this._leaveReplay();
       return;
@@ -3352,6 +3383,7 @@ const GameEngine = {
     this._stopPolling();
     this._clearLevelEvolutionTimer();
     GameState.currentStage = 'level-evolution';
+    await this._preloadLevelEvolutionAssets(GameState.currentLevel);
     showScreen('screen-level-evolution');
     this._setLevelCompleteEvolution(GameState.currentLevel);
     this._levelEvolutionTimer = setTimeout(() => {
