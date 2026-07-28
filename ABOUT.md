@@ -60,6 +60,7 @@ Each era focuses on a different prompt skill:
 - Maximum per level: 40 points
 - Maximum full-run score: 200 points
 - Faster completion times help break leaderboard ties
+- Leaderboard scores come from players' browsers and are not independently verified.
 
 If you stop before finishing, the game can resume on the same browser and device when you enter the same name again.
 
