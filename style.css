@@ -882,6 +882,15 @@ body.welcome .lp.resume-clickable:hover {
   box-shadow: 0 0 0 2px rgba(255,255,255,0.32), 0 10px 20px rgba(0,0,0,0.16);
   transform: translateY(-2px);
 }
+body.welcome .lp.replay-clickable {
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(66,214,199,0.52), 0 8px 18px rgba(24,147,138,0.18);
+  transform: translateY(-1px);
+}
+body.welcome .lp.replay-clickable:hover {
+  box-shadow: 0 0 0 2px rgba(232,255,252,0.86), 0 10px 20px rgba(24,147,138,0.26);
+  transform: translateY(-2px);
+}
 body.welcome .scoreboard-container {
   background: rgba(227, 242, 253, 0.26);
   border: 1.5px solid rgba(25,118,210,0.68);
@@ -1063,7 +1072,7 @@ body.welcome .name-error {
   transition: background 0.15s;
 }
 .btn-exit-admin:hover { background: rgba(255,255,255,0.35); }
-.admin-reset-area {
+.admin-preview-area {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -1071,7 +1080,7 @@ body.welcome .name-error {
   gap: 10px;
   margin: 14px 0 2px;
 }
-.admin-reset-area.hidden { display: none; }
+.admin-preview-area.hidden { display: none; }
 .admin-action-row {
   width: 100%;
   display: flex;
@@ -1079,18 +1088,6 @@ body.welcome .name-error {
   gap: 10px;
   flex-wrap: wrap;
 }
-.btn-admin-reset {
-  background: #b71c1c;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 24px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.btn-admin-reset:hover { background: #d32f2f; }
 .btn-admin-preview {
   background: #1565c0;
   color: #fff;
@@ -3105,8 +3102,38 @@ body.level-5 #screen-level-intro .concept-box h4 {
 }
 .gc-stat-sub { font-size: 0.7rem; color: #d1dbf8; opacity: 0.94; }
 
+.gc-mastery-recap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  margin: 16px 0 22px;
+}
+.gc-mastery-item {
+  border-left: 3px solid #42d6c7;
+  padding: 8px 12px;
+  background: rgba(6, 19, 51, 0.58);
+  text-align: left;
+}
+.gc-mastery-label {
+  display: block;
+  color: #8fb6ea;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.gc-mastery-item strong {
+  display: block;
+  margin-top: 4px;
+  color: #f5fbff;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
 @media (max-width: 640px) {
   .gc-stats { grid-template-columns: 1fr; }
+  .gc-mastery-recap { grid-template-columns: 1fr; }
   .gc-timeline {
     overflow-y: visible;
     overflow-x: auto;
@@ -3716,6 +3743,14 @@ body.level-5 .scoreboard-title {
   font-size: 0.9rem;
 }
 .scoreboard-table th {
+
+.scoreboard-trust-note {
+  margin: -3px 0 10px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.73rem;
+  line-height: 1.35;
+  text-align: center;
+}
   padding: 7px 10px;
   font-size: 0.78rem;
   text-transform: uppercase;

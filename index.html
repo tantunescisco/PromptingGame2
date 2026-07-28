@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Quest 2 - The Evolution of Civilization</title>
-  <link rel="stylesheet" href="style.css?v=2026072804" />
+  <link rel="stylesheet" href="style.css?v=2026072808" />
 </head>
 <body>
   <!-- AUDIO CONTROLS (always visible) -->
@@ -49,10 +49,9 @@
         <div class="lp lp5" id="lp-btn-4">🌌 Level 5</div>
       </div>
 
-      <!-- ADMIN RESET AREA (visible in admin mode only) -->
-      <div id="admin-reset-area" class="admin-reset-area hidden">
+      <!-- ADMIN PREVIEW AREA (visible in admin mode only) -->
+      <div id="admin-preview-area" class="admin-preview-area hidden">
         <div class="admin-action-row">
-          <button class="btn-admin-reset" onclick="AdminMode.confirmReset()">🗑️ Reset Leaderboard</button>
           <button class="btn-admin-preview" onclick="AdminMode.previewVictory()">🎦 Preview Completion</button>
         </div>
         <div class="admin-action-row admin-level-end-row" aria-label="Admin level completion previews">
@@ -67,6 +66,7 @@
       <!-- WELCOME LEADERBOARD -->
       <div class="scoreboard-container">
         <h3 class="scoreboard-title">🏆 This Week's Top 5</h3>
+        <p class="scoreboard-trust-note">Friendly competition: scores come from players' browsers and are not independently verified.</p>
         <table class="scoreboard-table" id="welcome-lb-table">
           <thead>
             <tr><th class="rank">#</th><th class="player-name">Player</th><th class="rank-achieved">Rank Achieved</th><th class="score-val">Score</th><th class="time-val">Time</th></tr>
@@ -161,6 +161,7 @@
       <!-- LEVEL SCOREBOARD -->
       <div class="scoreboard-container">
         <h3 class="scoreboard-title" id="sb-level-title">🏆 Level Scoreboard</h3>
+        <p class="scoreboard-trust-note">Friendly competition: scores come from players' browsers and are not independently verified.</p>
         <table class="scoreboard-table" id="level-scoreboard-table">
           <thead>
             <tr>
@@ -174,7 +175,7 @@
         </table>
       </div>
 
-      <button class="btn-primary" onclick="GameEngine.nextLevel()">Next Level →</button>
+      <button id="level-complete-next-btn" class="btn-primary" onclick="GameEngine.nextLevel()">Next Level →</button>
     </div>
   </div>
 
@@ -227,7 +228,7 @@
         <div class="gc-stat-card">
           <div class="gc-stat-icon">🎯</div>
           <div class="gc-stat-label">Score / Accuracy</div>
-          <div class="gc-stat-value"><span id="gc-score-counter">0</span> / 200</div>
+          <div class="gc-stat-value"><span id="gc-score-counter">0</span> / <span id="gc-score-max">225</span></div>
           <div class="gc-stat-sub" id="gc-accuracy-rate">—</div>
         </div>
         <div class="gc-stat-card gc-stat-card--rank">
@@ -244,6 +245,17 @@
         </div>
       </div>
 
+      <div class="gc-mastery-recap" aria-live="polite">
+        <div class="gc-mastery-item">
+          <span class="gc-mastery-label">Strongest Skill</span>
+          <strong id="gc-strongest-skill">—</strong>
+        </div>
+        <div class="gc-mastery-item">
+          <span class="gc-mastery-label">Practice Next</span>
+          <strong id="gc-practice-next">—</strong>
+        </div>
+      </div>
+
       <!-- Action Buttons -->
       <div class="gc-actions">
         <button class="gc-btn-primary" onclick="GameEngine.copyCompletionSummary()">📋 Copy Summary to Clipboard</button>
@@ -253,6 +265,7 @@
       <!-- Leaderboard -->
       <div class="scoreboard-container scoreboard-final gc-leaderboard">
         <h3 class="scoreboard-title" id="overall-sb-title">🌍 Overall Leaderboard</h3>
+        <p class="scoreboard-trust-note">Friendly competition: scores come from players' browsers and are not independently verified.</p>
         <table class="scoreboard-table" id="overall-scoreboard-table">
           <thead>
             <tr>
@@ -317,6 +330,8 @@
 
   <script src="firebase-config.js?v=20260728"></script>
   <script src="firebase-client.js?v=20260728"></script>
-  <script src="game.js?v=2026072804"></script>
+  <script src="game-data.js?v=2026072805"></script>
+  <script src="scoreboard.js?v=2026072805"></script>
+  <script src="game.js?v=2026072808"></script>
 </body>
 </html>

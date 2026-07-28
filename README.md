@@ -29,7 +29,7 @@ Live demo: [https://tantunescisco.github.io/PromptingGame2/](https://tantunescis
 
 - Single-page browser game with welcome, level intro, exercise, level-complete, and final completion screens
 - 4 exercise types: multiple choice, free-text, ordering, and matching
-- 4 randomly selected exercises per level from a 20-question pool
+- 4 randomly selected exercises per level from each era's question pool
 - Per-question hints with reduced scoring when used
 - Immediate feedback after each answer with explanation and prompt-engineering tip
 - Level timer shown during play and used for leaderboard tie-breaking
@@ -43,12 +43,21 @@ Live demo: [https://tantunescisco.github.io/PromptingGame2/](https://tantunescis
 | Correct answer after using a hint | 5 |
 | Partial free-text answer | 5 |
 | Wrong answer | 0 |
+| Third clean answer in a level | +2 streak bonus |
+| Fourth clean answer in a level | +3 streak bonus |
 
-- Maximum score per level: 40 points
-- Maximum score per full run: 200 points
+- Maximum score per level: 45 points
+- Maximum score per full run: 225 points
 - Community leaderboards rank by score descending, then time ascending
 - Scores are submitted from the browser and are for friendly, honor-system competition; they are not authoritative or tamper-proof
 - Free-text scoring uses keyword coverage thresholds for full or partial credit
+- Completion recaps identify the strongest completed era and the era to practice next
+
+### Prompt-injection safety
+
+- Level 5 distinguishes untrusted content from trusted system instructions and tool permissions
+- The game teaches defense in depth: code-enforced authorization, least-privilege tools, separated data/instructions, structured-output validation, and suspicious-request logging
+- Prompts can shape model behavior but must never be the only control protecting secrets or authorizing data access
 
 ### Scoreboards and persistence
 
@@ -66,13 +75,14 @@ Live demo: [https://tantunescisco.github.io/PromptingGame2/](https://tantunescis
 - If the player reloads or closes the browser, entering the same name prompts them to resume the previous run
 - Mid-level progress can resume from the saved exercise state, including score, timer, answers, and the selected exercise set
 - Finished runs clear saved resume progress automatically
+- Previously completed level chips become available as practice replays for the same player name. Replays preserve active quest progress and do not submit a new shared leaderboard score.
 
 ### Welcome screen and admin tools
 
 - Responsive welcome panorama with multiple artwork variants for different viewport shapes
 - Hidden admin login trigger by `Ctrl+Shift+A`
 - Hidden alternate admin trigger by clicking the welcome leaderboard title 5 times within 3 seconds
-- Firebase-authenticated admin mode allows jumping directly to any level, previewing completion screens, and resetting the leaderboard
+- Firebase-authenticated admin mode allows jumping directly to any level and previewing completion screens
 - Welcome screen visually highlights resumable level chips when a matching saved run exists
 - About button in the top-right control cluster opens the current game version and a learner guide in the active theme
 
@@ -147,7 +157,7 @@ Firebase web configuration is public by design; do not put a service-account cre
 
 ### Firebase rules
 
-Deploy `database.rules.json`, or paste these Realtime Database rules into the Firebase console. They allow public leaderboard reads, let authenticated players write only their own UID row, and let a UID marked under `admins` reset the leaderboard:
+Deploy `database.rules.json`, or paste these Realtime Database rules into the Firebase console. They allow public leaderboard reads, let authenticated players write only their own UID row, and let a UID marked under `admins` manage scores from trusted administrative tooling:
 
 ```json
 {
@@ -173,7 +183,7 @@ Deploy `database.rules.json`, or paste these Realtime Database rules into the Fi
 }
 ```
 
-This prevents unauthenticated writes and protects the admin reset action. It does not make player scores tamper-proof: a signed-in player can alter their own row through browser tools. That limitation is the tradeoff for avoiding a server-side paid backend.
+This prevents unauthenticated writes and protects administrative score management. It does not make player scores tamper-proof: a signed-in player can alter their own row through browser tools. The game labels shared scoreboards as friendly, honor-system competition, and removes the in-game reset action to avoid accidental public data loss. Clear scores only from the Firebase Realtime Database console when necessary. That limitation is the tradeoff for avoiding a server-side paid backend.
 
 ## Tech Stack
 
@@ -212,21 +222,27 @@ PromptingGame2/
 
 ## Architecture Notes
 
+### `game-data.js`
+
+Contains `GAME_DATA`: all level metadata, exercise pools, narrative content, and answer rules. It loads before the runtime so learning content can evolve independently of game behavior.
+
 ### `game.js`
 
 Primary game systems include:
 
-- `GAME_DATA`: all level metadata, exercise pools, narrative content, and answer rules
 - `GameState`: in-memory state for the active run
 - `ProgressStore`: local resume-state persistence
-- `Scoreboard`: shared and fallback leaderboard storage
 - `Timer`: elapsed-time tracking and formatting
 - `MusicEngine`: procedural per-era music
 - `SoundEngine`: procedural SFX
 - `CharacterEngine`: era character rendering and final timeline visuals
 - `GameEngine`: screen flow, exercise rendering, scoring, saving, restoring, and leaderboard rendering
-- `AdminMode`: hidden admin tools for login, level jumping, reset, and preview flows
+- `AdminMode`: Firebase-authenticated level-jump and preview tools
 - `AboutModal`: loads and renders `ABOUT.md` inside a themed modal
+
+### `scoreboard.js`
+
+Contains the Firebase-aware `Scoreboard` adapter for shared leaderboard reads, authenticated score writes, normalization, ranking, and `localStorage` fallback.
 
 ### `style.css`
 

@@ -6,8 +6,7 @@ window.PromptQuestScoreService = {
   saveScore: async () => false,
   signInAdmin: async () => false,
   signOutAdmin: async () => {},
-  isAdmin: async () => false,
-  resetScores: async () => false
+  isAdmin: async () => false
 };
 
 const firebaseConfig = window.PROMPT_QUEST_FIREBASE_CONFIG;
@@ -49,11 +48,6 @@ if (firebaseConfig?.apiKey && firebaseConfig?.projectId) {
     service.signOutAdmin = async () => {
       await authModule.signOut(auth);
       await authModule.signInAnonymously(auth);
-    };
-    service.resetScores = async () => {
-      if (!(await service.isAdmin())) return false;
-      await databaseModule.remove(databaseModule.ref(database, "scores"));
-      return true;
     };
     return true;
   }).catch(error => {
