@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.07.28.22";
+const APP_VERSION = "2026.07.28.24";
 
 // GAME DATA is loaded from game-data.js before this runtime.
 

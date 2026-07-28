@@ -8,7 +8,7 @@ Prompt Quest 2 teaches prompt engineering as a progression of increasingly power
 
 ## Version And Author
 
-- Version: 2026.06.03.14
+- Version: 2026.07.28.23
 - Author: Tiago Antunes
 - Email: tantunes@cisco.com
 - Role: Technical Consulting Engineering Technical Leader
@@ -57,8 +57,8 @@ Each era focuses on a different prompt skill:
 | Partial free-text answer | 5 |
 | Incorrect answer | 0 |
 
-- Maximum per level: 40 points
-- Maximum full-run score: 200 points
+- Maximum per level: 45 points
+- Maximum full-run score: 225 points
 - Faster completion times help break leaderboard ties
 - Leaderboard scores come from players' browsers and are not independently verified.
 

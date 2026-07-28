@@ -1544,14 +1544,14 @@ body.level-3 .timer-display {
 
 /* Mobile: stack vertically */
 @media (max-width: 640px) {
-  #screen-exercise.active { height: auto; }
+  #screen-exercise.active { height: auto; overflow-y: auto; }
   .ex-split { --char-panel-width: 100%; flex-direction: column; min-height: auto; height: auto; }
   .ex-left  { width: 100%; height: auto; padding: 16px 16px 12px; min-height: auto; }
   .ex-left-top { margin-bottom: 12px; }
   .ex-dialogue { padding: 12px 14px; margin-bottom: 6px; }
   .ex-char-zone { min-height: 124px; padding: 2px 0 88px; margin-top: 0; }
   .ex-left .level-character { width: 100px; }
-  .ex-right { height: auto; padding: 16px; gap: 12px; }
+  .ex-right { flex: none; height: auto; overflow: visible; padding: 16px; gap: 12px; }
   body.level-3 .ex-right { padding: 12px; gap: 10px; }
   body.level-3 .exercise-card { padding: 14px 14px 18px; }
   body.level-3 #exercise-question {
