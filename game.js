@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.07.28.09";
+const APP_VERSION = "2026.07.28.11";
 
 // GAME DATA is loaded from game-data.js before this runtime.
 
@@ -1829,7 +1829,7 @@ const LEVEL_BACKGROUND_IMAGES = [
 const FINAL_SYNCHRONIZER_BG = 'civil6.png';
 const COMPLETION_BG_IMAGE = `completion.png?v=${encodeURIComponent(APP_VERSION)}`;
 
-const LEVEL_EVOLUTION_MS = 7200;
+const LEVEL_EVOLUTION_MS = 5400;
 const FINAL_SYNCHRONIZER_INDEX = 5;
 
 function starRating(correct, total) {
