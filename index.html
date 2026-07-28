@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Quest 2 - The Evolution of Civilization</title>
-  <link rel="stylesheet" href="style.css?v=2026060314" />
+  <link rel="stylesheet" href="style.css?v=2026072801" />
 </head>
 <body>
   <!-- AUDIO CONTROLS (always visible) -->
@@ -274,33 +274,17 @@
   <div id="admin-login-modal" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="admin-login-title">
     <div class="admin-modal-box">
       <h2 class="admin-modal-title" id="admin-login-title">🔐 Admin Access</h2>
-      <p class="admin-modal-desc">Enter the admin password to continue.</p>
+      <p class="admin-modal-desc">Sign in with the Firebase Authentication admin account.</p>
       <div class="admin-form">
+        <label for="admin-email">Email</label>
+        <input type="email" id="admin-email" autocomplete="username" />
         <label for="admin-password">Password</label>
-        <input type="password" id="admin-password" placeholder="Enter admin password" />
-        <div id="admin-login-error" class="admin-error hidden">Invalid password. Please try again.</div>
+        <input type="password" id="admin-password" autocomplete="current-password" />
+        <div id="admin-login-error" class="admin-error hidden">This account is not authorized as an administrator.</div>
       </div>
       <div class="admin-modal-actions">
         <button class="btn-admin-cancel" onclick="AdminMode.closeLogin()">Cancel</button>
         <button class="btn-admin-submit" onclick="AdminMode.handleLogin()">Login</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADMIN PANEL MODAL -->
-  <div id="admin-panel-modal" class="admin-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="admin-panel-title">
-    <div class="admin-modal-box admin-panel-box">
-      <h2 class="admin-modal-title" id="admin-panel-title">⚙️ Admin Panel</h2>
-      <p class="admin-modal-desc">Manage the Prompt Quest leaderboard.</p>
-      <div class="admin-panel-section">
-        <div class="admin-panel-icon">🏆</div>
-        <h3>Leaderboard Management</h3>
-        <p>Permanently delete all player scores from the leaderboard. This action <strong>cannot be undone</strong>.</p>
-        <button class="btn-admin-danger" onclick="AdminMode.confirmReset()">🗑️ Reset Leaderboard</button>
-        <button class="btn-admin-preview" onclick="AdminMode.previewVictory()">🎦 Preview Completion</button>
-      </div>
-      <div class="admin-modal-actions">
-        <button class="btn-admin-cancel" onclick="AdminMode.closePanel()">Close</button>
       </div>
     </div>
   </div>
@@ -331,6 +315,8 @@
     </div>
   </div>
 
-  <script src="game.js?v=2026060314"></script>
+  <script src="firebase-config.js?v=20260728"></script>
+  <script src="firebase-client.js?v=20260728"></script>
+  <script src="game.js?v=2026072801"></script>
 </body>
 </html>

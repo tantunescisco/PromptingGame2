@@ -46,7 +46,8 @@ Live demo: [https://tantunescisco.github.io/PromptingGame2/](https://tantunescis
 
 - Maximum score per level: 40 points
 - Maximum score per full run: 200 points
-- Leaderboards rank by score descending, then time ascending
+- Community leaderboards rank by score descending, then time ascending
+- Scores are submitted from the browser and are for friendly, honor-system competition; they are not authoritative or tamper-proof
 - Free-text scoring uses keyword coverage thresholds for full or partial credit
 
 ### Scoreboards and persistence
@@ -54,10 +55,7 @@ Live demo: [https://tantunescisco.github.io/PromptingGame2/](https://tantunescis
 - Welcome screen shows the current top 5 overall leaderboard before the game starts
 - Level-complete screens show per-level leaderboards
 - Final completion screen shows the overall leaderboard
-- Shared scoreboard storage uses a 3-tier fallback model:
-  1. Firebase Realtime Database when `FIREBASE_URL` is configured
-  2. REST API endpoints via `server.py` if available
-  3. `localStorage` fallback for local-only play
+- Shared leaderboard storage uses Firebase Authentication plus Realtime Database. Players sign in anonymously and write only their own score row; Firebase email/password authentication protects admin access. If Firebase is unavailable, scores fall back to browser `localStorage`.
 - Duplicate player-name prevention checks the overall leaderboard before starting a new run
 - Player name validation requires 3 to 20 characters
 
@@ -74,8 +72,7 @@ Live demo: [https://tantunescisco.github.io/PromptingGame2/](https://tantunescis
 - Responsive welcome panorama with multiple artwork variants for different viewport shapes
 - Hidden admin login trigger by `Ctrl+Shift+A`
 - Hidden alternate admin trigger by clicking the welcome leaderboard title 5 times within 3 seconds
-- Admin mode allows jumping directly to any level from the welcome chips
-- Admin mode includes leaderboard reset and completion-screen preview actions
+- Firebase-authenticated admin mode allows jumping directly to any level, previewing completion screens, and resetting the leaderboard
 - Welcome screen visually highlights resumable level chips when a matching saved run exists
 - About button in the top-right control cluster opens the current game version and a learner guide in the active theme
 
@@ -120,32 +117,70 @@ http://127.0.0.1:4173/
 
 ## Storage Configuration
 
-The app supports three scoreboard storage modes:
+The app uses Firebase Realtime Database for shared scores and browser `localStorage` as an offline fallback.
 
-1. Firebase Realtime Database
-2. REST API backend served from the same origin
-3. Browser `localStorage`
+## Firebase Spark-Plan Setup
 
-If Firebase is configured, all players share the same live scoreboard even on GitHub Pages.
+This configuration requires no Cloud Functions and no billing account.
+
+1. In Firebase Authentication, enable the **Anonymous** provider for players and the **Email/Password** provider for the admin account.
+2. In Firebase Authentication, create an email/password user for the administrator. Select that user and copy its **User UID**.
+3. In Realtime Database, use the Data tab to add this record, replacing `ADMIN_UID` with the copied UID:
+
+```json
+{
+  "admins": {
+    "ADMIN_UID": true
+  }
+}
+```
+
+4. Deploy the rules from the repository root:
+
+```powershell
+firebase deploy --project promptinggamedb --only database
+```
+
+5. Use `Ctrl+Shift+A` in the game, then sign in with the email/password Firebase admin account.
+
+Firebase web configuration is public by design; do not put a service-account credential, private key, or other server secret in `firebase-config.js`.
 
 ### Firebase rules
 
-If you use Firebase Realtime Database for the shared scoreboard, the database must allow public read and write:
+Deploy `database.rules.json`, or paste these Realtime Database rules into the Firebase console. They allow public leaderboard reads, let authenticated players write only their own UID row, and let a UID marked under `admins` reset the leaderboard:
 
 ```json
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "scores": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$level": {
+        "$uid": {
+          ".write": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)"
+        }
+      }
+    },
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
+    },
+    ".read": false,
+    ".write": false
   }
 }
 ```
+
+This prevents unauthenticated writes and protects the admin reset action. It does not make player scores tamper-proof: a signed-in player can alter their own row through browser tools. That limitation is the tradeoff for avoiding a server-side paid backend.
 
 ## Tech Stack
 
 - Frontend: HTML5, CSS3, Vanilla JavaScript
 - Audio: Web Audio API
-- Shared scoreboard storage: Firebase Realtime Database
+- Authentication: Firebase Authentication (Anonymous and Email/Password)
+- Shared scoreboards: Firebase Realtime Database
 - Local persistence: `localStorage`
 - Deployment: GitHub Pages
 

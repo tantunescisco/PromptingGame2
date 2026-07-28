@@ -3389,6 +3389,18 @@ body.level-5 #screen-level-intro #intro-title {
 /* ============================================
    LIVE INDICATOR DOT
    ============================================ */
+.sb-honor-note {
+  display: inline-block;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--text-light);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
 .sb-live-dot {
   display: inline-block;
   font-size: 0.72rem;

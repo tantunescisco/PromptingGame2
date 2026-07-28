@@ -4,7 +4,7 @@
 
 "use strict";
 
-const APP_VERSION = "2026.06.03.14";
+const APP_VERSION = "2026.07.28.01";
 
 // ============================================================
 // GAME DATA — 5 Levels, 4 exercises each
@@ -1866,10 +1866,8 @@ const FIREBASE_URL = 'https://promptinggamedb-default-rtdb.europe-west1.firebase
 
 // ============================================================
 // SCOREBOARD STORAGE
-// — Tier 1: Firebase Realtime Database (if FIREBASE_URL is set)
-//           Works on GitHub Pages. All devices share scores.
-// — Tier 2: REST API via server.py (if running on local network)
-// — Tier 3: localStorage (per-device fallback / file:// mode)
+// — Tier 1: authenticated Firebase Realtime Database score storage
+// — Tier 2: localStorage fallback when Firebase is unavailable
 // ============================================================
 const Scoreboard = {
   _lsKey:      'pq_scores',
@@ -1946,16 +1944,6 @@ const Scoreboard = {
   },
 
   // ── Firebase helpers ─────────────────────────────────────
-  async _fbSave(levelId, name, score, timeMs) {
-    // POST appends a new entry with an auto-generated key (no race condition)
-    await fetch(`${FIREBASE_URL}/scores/${levelId}.json`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ name, score, timeMs, date: Date.now() })
-    });
-    return this._fbGet(levelId);
-  },
-
   async _fbGet(levelId) {
     const r    = await fetch(`${FIREBASE_URL}/scores/${levelId}.json`);
     const data = await r.json();
@@ -1995,27 +1983,26 @@ const Scoreboard = {
     return this._fbEnabled || (await this._isApiOnline());
   },
 
+  async _firebaseService() {
+    const service = window.PromptQuestScoreService;
+    if (!service) return null;
+    await service.ready;
+    return service.configured ? service : null;
+  },
+
   // ── Public API (3-tier, async) ────────────────────────────
   async saveLevel(levelId, name, score, timeMs) {
     const sanitized = this._sanitizeEntry(levelId, { name, score, timeMs });
     if (!sanitized) return this.getLevel(levelId);
 
-    // Tier 1 — Firebase
-    if (this._fbEnabled) {
-      try { return await this._fbSave(levelId, sanitized.name, sanitized.score, sanitized.timeMs); } catch {}
-    }
-    // Tier 2 — REST API
-    if (await this._isApiOnline()) {
+    const service = await this._firebaseService();
+    if (service) {
       try {
-        const r = await fetch(`/api/scores/${levelId}`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify(sanitized)
-        });
-        if (r.ok) return this._normalizeLevelEntries(levelId, await r.json());
+        await service.saveScore(levelId, sanitized);
+        return await this.getLevel(levelId);
       } catch {}
     }
-    // Tier 3 — localStorage
+
     return this._lsSave(levelId, sanitized.name, sanitized.score, sanitized.timeMs);
   },
 
@@ -2066,62 +2053,36 @@ const Scoreboard = {
     return this._aggregateOverall(this._lsLoad());
   },
 
-  // ── Admin: reset all scores across all tiers ──────────────
-  async resetAll() {
-    // Tier 1 — Firebase: set scores node to null (deletes all children)
-    if (this._fbEnabled) {
-      try {
-        await fetch(`${FIREBASE_URL}/scores.json`, {
-          method:  'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body:    'null'
-        });
-      } catch {}
-    }
-    // Tier 2 — REST API
-    if (await this._isApiOnline()) {
-      try { await fetch('/api/scores', { method: 'DELETE' }); } catch {}
-    }
-    // Tier 3 — localStorage
-    try { localStorage.removeItem(this._lsKey); } catch {}
-    // Reset API-online cache so next check is fresh
-    this._apiOnline = null;
-  }
 };
 
 // ============================================================
 // ADMIN MODE
 // ============================================================
 const AdminMode = {
-  _CREDS: { pass: 'Cisco!123' },
-
   showLogin() {
     const modal = document.getElementById('admin-login-modal');
     if (!modal) return;
-    document.getElementById('admin-password').value = '';
     document.getElementById('admin-login-error').classList.add('hidden');
     modal.classList.remove('hidden');
-    setTimeout(() => document.getElementById('admin-password').focus(), 60);
+    setTimeout(() => document.getElementById('admin-email').focus(), 60);
   },
 
   closeLogin() {
-    document.getElementById('admin-login-modal').classList.add('hidden');
+    document.getElementById('admin-login-modal')?.classList.add('hidden');
   },
 
-  handleLogin() {
-    const pass = document.getElementById('admin-password').value;
-    if (pass === this._CREDS.pass) {
+  async handleLogin() {
+    const email = document.getElementById('admin-email')?.value.trim();
+    const password = document.getElementById('admin-password')?.value;
+    const service = await Scoreboard._firebaseService();
+    let isAdmin = false;
+    try { isAdmin = !!service && await service.signInAdmin(email, password); } catch {}
+    if (isAdmin) {
       this._activateAdminLevelButtons();
       this.closeLogin();
     } else {
-      document.getElementById('admin-login-error').classList.remove('hidden');
-      document.getElementById('admin-password').value = '';
-      document.getElementById('admin-password').focus();
+      document.getElementById('admin-login-error')?.classList.remove('hidden');
     }
-  },
-
-  showPanel() {
-    document.getElementById('admin-panel-modal').classList.remove('hidden');
   },
 
   _activateAdminLevelButtons() {
@@ -2152,6 +2113,7 @@ const AdminMode = {
     if (banner) banner.classList.add('hidden');
     const resetArea = document.getElementById('admin-reset-area');
     if (resetArea) resetArea.classList.add('hidden');
+    Scoreboard._firebaseService().then(service => service?.signOutAdmin());
   },
 
   jumpToLevel(levelIndex) {
@@ -2164,34 +2126,23 @@ const AdminMode = {
     GameState.badges = [];
     GameState.answers = {};
     GameState.levelTimes = [];
-    this.closePanel();
     setTheme(`level-${levelIndex + 1}`);
     GameEngine.showLevelIntro();
   },
 
-  closePanel() {
-    document.getElementById('admin-panel-modal').classList.add('hidden');
-  },
-
   async confirmReset() {
-    const confirmed = confirm(
-      '⚠️ Reset the entire leaderboard?\n\n' +
-      'This will permanently delete ALL player scores and cannot be undone.\n\n' +
-      'Press OK to confirm, or Cancel to abort.'
-    );
-    if (!confirmed) return;
-
+    if (!confirm('Reset the entire leaderboard? This cannot be undone.')) return;
+    const service = await Scoreboard._firebaseService();
     try {
-      await Scoreboard.resetAll();
-      GameEngine._renderWelcomeLeaderboard();
-      alert('✅ Leaderboard has been reset successfully.');
+      if (!service || !(await service.resetScores())) throw new Error('Not authorized');
+      await GameEngine._renderWelcomeLeaderboard();
+      alert('Leaderboard reset successfully.');
     } catch {
-      alert('❌ Failed to reset the leaderboard. Please try again.');
+      alert('Unable to reset the leaderboard. Check your Firebase admin access.');
     }
   },
 
   previewVictory() {
-    this.closePanel();
     GameState.playerName = GameState.playerName || 'Admin';
     GameState.totalScore = 200;
     GameState.levelTimes = [30000, 45000, 60000, 40000, 50000];
@@ -2200,7 +2151,6 @@ const AdminMode = {
   },
 
   async previewLevelComplete(levelIndex) {
-    this.closePanel();
     const level = GAME_DATA.levels[levelIndex];
     GameState.playerName = GameState.playerName || 'Admin';
     GameState.currentLevel = levelIndex;
@@ -4424,9 +4374,9 @@ const GameEngine = {
     GameState.currentExercise = 0;
     GameState.score = 0;
     GameState.answers = {};
+    GameState.levelExercises = [];
     GameState.hintUsed = false;
 
-    // Randomly select 4 exercises from the level's pool
     const pool = [...GAME_DATA.levels[GameState.currentLevel].exercises];
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -4650,7 +4600,7 @@ const GameEngine = {
       if (!list) return;
       const order = [...list.querySelectorAll('.order-item')].map(li => li.dataset.id);
       isCorrect = JSON.stringify(order) === JSON.stringify(exercise.correctOrder);
-      userAnswer = order.join(',');
+      userAnswer = order;
 
     } else if (exercise.inputType === 'matching') {
       const ms = GameState.matchingState;
@@ -4662,6 +4612,7 @@ const GameEngine = {
         return;
       }
       isCorrect = allMatched;
+      userAnswer = { ...ms.pairs };
     }
 
     // Score — freetext uses 3-tier: full=10, partial=5, none=0
@@ -5314,15 +5265,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   GameEngine._updateWelcomeResumeCta();
 
-  // Allow Enter key to submit admin login
-  const adminPassInput = document.getElementById('admin-password');
-  if (adminPassInput) {
-    adminPassInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') AdminMode.handleLogin();
-    });
-  }
-
-  // Hidden trigger: Ctrl+Shift+A keyboard shortcut
+  // Hidden trigger: Ctrl+Shift+A keyboard shortcut opens Firebase admin login.
   document.addEventListener('keydown', e => {
     if (e.ctrlKey && e.shiftKey && e.key === 'A') {
       e.preventDefault();
@@ -5347,12 +5290,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Close admin modals on overlay click
+  const adminPassInput = document.getElementById('admin-password');
+  if (adminPassInput) {
+    adminPassInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') AdminMode.handleLogin();
+    });
+  }
+
   document.getElementById('admin-login-modal')?.addEventListener('click', e => {
     if (e.target === e.currentTarget) AdminMode.closeLogin();
-  });
-  document.getElementById('admin-panel-modal')?.addEventListener('click', e => {
-    if (e.target === e.currentTarget) AdminMode.closePanel();
   });
   document.getElementById('about-modal')?.addEventListener('click', e => {
     if (e.target === e.currentTarget) AboutModal.close();
